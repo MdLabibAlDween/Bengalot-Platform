@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { ArrowUpRight, ImageIcon, Layers, Package, Plus, Tags } from "lucide-react";
+import { ImageIcon, Layers, Package, Plus, Tags } from "lucide-react";
 import { AdminPageHeader, AdminStat } from "@/components/admin/admin-ui";
+import { ProductRowActions } from "@/components/admin/product-row-actions";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { categories, departments } from "@/lib/data";
 
@@ -14,6 +15,9 @@ export default async function AdminCataloguePage() {
         .limit(500)
     : { data: [] };
   const products = data ?? [];
+  const demoCount = products.filter(
+    (product) => (product.payload as { isDemo?: boolean } | null)?.isDemo
+  ).length;
 
   return (
     <div>
@@ -42,12 +46,14 @@ export default async function AdminCataloguePage() {
         <AdminStat label="Categories" value={categories.length} icon={Tags} tone="teal" />
       </div>
 
-      <div className="mt-4 rounded-[16px] border border-gold/30 bg-gold/[0.05] px-4 py-3 text-[0.62rem] leading-relaxed text-muted-foreground">
-        <strong className="text-foreground">Demo products</strong> stay visible on the
-        storefront with a Demo badge and a preview notice, but ordering is disabled.
-        Edit a product and uncheck <em>Demo product</em> when its real photos, price and
-        stock are ready.
-      </div>
+      {demoCount > 0 && (
+        <div className="mt-4 rounded-[16px] border border-gold/30 bg-gold/[0.05] px-4 py-3 text-[0.62rem] leading-relaxed text-muted-foreground">
+          <strong className="text-foreground">Demo products</strong> stay visible on the
+          storefront with a Demo badge and a preview notice, but ordering is disabled.
+          Edit a product and uncheck <em>Demo product</em> when its real photos, price and
+          stock are ready.
+        </div>
+      )}
 
       <div className="mt-4 overflow-hidden rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface)]">
         <div className="flex items-center justify-between gap-3 border-b border-[var(--color-border)] px-5 py-3.5">
@@ -98,10 +104,8 @@ export default async function AdminCataloguePage() {
                         {product.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right">
-                      <Link href={`/admin/catalogue/products/${product.id}`} className="inline-flex items-center gap-1 text-[0.54rem] font-bold uppercase tracking-[0.08em] text-indigo">
-                        Edit <ArrowUpRight className="h-3 w-3" />
-                      </Link>
+                    <td className="px-4 py-3">
+                      <ProductRowActions id={product.id} name={product.name} />
                     </td>
                   </tr>
                 ))}
