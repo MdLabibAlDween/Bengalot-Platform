@@ -1,0 +1,255 @@
+BENGALOT PRODUCT IMAGE PROMPTS
+===============================
+
+WHAT THIS FILE IS FOR
+---------------------
+Use these prompts in ChatGPT to turn one real product photo into a clean, colourful
+Bengalot catalogue image. Upload the product photo, paste the master prompt, then add
+the colour block for the colour you need. Generate one image per colour so the whole
+catalogue looks like one brand.
+
+The product must stay the same product. Only the fabric colour, background and light
+should change.
+
+HOW TO USE
+----------
+1. Upload the real product photo to ChatGPT.
+2. Paste the MASTER PROMPT.
+3. Add ONE colour block from COLOUR PROMPTS.
+4. Add ONE angle suffix from ANGLE SUFFIXES.
+5. Generate at 4:5. Check the neckline, sleeves, seams and print before keeping it.
+6. If the shape changed, regenerate instead of editing the result by hand.
+
+MASTER PROMPT
+-------------
+Edit the uploaded product photo into a premium Bengalot e-commerce image.
+
+Keep the exact same garment or accessory: same silhouette, cut, fit, length, neckline,
+sleeves, seams, stitching, buttons, hardware, embroidery placement, print scale,
+pattern and product proportions. Do not redesign, crop or distort the product. Do not
+add or remove details. Preserve the original logo, label, zipper and hardware exactly
+if present.
+
+Change only the main fabric colour to {{COLOUR_NAME}} ({{COLOUR_HEX}}). Keep the
+fabric weave, natural folds, texture and finish visible through the new colour. If the
+product has embroidery, a print or a border, keep every part of that design exactly as
+it is in the uploaded photo and recolour only the base fabric.
+
+Place the product on a warm ivory studio background (#F7F1E6) with one soft Bengalot
+brand accent: deep indigo (#3B2A8C), saffron (#E9A93A), magenta (#C2255C), jade
+(#175C4A) or terracotta (#D9693F). Use one accent only, subtle and out of focus, never
+overpowering the product. Soft diffused daylight from the upper left, gentle realistic
+contact shadow, clean editorial styling, luxury South Asian fashion brand,
+photo-realistic e-commerce product photography, sharp focus on the product, 4:5
+vertical composition with generous breathing room, high resolution, no text, no
+watermark, no logo overlay, no mannequin, no human, no extra props, no hangers, no
+busy background.
+
+NEGATIVE PROMPT
+---------------
+Do not change the product shape, colour-block placement, embroidery pattern, neckline,
+sleeve length, hem, buttons, stitching, fabric texture or proportions. No mannequin,
+no person, no hands, no extra clothing, no text, no watermark, no logo, no cartoon, no
+illustration, no low-resolution blur, no oversaturated colour, no plastic-looking
+fabric, no distorted seams, no extra pockets, no floating product, no harsh shadows,
+no pure white background, no cluttered props.
+
+ANGLE SUFFIXES (choose one)
+---------------------------
+- FRONT: "Front-facing flat lay, product centred, camera directly above."
+- THREE-QUARTER: "Three-quarter angle, slight perspective, product centred."
+- DETAIL: "Close-up detail of the fabric, embroidery and finish, shallow depth of field."
+- BACK: "Back-facing flat lay showing the reverse construction and finish."
+- WORN: "Styled on an invisible mannequin so the drape and fit are visible, no face, no
+  hands, clean ivory background."
+
+COLOUR PROMPTS
+--------------
+Paste the master prompt, then add the line for the colour. These hex values match the
+storefront palette in lib/data.ts and lib/theme.ts.
+
+MIDNIGHT
+{{COLOUR_NAME}} = Midnight, {{COLOUR_HEX}} = #14102B
+"Deep midnight blue-black with a soft inky depth, visible weave and natural highlights,
+not flat black. Warm ivory background, very subtle saffron accent."
+
+MIDNIGHT (SOFT BLACK VARIANT)
+{{COLOUR_NAME}} = Midnight, {{COLOUR_HEX}} = #1A1626
+"Soft blue-black with a warm undertone, visible fabric texture and gentle highlights,
+not crushed black. Warm ivory background, thin gold accent."
+
+IVORY
+{{COLOUR_NAME}} = Ivory, {{COLOUR_HEX}} = #EFE5D2
+"Warm ivory cream with a soft natural glow, visible slub texture and gentle folds, not
+yellow and not pure white. Deeper indigo accent."
+
+ROYAL INDIGO
+{{COLOUR_NAME}} = Royal Indigo, {{COLOUR_HEX}} = #3B2A8C
+"Rich royal indigo with a slightly luminous blue-violet depth, preserve the weave and
+soft fabric sheen. Warm ivory background, antique gold accent."
+
+DEEP INDIGO
+{{COLOUR_NAME}} = Deep Indigo, {{COLOUR_HEX}} = #2E2266
+"Deep saturated indigo with a calm, dark blue-violet tone, realistic fabric texture and
+soft highlights. Muted ivory backdrop, thin saffron accent."
+
+GOLD
+{{COLOUR_NAME}} = Antique Gold, {{COLOUR_HEX}} = #C89B45
+"Warm antique gold with a soft thread-like sheen, never bright yellow or cheap glitter.
+Keep matte fabric matte. Deep indigo and ivory setting."
+
+ROSEWOOD
+{{COLOUR_NAME}} = Rosewood, {{COLOUR_HEX}} = #9E2049
+"Deep rosewood red with a muted burgundy undertone, rich but natural, visible weave and
+soft folds. Warm ivory background, subtle gold accent."
+
+EMERALD
+{{COLOUR_NAME}} = Emerald, {{COLOUR_HEX}} = #175C4A
+"Deep emerald green with a jewel-like but natural depth, visible texture and soft
+highlights. Warm ivory and a touch of antique gold."
+
+EMERALD (COOL VARIANT)
+{{COLOUR_NAME}} = Peacock Emerald, {{COLOUR_HEX}} = #1F5C48
+"Deep peacock green-blue with a jewel-like depth, visible weave and soft highlights.
+Warm ivory background and a subtle gold accent."
+
+SAFFRON
+{{COLOUR_NAME}} = Saffron, {{COLOUR_HEX}} = #D89A32
+"Warm saffron gold with a sunny but sophisticated tone, natural fabric texture, no neon
+orange. Deep indigo and ivory setting."
+
+SKY
+{{COLOUR_NAME}} = Dusty Sky, {{COLOUR_HEX}} = #4E7FA8
+"Soft dusty sky blue with a calm, muted tone, visible weave and gentle folds. Warm ivory
+and a pale gold accent."
+
+ROSE
+{{COLOUR_NAME}} = Dusty Rose, {{COLOUR_HEX}} = #C25A73
+"Muted dusty rose pink with a sophisticated, slightly warm tone, natural fabric
+texture, not bubblegum pink. Ivory and a thin gold accent."
+
+ESPRESSO
+{{COLOUR_NAME}} = Espresso, {{COLOUR_HEX}} = #4A3527
+"Deep espresso brown with a warm leather-like richness, visible texture and soft natural
+highlights, not flat black. Ivory and saffron setting."
+
+ESPRESSO (DARK COCOA VARIANT)
+{{COLOUR_NAME}} = Dark Cocoa, {{COLOUR_HEX}} = #3E2C20
+"Very deep cocoa brown with a soft matte finish, visible grain and natural highlights.
+Warm ivory background, muted gold accent."
+
+ONYX
+{{COLOUR_NAME}} = Onyx, {{COLOUR_HEX}} = #1C1A1A
+"Soft onyx black with visible fabric weave and gentle highlights, not crushed or
+plastic. Warm ivory and a subtle antique gold accent."
+
+SAND
+{{COLOUR_NAME}} = Sand, {{COLOUR_HEX}} = #B7A184
+"Warm sand beige with a natural stone tone, visible weave and soft folds. Deep indigo
+and ivory setting."
+
+NATURAL JUTE
+{{COLOUR_NAME}} = Natural Jute, {{COLOUR_HEX}} = #B99458
+"Natural golden jute with visible woven texture and warm tonal variation, never plastic
+or printed. Ivory and deep indigo setting."
+
+TERRACOTTA
+{{COLOUR_NAME}} = Terracotta, {{COLOUR_HEX}} = #D9693F
+"Warm terracotta clay with a slightly earthy orange-red tone, visible fabric texture and
+natural folds. Ivory and muted teal accent."
+
+TEAL
+{{COLOUR_NAME}} = Deep Teal, {{COLOUR_HEX}} = #0E8F8A
+"Deep teal with a rich blue-green balance, visible weave and soft highlights, not neon.
+Warm ivory and antique gold accent."
+
+MAGENTA
+{{COLOUR_NAME}} = Bengal Magenta, {{COLOUR_HEX}} = #C2255C
+"Deep magenta with a jewel-toned richness, visible fabric texture and soft folds, not
+fluorescent pink. Ivory and a thin gold accent."
+
+NAVY
+{{COLOUR_NAME}} = Deep Navy, {{COLOUR_HEX}} = #1B2A4A
+"Deep classic navy with a calm, slightly dusty finish, visible weave and soft
+highlights, not bright royal blue. Warm ivory and a saffron accent."
+
+OLIVE
+{{COLOUR_NAME}} = Olive, {{COLOUR_HEX}} = #6B6B3A
+"Muted olive green with a natural earthy tone, visible fabric texture and gentle folds,
+not neon or military green. Ivory and antique gold setting."
+
+BURGUNDY
+{{COLOUR_NAME}} = Burgundy, {{COLOUR_HEX}} = #6E1F32
+"Deep wine burgundy with a rich but natural tone, visible weave and soft highlights.
+Warm ivory background, thin gold accent."
+
+CHARCOAL
+{{COLOUR_NAME}} = Charcoal, {{COLOUR_HEX}} = #3A3A3A
+"Soft charcoal grey with visible fabric texture and natural highlights, not flat black
+and not silver. Warm ivory and a muted indigo accent."
+
+CAMEL
+{{COLOUR_NAME}} = Camel, {{COLOUR_HEX}} = #B58455
+"Warm camel tan with a soft natural finish, visible grain or weave and gentle
+highlights. Ivory background and deep indigo accent."
+
+POWDER BLUE
+{{COLOUR_NAME}} = Powder Blue, {{COLOUR_HEX}} = #A8C3D9
+"Soft powder blue with a calm pastel tone, visible fabric texture and gentle folds, not
+baby blue and not shiny. Warm ivory and a pale gold accent."
+
+LAVENDER
+{{COLOUR_NAME}} = Muted Lavender, {{COLOUR_HEX}} = #8E7AA8
+"Soft muted lavender with a dusty, sophisticated tone, visible weave and natural folds,
+not neon purple. Warm ivory and a thin gold accent."
+
+IF THE COLOUR IS NOT LISTED
+---------------------------
+Use this formula:
+"Change only the main fabric colour to {{COLOUR_NAME}} ({{COLOUR_HEX}}). Keep the
+fabric weave, folds, embroidery, print, border and finish exactly as uploaded. Use a
+warm ivory studio background (#F7F1E6) and one subtle Bengalot accent colour: deep
+indigo #3B2A8C, saffron #E9A93A, magenta #C2255C, jade #175C4A or terracotta #D9693F."
+
+PRODUCT TYPE NOTES
+------------------
+- SAREE: keep the drape, pallu, border width, motif scale and blouse piece exactly as
+  uploaded. Do not invent a new pattern. Show the saree flat with a soft natural fall.
+- PANJABI / KURTA / SHIRT: keep the placket, collar, buttons, cuffs and embroidery
+  placement. Show the full length without cropping the hem.
+- SHOES / SANDALS: keep the sole, stitching, hardware and shape. Use a three-quarter
+  angle and a soft shadow. Do not add laces or buckles that are not there.
+- BAGS: keep the handles, straps, hardware and stitching. Show the front and one
+  three-quarter view if the prompt allows two images.
+- JEWELLERY: keep the metal tone, stone placement and chain length. Do not add stones.
+  Use a close-up detail prompt and a clean ivory surface.
+- KIDS: keep the same proportions and print placement. Do not shrink or stylise the
+  product into a cartoon.
+
+CONSISTENCY RULES
+-----------------
+- Same camera angle for every colour of the same product.
+- Same background tone and light direction for the whole collection.
+- Keep the product centred with equal breathing room.
+- Use one accent colour per image; never all brand colours at once.
+- Preserve the original product's character and fabric.
+- If the product has embroidery or a print, keep the pattern exactly as uploaded.
+- Generate at 4:5. Do not crop the garment.
+- Check the neckline, sleeves and hem after generation. Regenerate if they changed.
+- Do not let the model add pockets, belts, buttons, labels or embroidery that were not
+  in the original product.
+- Do not use pure white backgrounds. The Bengalot look is warm ivory.
+- Do not add text, logos, badges, price tags or watermarks.
+
+QUICK ONE-PARAGRAPH VERSION
+---------------------------
+"Edit the uploaded product photo into a premium Bengalot e-commerce image. Keep the
+exact same product, silhouette, cut, seams, embroidery, buttons, print, hardware and
+fabric texture. Change only the main fabric colour to {{COLOUR_NAME}} ({{COLOUR_HEX}}).
+Place it on a warm ivory studio background with one subtle Bengalot accent colour (deep
+indigo, saffron, magenta, jade or terracotta), soft diffused daylight, realistic contact
+shadow, clean luxury South Asian fashion editorial style, 4:5 vertical, photo-realistic,
+high resolution, no text, no watermark, no mannequin, no extra props. Do not alter the
+product design."
+
+END OF FILE
