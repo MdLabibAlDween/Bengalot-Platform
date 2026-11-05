@@ -222,13 +222,14 @@ export function ProductEditor({
   initial: ProductEditorValue;
   departments: { slug: string; name: string }[];
   categories: { slug: string; name: string; department: string }[];
-  sizeGuides: { id: string; name: string }[];
+  sizeGuides: { id: string; name: string; unit: string; note: string; columns: string[] }[];
 }) {
   const router = useRouter();
   const [value, setValue] = useState(initial);
   const [tab, setTab] = useState<Tab>("details");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const selectedGuide = sizeGuides.find((guide) => guide.id === value.sizeGuideId);
 
   const set = <K extends keyof ProductEditorValue>(
     key: K,
@@ -529,11 +530,29 @@ export function ProductEditor({
       </div>
 
       {tab === "details" && (
-        <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
+        <div className="space-y-4">
+          <div className="rounded-[18px] border border-indigo/15 bg-indigo/[0.04] p-4 text-[0.62rem] leading-relaxed text-muted-foreground">
+            <p className="font-bold uppercase tracking-[0.12em] text-indigo">
+              How to add a product
+            </p>
+            <ol className="mt-2 grid gap-1.5 sm:grid-cols-2">
+              <li><strong className="text-foreground">1. Details:</strong> name, placement, price and status.</li>
+              <li><strong className="text-foreground">2. Media:</strong> upload the front photo first.</li>
+              <li><strong className="text-foreground">3. Variants:</strong> choose the product shape, then stock.</li>
+              <li><strong className="text-foreground">4. Content:</strong> description, materials, care and size guide.</li>
+              <li><strong className="text-foreground">5. SEO:</strong> optional search title and description.</li>
+              <li><strong className="text-foreground">6. Save:</strong> keep it Draft until the photos and stock are ready.</li>
+            </ol>
+          </div>
+          <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
           <section className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
             <h2 className="font-display text-xl">Product identity</h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <FieldRow label="Product name" wide>
+              <FieldRow
+                label="Product name"
+                help="Customer-facing name. Example: Ivory Jamdani Panjabi."
+                wide
+              >
                 <Input
                   value={value.name}
                   onChange={(event) => {
@@ -564,14 +583,20 @@ export function ProductEditor({
                   }
                 />
               </FieldRow>
-              <FieldRow label="Base SKU">
+              <FieldRow
+                label="Base SKU"
+                help="Internal stock code, not shown to customers. Example: BGL-PAN-001."
+              >
                 <Input
                   value={value.sku}
                   onChange={(event) => set("sku", event.target.value.toUpperCase())}
                   placeholder="BGL-PAN-001"
                 />
               </FieldRow>
-              <FieldRow label="Audience">
+              <FieldRow
+                label="Audience"
+                help="Who the product is for. This is used for filtering, not the department menu."
+              >
                 <Select
                   value={value.audience}
                   onChange={(event) =>
@@ -584,7 +609,10 @@ export function ProductEditor({
                   <option value="unisex">Unisex</option>
                 </Select>
               </FieldRow>
-              <FieldRow label="Department">
+              <FieldRow
+                label="Department"
+                help="Where it appears in the top navigation. Example: Men."
+              >
                 <Select
                   value={value.department}
                   onChange={(event) => {
@@ -606,7 +634,10 @@ export function ProductEditor({
                   ))}
                 </Select>
               </FieldRow>
-              <FieldRow label="Category">
+              <FieldRow
+                label="Category"
+                help="The subcategory inside the department. Example: Panjabi & Fatua."
+              >
                 <Select
                   value={value.category}
                   onChange={(event) => set("category", event.target.value)}
@@ -625,14 +656,20 @@ export function ProductEditor({
             <section className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
               <h2 className="font-display text-xl">Pricing & publishing</h2>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <FieldRow label="Price (৳)">
+                <FieldRow
+                  label="Price (৳)"
+                  help="Selling price in BDT. Whole numbers only, e.g. 4850. Do not type ৳ or commas."
+                >
                   <Input
                     type="number"
                     value={value.price}
                     onChange={(event) => set("price", Number(event.target.value))}
                   />
                 </FieldRow>
-                <FieldRow label="Compare-at (৳)">
+                <FieldRow
+                  label="Compare-at (৳)"
+                  help="Original price for a strikethrough. Leave blank if not on sale. Must be higher than the selling price."
+                >
                   <Input
                     type="number"
                     value={value.compareAt ?? ""}
@@ -641,7 +678,10 @@ export function ProductEditor({
                     }
                   />
                 </FieldRow>
-                <FieldRow label="Status">
+                <FieldRow
+                  label="Status"
+                  help="Draft = hidden while you prepare it. Published = live on the storefront."
+                >
                   <Select
                     value={value.status}
                     onChange={(event) =>
@@ -653,7 +693,10 @@ export function ProductEditor({
                     <option value="scheduled">Scheduled</option>
                   </Select>
                 </FieldRow>
-                <FieldRow label="Badge">
+                <FieldRow
+                  label="Badge"
+                  help="Optional card label. Use New for new arrivals, Sale only when compare-at is filled."
+                >
                   <Select
                     value={value.badge}
                     onChange={(event) =>
@@ -688,14 +731,20 @@ export function ProductEditor({
             <section className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
               <h2 className="font-display text-xl">Merchandising</h2>
               <div className="mt-4 space-y-3">
-                <FieldRow label="Collection slug">
+                <FieldRow
+                  label="Collection slug"
+                  help="Optional. Example: new-arrivals or best-sellers. Leave blank if it is not in a collection."
+                >
                   <Input
                     value={value.collectionSlug}
                     onChange={(event) => set("collectionSlug", event.target.value)}
                     placeholder="new-arrivals"
                   />
                 </FieldRow>
-                <FieldRow label="Collection note">
+                <FieldRow
+                  label="Collection note"
+                  help="Optional short line shown with the product in that collection."
+                >
                   <Input
                     value={value.collectionNote}
                     onChange={(event) => set("collectionNote", event.target.value)}
@@ -735,6 +784,7 @@ export function ProductEditor({
               </div>
             </section>
           </div>
+        </div>
         </div>
       )}
 
@@ -876,7 +926,8 @@ export function ProductEditor({
                 <div>
                   <h2 className="font-display text-xl">Sizes</h2>
                   <p className="mt-1 text-[0.58rem] text-muted-foreground">
-                    Labels shown on the product page.
+                    Examples: S, M, L, XL. For one-size products keep only{" "}
+                    <strong className="text-foreground">One size</strong>.
                   </p>
                 </div>
                 <Button
@@ -956,7 +1007,8 @@ export function ProductEditor({
                 <div>
                   <h2 className="font-display text-xl">Colours</h2>
                   <p className="mt-1 text-[0.58rem] text-muted-foreground">
-                    Swatches and optional colour-specific images.
+                    Add the colour name and swatch. For a single-colour product keep only{" "}
+                    <strong className="text-foreground">Default</strong>; the selector is hidden.
                   </p>
                 </div>
                 <Button
@@ -1023,9 +1075,10 @@ export function ProductEditor({
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h2 className="font-display text-xl">Variant inventory</h2>
-                <p className="mt-1 text-[0.6rem] text-muted-foreground">
+                <p className="mt-1 max-w-2xl text-[0.6rem] leading-relaxed text-muted-foreground">
                   Stock and SKU are tracked per size + colour. Generate the matrix after setting
-                  your sizes and colours, then adjust the quantities.
+                  your sizes and colours, then adjust the quantities. Price and compare-at are
+                  optional — leave them blank to use the base price above.
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -1189,18 +1242,20 @@ export function ProductEditor({
           <section className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
             <h2 className="font-display text-xl">Product copy</h2>
             <div className="mt-4 space-y-3">
-              <FieldRow label="Short description" help="Shown under the product name.">
+              <FieldRow label="Short description" help="One sentence shown under the product name. Example: A hand-finished cotton panjabi for festive evenings.">
                 <Textarea
                   value={value.shortDescription}
                   onChange={(event) => set("shortDescription", event.target.value)}
                   className="min-h-20"
+                  placeholder="A hand-finished cotton panjabi for festive evenings."
                 />
               </FieldRow>
-              <FieldRow label="Full description">
+              <FieldRow label="Full description" help="2–4 short paragraphs. Describe fit, fabric and occasion.">
                 <Textarea
                   value={value.description}
                   onChange={(event) => set("description", event.target.value)}
                   className="min-h-40"
+                  placeholder="Cut from a soft cotton-silk blend, this panjabi has a relaxed drape and a narrow band collar..."
                 />
               </FieldRow>
               <FieldRow label="Highlights" help="One feature per line, e.g. Hand-finished neckline.">
@@ -1210,11 +1265,12 @@ export function ProductEditor({
                   className="min-h-24"
                 />
               </FieldRow>
-              <FieldRow label="Fit note">
+              <FieldRow label="Fit note" help="Example: Relaxed fit — model is 5ft 10in and wears size M.">
                 <Textarea
                   value={value.fitNote}
                   onChange={(event) => set("fitNote", event.target.value)}
                   className="min-h-20"
+                  placeholder="Relaxed fit — model is 5ft 10in and wears size M."
                 />
               </FieldRow>
             </div>
@@ -1223,44 +1279,71 @@ export function ProductEditor({
           <section className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
             <h2 className="font-display text-xl">Materials & care</h2>
             <div className="mt-4 space-y-3">
-              <FieldRow label="Materials summary">
+              <FieldRow label="Materials summary" help="One short sentence for the overview. Example: Cotton-silk blend with tonal hand embroidery.">
                 <Textarea
                   value={value.materials}
                   onChange={(event) => set("materials", event.target.value)}
                   className="min-h-20"
+                  placeholder="Cotton-silk blend with tonal hand embroidery."
                 />
               </FieldRow>
-              <FieldRow label="Material lines" help="One per line, shown as bullets.">
+              <FieldRow label="Material lines" help="One per line, e.g. 100% cotton. Shown as bullets.">
                 <Textarea
                   value={value.materialLines.join("\n")}
                   onChange={(event) => setList("materialLines", event.target.value)}
                   className="min-h-24"
+                  placeholder={"100% cotton\nHand-finished embroidery\nCorozo buttons"}
                 />
               </FieldRow>
-              <FieldRow label="Care summary">
+              <FieldRow label="Care summary" help="One sentence. Example: Gentle machine wash cold and line dry.">
                 <Textarea
                   value={value.care}
                   onChange={(event) => set("care", event.target.value)}
                   className="min-h-20"
+                  placeholder="Gentle machine wash cold and line dry in shade."
                 />
               </FieldRow>
-              <FieldRow label="Care lines" help="One per line, shown with care icons.">
+              <FieldRow label="Care lines" help="One per line, e.g. Do not bleach. Shown with care icons.">
                 <Textarea
                   value={value.careLines.join("\n")}
                   onChange={(event) => setList("careLines", event.target.value)}
                   className="min-h-24"
+                  placeholder={"Machine wash cold\nDo not bleach\nWarm iron on reverse"}
                 />
               </FieldRow>
-              <FieldRow label="Size guide">
+              <FieldRow
+                label="Size guide template"
+                help="Choose the chart that matches this product. You do not type measurements or “inc / cm” here."
+              >
                 <Select
                   value={value.sizeGuideId}
                   onChange={(event) => set("sizeGuideId", event.target.value)}
                 >
                   {sizeGuides.map((guide) => (
-                    <option key={guide.id} value={guide.id}>{guide.name}</option>
+                    <option key={guide.id} value={guide.id}>
+                      {guide.name} — {guide.unit}
+                    </option>
                   ))}
                 </Select>
               </FieldRow>
+              {selectedGuide && (
+                <div className="rounded-xl border border-indigo/15 bg-indigo/[0.04] p-3 text-[0.6rem] leading-relaxed text-muted-foreground">
+                  <p className="font-bold uppercase tracking-[0.1em] text-indigo">
+                    {selectedGuide.name} · {selectedGuide.unit}
+                  </p>
+                  <p className="mt-1.5">{selectedGuide.note}</p>
+                  <p className="mt-1.5">
+                    Columns: {selectedGuide.columns.join(" · ")}
+                  </p>
+                  <p className="mt-1.5 font-semibold text-foreground">
+                    {/inch/i.test(selectedGuide.unit)
+                      ? "Measurements are already in inches. Customers can switch to cm on the product page — do not type “inc” or “cm” in the product form."
+                      : /centimet/i.test(selectedGuide.unit)
+                        ? "Measurements are already in centimetres. Customers can switch to inches on the product page — do not type “inc” or “cm” in the product form."
+                        : "This guide uses the unit shown above. The storefront displays it as-is."}
+                  </p>
+                </div>
+              )}
             </div>
           </section>
         </div>

@@ -100,7 +100,13 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
         initial={value}
         departments={departments.map(({ slug, name }) => ({ slug, name }))}
         categories={categories.map(({ slug, name, department }) => ({ slug, name, department }))}
-        sizeGuides={Object.values(sizeGuideTemplates).map(({ id, name }) => ({ id, name }))}
+        sizeGuides={Object.values(sizeGuideTemplates).map(({ id, name, unit, note, columns }) => ({
+          id,
+          name,
+          unit,
+          note,
+          columns,
+        }))}
       />
     </div>
   );
