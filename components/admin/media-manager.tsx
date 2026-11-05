@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, ImageIcon, Plus, Save, Trash2 } from "lucide-react";
+import { Check, ImageIcon, Plus, Search, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Input, Label, Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,7 @@ export function MediaManager({ initial }: { initial: MediaSlot[] }) {
   const [slots, setSlots] = useState(initial);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
   const [newSlot, setNewSlot] = useState({
     slot_key: "",
     label: "",
@@ -39,12 +40,21 @@ export function MediaManager({ initial }: { initial: MediaSlot[] }) {
   });
 
   const groups = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    const visible = needle
+      ? slots.filter((slot) =>
+          [slot.slot_key, slot.label, slot.group_label]
+            .join(" ")
+            .toLowerCase()
+            .includes(needle)
+        )
+      : slots;
     const map = new Map<string, MediaSlot[]>();
-    for (const slot of slots) {
+    for (const slot of visible) {
       map.set(slot.group_label, [...(map.get(slot.group_label) ?? []), slot]);
     }
     return [...map.entries()];
-  }, [slots]);
+  }, [slots, query]);
 
   const update = (id: string, patch: Partial<MediaSlot>) => {
     setSlots((current) => current.map((slot) => (slot.id === id ? { ...slot, ...patch } : slot)));
@@ -133,8 +143,18 @@ export function MediaManager({ initial }: { initial: MediaSlot[] }) {
     <div className="space-y-4">
       <div className="rounded-[18px] border border-indigo/15 bg-indigo/[0.04] p-4 text-[0.66rem] leading-relaxed text-muted-foreground">
         Paste a public image URL — Supabase Storage, your CDN, or any HTTPS image. Leave a slot
-        empty to keep the generated Bengalot placeholder. Product and category artwork use these
-        slots where the storefront supports image overrides.
+        empty to keep the generated Bengalot placeholder. Department images and every
+        category/subcategory now have their own slot; new categories get one automatically.
+      </div>
+
+      <div className="relative max-w-sm">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search image slots…"
+          className="h-9 pl-9 text-[0.66rem]"
+        />
       </div>
 
       {groups.map(([group, groupSlots]) => (

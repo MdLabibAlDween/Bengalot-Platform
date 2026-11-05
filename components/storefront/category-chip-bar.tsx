@@ -13,6 +13,7 @@ import { ArtIconGlyph } from "@/components/brand/product-art";
 import { JamdaniField } from "@/components/brand/ornaments";
 import { countForCategory } from "@/lib/data";
 import { useLocale } from "@/lib/providers";
+import { useSiteConfig } from "@/lib/site-config-provider";
 import type { Category, Department } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -45,6 +46,7 @@ export function CategoryChipBar({
   className?: string;
 }) {
   const { locale, t } = useLocale();
+  const { media } = useSiteConfig();
   const [stickyVisible, setStickyVisible] = useState(false);
   const barRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -130,6 +132,11 @@ export function CategoryChipBar({
       categories.findIndex((item) => item.slug === category.slug)
     );
     const [tone, toneDeep] = CHIP_TONES[toneIndex % CHIP_TONES.length];
+    const image =
+      media[`category.${department.slug}.${category.slug}.main`] ||
+      media[`category.${category.slug}.main`] ||
+      category.imageUrl ||
+      media["category-default"];
 
     const body = (
       <>
@@ -160,6 +167,15 @@ export function CategoryChipBar({
               className="relative h-[46%] w-[46%] text-ivory/90 transition-transform duration-500 group-hover:scale-110"
               strokeWidth={2.4}
             />
+            {image && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={image}
+                alt={name}
+                loading="lazy"
+                className="absolute inset-0 h-full w-full rounded-full object-cover"
+              />
+            )}
             <span className="absolute inset-0 rounded-full ring-1 ring-inset ring-ivory/10" />
           </span>
           {!compact && count > 0 && (

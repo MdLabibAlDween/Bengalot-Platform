@@ -12,6 +12,7 @@ import { DepartmentCategoryStrip } from "@/components/storefront/department-cate
 import { ProductCard } from "@/components/storefront/product-card";
 import { ProductGrid } from "@/components/storefront/product-grid";
 import { getStoreBundles, getStoreCategories } from "@/lib/taxonomy-db";
+import { getMediaMap } from "@/lib/admin/settings";
 import {
   departments,
   getDepartment,
@@ -61,6 +62,9 @@ export default async function DepartmentPage({
 
   const allCategories = await getStoreCategories(department.slug);
   const dbProducts = await getDbProducts(department.slug);
+  const media = await getMediaMap();
+  const departmentImage =
+    media[`department.${department.slug}`] || media[`department-${department.slug}`];
   const allProducts = [
     ...dbProducts,
     ...productsFor(department.slug).filter(
@@ -145,12 +149,21 @@ export default async function DepartmentPage({
           <div className="relative mx-auto w-full max-w-[430px]">
             <div className="relative overflow-hidden rounded-[200px_200px_24px_24px] border border-gold/30 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.5)]">
               <div className="aspect-[4/5]">
-                <DepartmentArt
-                  id={`dept-hero-art-${department.slug}`}
-                  art={department.icon}
-                  palette={department.heroPalette}
-                  word={department.name.slice(0, 1)}
-                />
+                {departmentImage ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={departmentImage}
+                    alt={department.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <DepartmentArt
+                    id={`dept-hero-art-${department.slug}`}
+                    art={department.icon}
+                    palette={department.heroPalette}
+                    word={department.name.slice(0, 1)}
+                  />
+                )}
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-midnight/70 via-transparent to-transparent" />
               <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-6">

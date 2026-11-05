@@ -139,6 +139,15 @@ export async function POST(request: Request) {
       entityId: data.id,
       after: { slug: payload.slug, status: payload.status },
     });
+    await auth.admin.from("admin_media").upsert(
+      {
+        slot_key: `category.${payload.department}.${payload.slug}.main`,
+        label: `${payload.name} image`,
+        group_label: `Categories — ${payload.department.charAt(0).toUpperCase()}${payload.department.slice(1)}`,
+        sort: 500,
+      },
+      { onConflict: "slot_key", ignoreDuplicates: true }
+    );
   } else if (input.kind === "collection") {
     if (!input.slug || !input.title) {
       return badRequest("Collection title and slug are required.");
