@@ -118,7 +118,7 @@ export function BundleDetail({ bundle }: { bundle: Bundle }) {
           qty: item.quantity,
           bundleId: bundle.slug,
           bundleName: bundle.name,
-          snapshot: item.product,
+          snapshot: { ...item.product, isDemo: false },
         },
         { silent: true }
       );

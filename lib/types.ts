@@ -143,6 +143,7 @@ export type Category = {
   isDemo?: boolean;
   icon: ArtIcon;
   tagline: string;
+  imageUrl?: string;
 };
 
 export type Review = {

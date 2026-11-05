@@ -94,7 +94,7 @@ function Section({
 }) {
   switch (section.key) {
     case "hero":
-      return <Hero slides={heroSlides} />;
+      return <Hero slides={heroSlides} catalogue={featured} />;
     case "trust":
       return <TrustStrip />;
     case "departments":

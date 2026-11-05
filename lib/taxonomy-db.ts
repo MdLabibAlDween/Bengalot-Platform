@@ -21,6 +21,7 @@ export type StoreCategoryRow = {
   department: string;
   icon: string;
   tagline: string;
+  image_url: string | null;
   status: "published" | "hidden";
   is_demo: boolean;
   sort: number;
@@ -87,6 +88,7 @@ export function mapCategoryRow(row: StoreCategoryRow): Category {
     isDemo: row.is_demo,
     icon: (row.icon || "tshirt") as ArtIcon,
     tagline: row.tagline,
+    imageUrl: row.image_url ?? undefined,
   };
 }
 

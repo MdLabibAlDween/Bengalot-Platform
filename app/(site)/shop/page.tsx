@@ -11,6 +11,7 @@ import {
   products,
 } from "@/lib/data";
 import { getDbProducts } from "@/lib/catalog-db";
+import { getMediaMap } from "@/lib/admin/settings";
 import { SITE, WHATSAPP_LINK } from "@/lib/constants";
 import { WhatsAppIcon } from "@/components/site/whatsapp-icon";
 
@@ -55,7 +56,10 @@ const collections = [
 ];
 
 export default async function ShopPage() {
-  const dbProducts = await getDbProducts();
+  const [dbProducts, media] = await Promise.all([
+    getDbProducts(),
+    getMediaMap(),
+  ]);
   const catalogue = [
     ...dbProducts,
     ...products.filter((product) => !dbProducts.some((item) => item.slug === product.slug)),
@@ -107,24 +111,36 @@ export default async function ShopPage() {
         </div>
       </section>
 
-      <section className="container-luxe py-14 md:py-20">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <section className="container-luxe py-10 md:py-14">
+        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
           {departments.map((department, index) => {
             const count = catalogue.filter((product) => product.department === department.slug).length;
-            const cats = categoriesFor(department.slug).slice(0, 3);
+            const cats = categoriesFor(department.slug).slice(0, 2);
+            const image =
+              media[`department.${department.slug}`] || media[`department-${department.slug}`];
             return (
               <Reveal key={department.slug} delay={(index % 3) * 0.06}>
                 <Link
                   href={`/${department.slug}`}
-                  className="group relative block overflow-hidden rounded-[22px] border border-white/10 shadow-[0_30px_60px_-40px_rgba(20,10,50,0.5)] transition-transform duration-500 hover:-translate-y-1.5"
+                  className="group relative block overflow-hidden rounded-[18px] border border-white/10 shadow-[0_24px_50px_-38px_rgba(20,10,50,0.5)] transition-transform duration-500 hover:-translate-y-1"
                 >
                   <div className="absolute inset-0">
-                    <DepartmentArt
-                      id={`shop-dept-${department.slug}`}
-                      art={department.icon}
-                      palette={department.heroPalette}
-                      word={department.name.slice(0, 1)}
-                    />
+                    {image ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={image}
+                        alt={department.name}
+                        loading="lazy"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <DepartmentArt
+                        id={`shop-dept-${department.slug}`}
+                        art={department.icon}
+                        palette={department.heroPalette}
+                        word={department.name.slice(0, 1)}
+                      />
+                    )}
                   </div>
                   <div
                     className="absolute inset-0"
@@ -132,30 +148,30 @@ export default async function ShopPage() {
                       background: `linear-gradient(180deg, ${department.accentDeep}05 0%, ${department.accentDeep}35 40%, ${department.accentDeep}F7 100%)`,
                     }}
                   />
-                  <div className="relative flex aspect-[4/5] flex-col justify-between p-5 text-ivory sm:p-6">
+                  <div className="relative flex min-h-[250px] flex-col justify-between p-4 text-ivory">
                     <div className="flex items-start justify-between">
-                      <span className="text-[0.56rem] font-bold uppercase tracking-[0.22em] text-ivory/45">
+                      <span className="text-[0.5rem] font-bold uppercase tracking-[0.18em] text-ivory/45">
                         0{index + 1} / 06
                       </span>
-                      <span className="grid h-9 w-9 place-items-center rounded-full border border-ivory/25 bg-ivory/10 backdrop-blur transition group-hover:border-gold group-hover:bg-gold group-hover:text-midnight">
-                        <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:rotate-45" />
+                      <span className="grid h-8 w-8 place-items-center rounded-full border border-ivory/25 bg-ivory/10 backdrop-blur transition group-hover:border-gold group-hover:bg-gold group-hover:text-midnight">
+                        <ArrowUpRight className="h-3 w-3 transition-transform group-hover:rotate-45" />
                       </span>
                     </div>
                     <div>
-                      <p className="mb-1.5 text-[0.52rem] font-bold uppercase tracking-[0.2em] text-gold">
+                      <p className="mb-1 text-[0.48rem] font-bold uppercase tracking-[0.16em] text-gold">
                         {count} pieces · {department.nameBn}
                       </p>
-                      <h2 className="font-display text-[2.4rem] leading-none text-ivory">
+                      <h2 className="font-display text-[1.65rem] leading-none text-ivory">
                         {department.name}
                       </h2>
-                      <p className="mt-2 max-w-[250px] text-[0.74rem] leading-relaxed text-ivory/55">
+                      <p className="mt-1.5 line-clamp-2 text-[0.66rem] leading-relaxed text-ivory/55">
                         {department.tagline}
                       </p>
-                      <div className="mt-4 flex flex-wrap gap-1.5">
+                      <div className="mt-2 flex flex-wrap gap-1">
                         {cats.map((c) => (
                           <span
                             key={c.slug}
-                            className="rounded-full border border-ivory/15 bg-ivory/5 px-2.5 py-1 text-[0.5rem] uppercase tracking-[0.1em] text-ivory/60 backdrop-blur"
+                            className="rounded-full border border-ivory/15 bg-ivory/5 px-2 py-0.5 text-[0.46rem] uppercase tracking-[0.08em] text-ivory/60 backdrop-blur"
                           >
                             {c.name}
                           </span>
@@ -170,7 +186,7 @@ export default async function ShopPage() {
         </div>
       </section>
 
-      <section className="border-t border-[var(--border)] bg-[var(--surface-2)] py-14 md:py-20">
+      <section className="border-t border-[var(--border)] bg-[var(--surface-2)] py-10 md:py-14">
         <div className="container-luxe">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
@@ -184,12 +200,12 @@ export default async function ShopPage() {
             </p>
           </div>
 
-          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-6 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
             {collections.map((collection) => (
               <Link
                 key={collection.title}
                 href={collection.href}
-                className="group relative flex min-h-[190px] flex-col justify-between overflow-hidden rounded-2xl border border-white/10 p-5 text-ivory transition hover:-translate-y-1"
+                className="group relative flex min-h-[150px] flex-col justify-between overflow-hidden rounded-2xl border border-white/10 p-4 text-ivory transition hover:-translate-y-1"
                 style={{
                   background: `linear-gradient(145deg, ${collection.palette[0]}, ${collection.palette[1]})`,
                 }}
@@ -207,7 +223,7 @@ export default async function ShopPage() {
                   <ArrowUpRight className="h-3.5 w-3.5 text-ivory/50 transition group-hover:text-gold" />
                 </div>
                 <div className="relative">
-                  <h3 className="font-display text-[1.8rem] leading-tight text-ivory">
+                  <h3 className="font-display text-[1.45rem] leading-tight text-ivory">
                     {collection.title}
                   </h3>
                   <span className="mt-2 flex items-center gap-2 text-[0.52rem] font-bold uppercase tracking-[0.14em] text-ivory/50 transition group-hover:text-gold">

@@ -10,6 +10,7 @@ import type { MediaSlot } from "@/lib/admin/settings";
 import { cn } from "@/lib/utils";
 
 function slotUsage(slot: MediaSlot) {
+  if (slot.slot_key.startsWith("hero-banner")) return "Homepage hero slider";
   if (slot.slot_key.startsWith("hero-")) return "Homepage hero cards";
   if (slot.slot_key === "gift-card-art") return "Homepage gift-card section";
   if (slot.slot_key.startsWith("lookbook-") || slot.slot_key.startsWith("collection.")) {

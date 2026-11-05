@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="760" viewBox="0 0 1920 760" role="img" aria-label="Bengalot royal indigo and gold banner">
+  <defs>
+    <linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FBF6EB"/>
+      <stop offset="0.58" stop-color="#F2E7D2"/>
+      <stop offset="1" stop-color="#E7D6BA"/>
+    </linearGradient>
+    <linearGradient id="indigo1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3B2A8C"/>
+      <stop offset="1" stop-color="#171038"/>
+    </linearGradient>
+    <linearGradient id="gold1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F0CC7A"/>
+      <stop offset="1" stop-color="#C89B45"/>
+    </linearGradient>
+    <pattern id="jamdani1" width="48" height="48" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="48" height="48" fill="none"/>
+      <path d="M24 4 44 24 24 44 4 24Z" fill="none" stroke="#C89B45" stroke-width="1.2" opacity="0.45"/>
+      <circle cx="24" cy="24" r="4" fill="#C89B45" opacity="0.35"/>
+    </pattern>
+    <filter id="soft1" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
+  </defs>
+
+  <rect width="1920" height="760" fill="url(#bg1)"/>
+  <rect width="1920" height="760" fill="url(#jamdani1)" opacity="0.24"/>
+  <ellipse cx="1460" cy="410" rx="430" ry="360" fill="#3B2A8C" opacity="0.12" filter="url(#soft1)"/>
+  <circle cx="1460" cy="380" r="330" fill="url(#indigo1)"/>
+  <circle cx="1460" cy="380" r="330" fill="none" stroke="#C89B45" stroke-width="4" opacity="0.9"/>
+  <circle cx="1460" cy="380" r="300" fill="none" stroke="#EFE5D2" stroke-width="1.4" opacity="0.5"/>
+
+  <path d="M1110 40 C1240 130 1170 280 1280 360 C1370 425 1500 360 1590 470 C1680 580 1590 700 1440 740 C1320 775 1190 690 1170 575 C1150 470 1240 420 1210 320 C1180 220 1050 170 1110 40Z" fill="#211756" opacity="0.96"/>
+  <path d="M1110 40 C1240 130 1170 280 1280 360 C1370 425 1500 360 1590 470 C1680 580 1590 700 1440 740" fill="none" stroke="url(#gold1)" stroke-width="9" opacity="0.9"/>
+  <path d="M1190 120 C1290 220 1220 330 1330 410 C1420 475 1530 430 1600 520" fill="none" stroke="#EFE5D2" stroke-width="4" opacity="0.55"/>
+  <path d="M1080 580 C1180 520 1320 560 1420 640 C1510 710 1630 690 1710 630" fill="none" stroke="#C89B45" stroke-width="4" opacity="0.55"/>
+
+  <g opacity="0.9">
+    <circle cx="1460" cy="380" r="180" fill="none" stroke="#C89B45" stroke-width="2" opacity="0.55"/>
+    <g fill="#C89B45" opacity="0.8">
+      <path d="M1460 250 C1500 300 1500 330 1460 360 C1420 330 1420 300 1460 250Z"/>
+      <path d="M1460 510 C1500 460 1500 430 1460 400 C1420 430 1420 460 1460 510Z"/>
+      <path d="M1330 380 C1380 340 1410 340 1440 380 C1410 420 1380 420 1330 380Z"/>
+      <path d="M1590 380 C1540 340 1510 340 1480 380 C1510 420 1540 420 1590 380Z"/>
+    </g>
+    <circle cx="1460" cy="380" r="18" fill="#EFE5D2" opacity="0.9"/>
+  </g>
+
+  <g opacity="0.55">
+    <circle cx="260" cy="380" r="210" fill="none" stroke="#3B2A8C" stroke-width="1.5"/>
+    <circle cx="260" cy="380" r="160" fill="none" stroke="#C89B45" stroke-width="1"/>
+    <path d="M90 380 C150 300 220 300 280 380 C220 460 150 460 90 380Z" fill="#3B2A8C" opacity="0.18"/>
+  </g>
+  <rect x="72" y="72" width="1776" height="616" fill="none" stroke="#C89B45" stroke-width="1.2" opacity="0.45"/>
+</svg>

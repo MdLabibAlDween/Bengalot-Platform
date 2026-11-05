@@ -157,10 +157,7 @@ export function bundleItemCount(bundle: Bundle) {
  * ordered.
  */
 export function isDemoBundle(bundle: Bundle) {
-  return (
-    Boolean(bundle.isDemo) ||
-    getBundleItems(bundle).some((item) => Boolean(item.product.isDemo))
-  );
+  return Boolean(bundle.isDemo);
 }
 
 /**

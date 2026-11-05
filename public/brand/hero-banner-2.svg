@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="760" viewBox="0 0 1920 760" role="img" aria-label="Bengalot rosewood and gold festive banner">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FBF4E9"/>
+      <stop offset="0.55" stop-color="#F3E2D8"/>
+      <stop offset="1" stop-color="#EAD0C0"/>
+    </linearGradient>
+    <linearGradient id="rose2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#C2255C"/>
+      <stop offset="0.55" stop-color="#8E1B45"/>
+      <stop offset="1" stop-color="#4E102A"/>
+    </linearGradient>
+    <linearGradient id="gold2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F4D58E"/>
+      <stop offset="1" stop-color="#C89B45"/>
+    </linearGradient>
+    <pattern id="paisley2" width="64" height="64" patternUnits="userSpaceOnUse">
+      <path d="M32 8 C48 18 52 40 32 56 C12 40 16 18 32 8Z" fill="none" stroke="#C89B45" stroke-width="1.1" opacity="0.4"/>
+      <path d="M32 20 C40 26 42 38 32 44 C22 38 24 26 32 20Z" fill="none" stroke="#C89B45" stroke-width="0.8" opacity="0.35"/>
+    </pattern>
+    <filter id="soft2" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="26"/>
+    </filter>
+  </defs>
+
+  <rect width="1920" height="760" fill="url(#bg2)"/>
+  <rect width="1920" height="760" fill="url(#paisley2)" opacity="0.22"/>
+  <ellipse cx="1330" cy="390" rx="500" ry="380" fill="#C2255C" opacity="0.16" filter="url(#soft2)"/>
+  <path d="M780 760 C860 560 1040 500 1200 390 C1360 280 1340 120 1520 40 L1920 40 L1920 760Z" fill="url(#rose2)"/>
+  <path d="M780 760 C860 560 1040 500 1200 390 C1360 280 1340 120 1520 40" fill="none" stroke="url(#gold2)" stroke-width="10" opacity="0.92"/>
+  <path d="M920 760 C990 600 1140 540 1280 450 C1420 360 1400 220 1540 120" fill="none" stroke="#EFE5D2" stroke-width="4" opacity="0.5"/>
+
+  <g transform="translate(1500 360)">
+    <path d="M-120 -210 C-40 -170 40 -170 120 -210 L120 150 C40 190 -40 190 -120 150Z" fill="#EFE5D2" opacity="0.08"/>
+    <path d="M-92 -180 C-30 -150 30 -150 92 -180 L92 125 C30 155 -30 155 -92 125Z" fill="none" stroke="#C89B45" stroke-width="3" opacity="0.85"/>
+    <path d="M-56 -130 L-56 90 M0 -118 L0 102 M56 -130 L56 90" stroke="#C89B45" stroke-width="2" opacity="0.6"/>
+    <circle cx="0" cy="-10" r="92" fill="none" stroke="#EFE5D2" stroke-width="1.5" opacity="0.3"/>
+  </g>
+
+  <g opacity="0.55">
+    <circle cx="360" cy="380" r="240" fill="none" stroke="#8E1B45" stroke-width="1.5"/>
+    <circle cx="360" cy="380" r="190" fill="none" stroke="#C89B45" stroke-width="1.2"/>
+    <g fill="#C2255C" opacity="0.22">
+      <path d="M360 170 C410 240 410 300 360 350 C310 300 310 240 360 170Z"/>
+      <path d="M360 590 C410 520 410 460 360 410 C310 460 310 520 360 590Z"/>
+      <path d="M150 380 C220 330 280 330 330 380 C280 430 220 430 150 380Z"/>
+      <path d="M570 380 C500 330 440 330 390 380 C440 430 500 430 570 380Z"/>
+    </g>
+    <circle cx="360" cy="380" r="22" fill="#C89B45" opacity="0.75"/>
+  </g>
+  <rect x="72" y="72" width="1776" height="616" fill="none" stroke="#C89B45" stroke-width="1.2" opacity="0.45"/>
+</svg>

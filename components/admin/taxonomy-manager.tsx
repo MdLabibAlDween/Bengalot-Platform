@@ -7,12 +7,14 @@ import {
   ArrowUp,
   Check,
   FolderTree,
+  ImageIcon,
   Layers,
   Pencil,
   Plus,
   Search,
   Sparkles,
   Trash2,
+  Upload,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -28,6 +30,7 @@ type CategoryRow = {
   department: string;
   icon: string;
   tagline: string;
+  image_url: string | null;
   status: "published" | "hidden";
   is_demo: boolean;
   sort: number;
@@ -104,6 +107,7 @@ const emptyCategory = {
   department: "men",
   icon: "tshirt",
   tagline: "",
+  imageUrl: "",
   status: "published" as "published" | "hidden",
   isDemo: true,
   sort: "0",
@@ -318,6 +322,7 @@ export function TaxonomyManager({
   const [saving, setSaving] = useState(false);
   const [category, setCategory] = useState(emptyCategory);
   const [categoryOpen, setCategoryOpen] = useState(false);
+  const [categoryUploading, setCategoryUploading] = useState(false);
   const [collection, setCollection] = useState(emptyCollection);
   const [collectionOpen, setCollectionOpen] = useState(false);
   const [bundle, setBundle] = useState(emptyBundle);
@@ -384,6 +389,22 @@ export function TaxonomyManager({
     }
   };
 
+  const uploadCategoryImage = async (file: File | undefined) => {
+    if (!file) return;
+    setCategoryUploading(true);
+    const form = new FormData();
+    form.append("file", file);
+    const response = await fetch("/api/admin/upload", { method: "POST", body: form });
+    const result = await response.json().catch(() => ({}));
+    setCategoryUploading(false);
+    if (!response.ok || !result.url) {
+      toast.error(result.error ?? "Could not upload the category image.");
+      return;
+    }
+    setCategory((current) => ({ ...current, imageUrl: result.url as string }));
+    toast.success("Category image uploaded — press Save category");
+  };
+
   const saveCategory = async () => {
     const ok = await action(
       {
@@ -396,6 +417,7 @@ export function TaxonomyManager({
         department: category.department,
         icon: category.icon,
         tagline: category.tagline,
+        imageUrl: category.imageUrl,
         status: category.status,
         isDemo: category.isDemo,
         sort: Number(category.sort) || 0,
@@ -474,6 +496,7 @@ export function TaxonomyManager({
             department: row.department,
             icon: row.icon,
             tagline: row.tagline,
+            imageUrl: row.image_url ?? "",
             status: row.status,
             isDemo: row.is_demo,
             sort: String(row.sort),
@@ -924,6 +947,48 @@ export function TaxonomyManager({
                 className="min-h-20"
               />
             </div>
+
+            <div className="sm:col-span-2">
+              <Label htmlFor="cat-image">Category / subcategory image</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="cat-image"
+                  value={category.imageUrl}
+                  onChange={(event) => setCategory({ ...category, imageUrl: event.target.value })}
+                  placeholder="https://... or upload below"
+                  className="flex-1"
+                />
+                <label className="inline-flex h-10 shrink-0 cursor-pointer items-center gap-1.5 rounded-full bg-indigo px-3.5 text-[0.52rem] font-bold uppercase tracking-[0.08em] text-ivory">
+                  <Upload className="h-3 w-3" />
+                  {categoryUploading ? "Uploading" : "Upload"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(event) => void uploadCategoryImage(event.target.files?.[0])}
+                  />
+                </label>
+              </div>
+              <div className="mt-2 flex items-center gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--muted)]/25 p-2.5">
+                <span className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-lg border border-[var(--color-border)] bg-[var(--surface)] text-muted-foreground/40">
+                  {category.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={category.imageUrl}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <ImageIcon className="h-5 w-5" />
+                  )}
+                </span>
+                <p className="text-[0.56rem] leading-relaxed text-muted-foreground">
+                  Shown on category circles, department category rails and category
+                  cards. Leave blank to use the department image or generated artwork.
+                </p>
+              </div>
+            </div>
+
             <div>
               <Label htmlFor="cat-status">Status</Label>
               <Select

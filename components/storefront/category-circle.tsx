@@ -31,6 +31,7 @@ export function CategoryCircle({
   const light = tone === "light";
   const { media } = useSiteConfig();
   const image =
+    category.imageUrl ||
     media[`category.${department.slug}.${category.slug}.main`] ||
     media[`category.${category.slug}.main`] ||
     media["category-default"];

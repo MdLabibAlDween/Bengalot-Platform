@@ -62,7 +62,6 @@ function HeroProductCard({
   compact = false,
   contentClassName,
   artTone,
-  slot = "main",
 }: {
   product?: Product;
   accent: Slot;
@@ -73,15 +72,12 @@ function HeroProductCard({
   compact?: boolean;
   contentClassName?: string;
   artTone?: PlaceholderTone;
-  slot?: "main" | "side-a" | "side-b";
 }) {
   const department = product ? getDepartment(product.department) : undefined;
   const { media } = useSiteConfig();
-  const heroImage =
-    media[`hero-${slot}`] ||
-    (product
-      ? media[`product.${product.slug}.main`] || product.imageUrl
-      : media["hero-main"]);
+  const heroImage = product
+    ? media[`product.${product.slug}.main`] || product.imageUrl
+    : media["hero-main"];
 
   return (
     <Link
@@ -194,8 +190,18 @@ function HeroProductCard({
   );
 }
 
-export function Hero({ slides: providedSlides }: { slides?: HeroSlide[] }) {
+export function Hero({
+  slides: providedSlides,
+  catalogue,
+}: {
+  slides?: HeroSlide[];
+  catalogue?: Product[];
+}) {
   const slides = providedSlides && providedSlides.length > 0 ? providedSlides : getHeroSlides();
+  const liveProducts = useMemo(
+    () => new Map((catalogue ?? []).map((product) => [product.slug, product])),
+    [catalogue]
+  );
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const reduce = useReducedMotion();
@@ -228,9 +234,9 @@ export function Hero({ slides: providedSlides }: { slides?: HeroSlide[] }) {
   const products = useMemo(
     () =>
       (slide?.productSlugs ?? [])
-        .map((slug) => getProduct(slug))
+        .map((slug) => liveProducts.get(slug) ?? getProduct(slug))
         .filter((product): product is Product => Boolean(product)),
-    [slide]
+    [slide, liveProducts]
   );
 
   useEffect(() => {
@@ -316,13 +322,11 @@ export function Hero({ slides: providedSlides }: { slides?: HeroSlide[] }) {
             "radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--color-indigo) 18%, transparent) 1px, transparent 0)",
           backgroundSize: "26px 26px",
           maskImage: "linear-gradient(90deg, transparent, black 25%, black 75%, transparent)",
-          WebkitMaskImage:
-            "linear-gradient(90deg, transparent, black 25%, black 75%, transparent)",
+          WebkitMaskImage: "linear-gradient(90deg, transparent, black 25%, black 75%, transparent)",
         }}
       />
 
       <div className="container-wide hero-shell relative flex flex-col justify-center gap-3 sm:gap-4 lg:grid lg:grid-cols-[45fr_55fr] lg:items-center lg:gap-10 lg:py-0 xl:gap-14">
-        {/* Product composition — first in source on mobile */}
         <div className="relative order-1 lg:order-2">
           <div className="relative mx-auto h-[clamp(210px,30svh,270px)] w-full max-w-[560px] lg:hidden">
             <div className="relative mx-auto h-full w-full max-w-[400px]">
@@ -334,9 +338,7 @@ export function Hero({ slides: providedSlides }: { slides?: HeroSlide[] }) {
                   transition={{ duration: 0.45, delay: 0.06 + slot * 0.07 }}
                   className={cn(
                     "absolute top-[6px] h-[calc(100%-12px)] w-[42vw] max-w-[200px]",
-                    slot === 0
-                      ? "left-[3%] z-20 -rotate-3"
-                      : "right-[3%] z-10 rotate-3"
+                    slot === 0 ? "left-[3%] z-20 -rotate-3" : "right-[3%] z-10 rotate-3"
                   )}
                 >
                   <HeroProductCard
@@ -347,7 +349,6 @@ export function Hero({ slides: providedSlides }: { slides?: HeroSlide[] }) {
                     instance={`mobile-${slide.slug}`}
                     artTone={slot === 0 ? "indigo" : "magenta"}
                     compact
-                    slot={slot === 0 ? "main" : "side-a"}
                     contentClassName={slot === 0 ? "pr-2" : "pl-8 pr-1"}
                   />
                 </motion.div>
@@ -383,7 +384,6 @@ export function Hero({ slides: providedSlides }: { slides?: HeroSlide[] }) {
                     artClassName="aspect-[4/4.5] xl:aspect-[4/4.7]"
                     instance={`desktop-main-${slide.slug}`}
                     artTone="indigo"
-                    slot="main"
                   />
                 </motion.div>
 
@@ -397,7 +397,6 @@ export function Hero({ slides: providedSlides }: { slides?: HeroSlide[] }) {
                     artClassName="aspect-[4/2.3] xl:aspect-[4/2.5]"
                     instance={`desktop-side-a-${slide.slug}`}
                     artTone="magenta"
-                    slot="side-a"
                   />
                 </motion.div>
 
@@ -411,7 +410,6 @@ export function Hero({ slides: providedSlides }: { slides?: HeroSlide[] }) {
                     artClassName="aspect-[4/2.3] xl:aspect-[4/2.5]"
                     instance={`desktop-side-b-${slide.slug}`}
                     artTone="terracotta"
-                    slot="side-b"
                   />
                 </motion.div>
               </motion.div>
@@ -419,7 +417,6 @@ export function Hero({ slides: providedSlides }: { slides?: HeroSlide[] }) {
           </div>
         </div>
 
-        {/* Copy */}
         <div className="relative z-10 order-2 max-w-[600px] lg:order-1">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
@@ -430,10 +427,7 @@ export function Hero({ slides: providedSlides }: { slides?: HeroSlide[] }) {
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]/70 px-3 py-1.5 backdrop-blur-sm lg:gap-2.5 lg:px-3.5 lg:py-2">
-                <span
-                  className="h-1.5 w-1.5 rounded-full bg-saffron"
-                  aria-hidden="true"
-                />
+                <span className="h-1.5 w-1.5 rounded-full bg-saffron" aria-hidden="true" />
                 <span className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--color-indigo)]">
                   {slide.label}
                 </span>
@@ -495,9 +489,7 @@ export function Hero({ slides: providedSlides }: { slides?: HeroSlide[] }) {
                             ? "w-7"
                             : "w-2.5 bg-[var(--color-border)] group-hover:bg-[var(--color-gold-ink)]"
                         )}
-                        style={{
-                          backgroundColor: active ? item.accentColor : undefined,
-                        }}
+                        style={{ backgroundColor: active ? item.accentColor : undefined }}
                       />
                     </button>
                   );
