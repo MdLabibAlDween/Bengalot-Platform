@@ -9,7 +9,7 @@ insert into public.admin_media (slot_key, label, group_label, sort)
 select
   'category.' || department || '.' || slug || '.main',
   name || ' image',
-  'Categories — ' || initcap(department),
+  'Categories',
   100 + row_number() over (order by department, sort, slug)
 from public.store_categories
 on conflict (slot_key) do nothing;

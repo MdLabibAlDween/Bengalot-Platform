@@ -143,7 +143,7 @@ export async function POST(request: Request) {
       {
         slot_key: `category.${payload.department}.${payload.slug}.main`,
         label: `${payload.name} image`,
-        group_label: `Categories — ${payload.department.charAt(0).toUpperCase()}${payload.department.slice(1)}`,
+        group_label: "Categories",
         sort: 500,
       },
       { onConflict: "slot_key", ignoreDuplicates: true }
