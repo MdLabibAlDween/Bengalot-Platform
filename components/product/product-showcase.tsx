@@ -204,7 +204,7 @@ export function ProductShowcase({
   const saved = wishlist.has(product.slug);
   const [colorIndex, setColorIndex] = useState(0);
   const [activeImage, setActiveImage] = useState(0);
-  const [size, setSize] = useState("");
+  const [size, setSize] = useState(product.sizes[0]?.label ?? "");
   const [qty, setQty] = useState(1);
   const [district, setDistrict] = useState("");
   const [lightbox, setLightbox] = useState(false);
@@ -217,6 +217,9 @@ export function ProductShowcase({
 
   const selectedColor = product.colors[colorIndex]?.name ?? product.colors[0]?.name ?? "";
   const selectedColorHex = product.colors[colorIndex]?.hex ?? product.palette[0];
+  const showColors = product.colors.length > 1;
+  const showSizes = product.sizes.length > 1;
+  const effectiveSize = size || product.sizes[0]?.label || "One size";
   const gallery = useMemo<GalleryImage[]>(() => {
     const photos = product.images ?? [];
     const relevant = photos.filter(
@@ -269,16 +272,16 @@ export function ProductShowcase({
   }, [product.images, product.imageUrl, product.art, product.name, product.palette, selectedColor, selectedColorHex]);
 
   const active = gallery[activeImage] ?? gallery[0];
-  const selectedSize = product.sizes.find((option) => option.label === size);
+  const selectedSize = product.sizes.find((option) => option.label === effectiveSize);
   const variants = product.variants ?? [];
   const selectedVariant = variants.find(
-    (variant) => variant.size === size && variant.color === selectedColor
+    (variant) => variant.size === effectiveSize && variant.color === selectedColor
   );
   const activePrice = selectedVariant?.price ?? product.price;
   const activeCompareAt = selectedVariant?.compareAt ?? product.compareAt;
   const off = discountedPrice(activePrice, activeCompareAt);
   const availableStock = variants.length
-    ? variantStock(variants, size, selectedColor) ?? 0
+    ? variantStock(variants, effectiveSize, selectedColor) ?? 0
     : selectedSize?.stock ?? product.stock;
   const fee = district
     ? deliveryChargeFor(district, profile.deliveryInside, profile.deliveryOutside)
@@ -351,7 +354,7 @@ export function ProductShowcase({
   }, [lightbox, gallery.length]);
 
   const requireSize = () => {
-    if (!size) {
+    if (showSizes && !size) {
       setShakeSizes(true);
       toast.error("Please choose a size", {
         description: "Select a size to add this piece to your bag.",
@@ -379,7 +382,7 @@ export function ProductShowcase({
     addLine(
       {
         productSlug: product.slug,
-        size,
+        size: effectiveSize,
         color: selectedColor,
         qty,
         snapshot: product,
@@ -405,7 +408,7 @@ export function ProductShowcase({
     productName: product.name,
     sku: product.sku,
     color: selectedColor,
-    size: size || "Not selected yet",
+    size: effectiveSize,
     quantity: qty,
     price: formatBDT(activePrice),
     url: shareUrl,
@@ -727,6 +730,7 @@ export function ProductShowcase({
           </div>
 
           {/* Color */}
+          {showColors && (
           <div className="mt-6">
             <div className="mb-3 flex items-center justify-between gap-3">
               <p className="text-[0.66rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
@@ -771,8 +775,10 @@ export function ProductShowcase({
               })}
             </div>
           </div>
+          )}
 
           {/* Size */}
+          {showSizes && (
           <div className="mt-6">
             <div className="mb-3 flex items-center justify-between gap-3">
               <p className="text-[0.66rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
@@ -844,11 +850,12 @@ export function ProductShowcase({
             )}
             {selectedSize && availableStock > 0 && availableStock <= 4 && (
               <p className="mt-2.5 flex items-center gap-1.5 text-[0.66rem] font-semibold text-rosewood ">
-                <Sparkles className="h-3 w-3" /> Only {availableStock} left in {selectedColor} ·{" "}
-                {selectedSize.label}
+                <Sparkles className="h-3 w-3" /> Only {availableStock} left in {selectedColor}
+                {showSizes ? ` · ${selectedSize.label}` : ""}
               </p>
             )}
           </div>
+          )}
 
           <div ref={buyRef} className="mt-7 space-y-3">
             <div className="flex items-center justify-between gap-4">
@@ -1066,7 +1073,8 @@ export function ProductShowcase({
               <Price amount={activePrice} />
             </p>
             <p className="truncate text-[0.66rem] text-muted-foreground">
-              {selectedColor} · {size || "Choose a size"}
+              {selectedColor}
+              {showSizes ? ` · ${effectiveSize}` : product.sizes.length === 1 && product.sizes[0]?.label !== "One size" ? ` · ${effectiveSize}` : ""}
             </p>
           </div>
           <button

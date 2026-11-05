@@ -286,6 +286,31 @@ export function ProductEditor({
       ),
     }));
 
+  const applyPreset = (mode: "single" | "colour" | "size" | "both") => {
+    setValue((current) => {
+      const totalStock = current.variants.length
+        ? current.variants.reduce((sum, variant) => sum + Math.max(0, variant.stock), 0)
+        : current.sizes.reduce((sum, size) => sum + Math.max(0, size.stock), 0);
+      const oneSize = [{ label: "One size", stock: totalStock }];
+      const defaultColour = [{ name: "Default", hex: "#3B2A8C" }];
+      if (mode === "single") {
+        return { ...current, sizes: oneSize, colors: defaultColour, variants: [] };
+      }
+      if (mode === "colour") {
+        return {
+          ...current,
+          sizes: oneSize,
+          colors: current.colors.length > 0 ? current.colors : defaultColour,
+          variants: [],
+        };
+      }
+      if (mode === "size") {
+        return { ...current, colors: defaultColour, variants: [] };
+      }
+      return current;
+    });
+  };
+
   const generateVariants = () => {
     const existing = new Map(
       value.variants.map((variant) => [`${variant.size}::${variant.color}`, variant])
@@ -814,6 +839,37 @@ export function ProductEditor({
 
       {tab === "variants" && (
         <div className="space-y-4">
+          <section className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 className="font-display text-xl">Product shape</h2>
+                <p className="mt-1 max-w-2xl text-[0.6rem] leading-relaxed text-muted-foreground">
+                  Choose a starting point. One size + Default colour hides both selectors
+                  on the product page. Colour-only keeps <strong>One size</strong> and adds
+                  colours. Size-only keeps <strong>Default</strong> and adds sizes.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {([
+                  ["single", "Single product"],
+                  ["colour", "Colour only"],
+                  ["size", "Size only"],
+                  ["both", "Size + colour"],
+                ] as const).map(([mode, label]) => (
+                  <Button
+                    key={mode}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => applyPreset(mode)}
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </section>
+
           <div className="grid gap-4 xl:grid-cols-2">
             <section className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
               <div className="flex items-center justify-between gap-3">

@@ -50,6 +50,8 @@ export function ProductQuickView({
     : product.sizes.find((s) => s.stock > 0)?.label ?? product.sizes[0]?.label ?? "";
   const [color, setColor] = useState(product.colors[0]?.name ?? "Default");
   const [size, setSize] = useState(firstAvailable);
+  const showColors = product.colors.length > 1;
+  const showSizes = product.sizes.length > 1;
   const colorHex = product.colors.find((option) => option.name === color)?.hex;
   const { addLine } = useCart();
   const selectedVariant = variants.find(
@@ -177,6 +179,7 @@ export function ProductQuickView({
 
             {isDemo && <DemoOrderNotice compact className="mt-4" />}
 
+            {showColors && (
             <div className="mt-6">
               <p className="mb-2.5 text-[0.62rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
                 Color · <span className="text-foreground">{color}</span>
@@ -207,7 +210,9 @@ export function ProductQuickView({
                 })}
               </div>
             </div>
+            )}
 
+            {showSizes && (
             <div className="mt-5">
               <div className="mb-2.5 flex items-center justify-between">
                 <p className="text-[0.62rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
@@ -245,6 +250,7 @@ export function ProductQuickView({
                 })}
               </div>
             </div>
+            )}
 
             <div className="mt-6 flex gap-3">
               <Button
