@@ -346,7 +346,9 @@ export const getStoreBundles = cache(async (department?: string) => {
       ? publishedBundles.filter((bundle) => bundle.department === department)
       : publishedBundles;
   }
-  return (data as StoreBundleRow[]).map(mapBundleRow);
+  return (data as StoreBundleRow[])
+    .map(mapBundleRow)
+    .filter((bundle) => !STORE_SETTINGS.hideDemoProducts || !bundle.isDemo);
 });
 
 export async function getAllStoreBundles() {
@@ -372,7 +374,9 @@ export const getStoreBundle = cache(async (slug: string) => {
   }
   const row = data as StoreBundleRow;
   if (row.status !== "published") return undefined;
-  return mapBundleRow(row);
+  const bundle = mapBundleRow(row);
+  if (STORE_SETTINGS.hideDemoProducts && bundle.isDemo) return undefined;
+  return bundle;
 });
 
 export const getCatalogSnapshot = cache(async () => {

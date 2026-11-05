@@ -99,7 +99,11 @@ export const bundles: Bundle[] = [
 
 export const publishedBundles = bundles
   .filter((bundle) => bundle.status === "published")
-  .filter((bundle) => !STORE_SETTINGS.hideDemoContent || !bundle.isDemo)
+  .filter(
+    (bundle) =>
+      !(STORE_SETTINGS.hideDemoContent || STORE_SETTINGS.hideDemoProducts) ||
+      !bundle.isDemo
+  )
   .sort((a, b) => a.sort - b.sort);
 
 export const featuredBundles = publishedBundles.filter((bundle) => bundle.featured);

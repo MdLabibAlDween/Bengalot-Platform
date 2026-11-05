@@ -18,7 +18,6 @@ import {
   getDepartment,
   getProduct,
   getSizeGuide,
-  products,
   productsFor,
   reviewsFor,
 } from "@/lib/data";
@@ -29,11 +28,7 @@ import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import type { Product, Review } from "@/lib/types";
 import { cn, safeJsonLd } from "@/lib/utils";
 
-export const dynamicParams = true;
-
-export function generateStaticParams() {
-  return products.map((product) => ({ slug: product.slug }));
-}
+export const dynamic = "force-dynamic";
 
 async function resolveProduct(slug: string): Promise<Product | undefined> {
   return (await getDbProduct(slug)) ?? getProduct(slug);
@@ -65,7 +60,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const product = await resolveProduct(slug);
-  if (!product) return { title: "Product not found" };
+  if (!product) notFound();
   const title = product.seoTitle || `${product.name} — ${product.shortDescription.slice(0, 60)}`;
   const description = product.seoDescription || product.shortDescription;
   return {

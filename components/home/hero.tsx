@@ -21,7 +21,7 @@ import { ProductArt } from "@/components/brand/product-art";
 import { Grain, JamdaniField } from "@/components/brand/ornaments";
 import { useSiteConfig } from "@/lib/site-config-provider";
 import { getDepartment, getProduct } from "@/lib/data";
-import { getHeroSlides, type HeroSlide } from "@/lib/homepage";
+import { getHeroSlides, isDemoProductVisible, type HeroSlide } from "@/lib/homepage";
 import { deliveryLine } from "@/lib/settings";
 import type { PlaceholderTone } from "@/lib/theme";
 import type { Product } from "@/lib/types";
@@ -197,7 +197,10 @@ export function Hero({
   slides?: HeroSlide[];
   catalogue?: Product[];
 }) {
-  const slides = providedSlides && providedSlides.length > 0 ? providedSlides : getHeroSlides();
+  const slides =
+    providedSlides && providedSlides.length > 0
+      ? providedSlides.filter((slide) => isDemoProductVisible(slide.isDemo))
+      : getHeroSlides();
   const liveProducts = useMemo(
     () => new Map((catalogue ?? []).map((product) => [product.slug, product])),
     [catalogue]

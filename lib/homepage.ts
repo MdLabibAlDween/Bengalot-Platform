@@ -70,6 +70,13 @@ export function isDemoVisible(isDemo?: boolean) {
   return !isDemo || !STORE_SETTINGS.hideDemoContent;
 }
 
+export function isDemoProductVisible(isDemo?: boolean) {
+  return (
+    !isDemo ||
+    (!STORE_SETTINGS.hideDemoContent && !STORE_SETTINGS.hideDemoProducts)
+  );
+}
+
 export function getHomeSections() {
   return HOMEPAGE_SECTIONS.filter((section) => section.enabled).sort(
     (a, b) => a.sort - b.sort
@@ -313,7 +320,7 @@ export const HERO_SLIDES: HeroSlide[] = [
 
 export function getHeroSlides() {
   return HERO_SLIDES.filter(
-    (slide) => slide.status === "published" && isDemoVisible(slide.isDemo)
+    (slide) => slide.status === "published" && isDemoProductVisible(slide.isDemo)
   )
     .sort((a, b) => a.sort - b.sort)
     .slice(0, 5);

@@ -6,18 +6,14 @@ import { BundleDetail } from "@/components/bundle/bundle-detail";
 import { BundleCard } from "@/components/bundle/bundle-card";
 import { Breadcrumbs } from "@/components/storefront/breadcrumbs";
 import { SectionHeading } from "@/components/storefront/section-heading";
-import { bundles, getBundlePricing, isDemoBundle } from "@/lib/bundles";
+import { getBundlePricing, isDemoBundle } from "@/lib/bundles";
 import { getStoreBundle, getStoreBundles } from "@/lib/taxonomy-db";
 import { getDepartment } from "@/lib/data";
 import { SITE } from "@/lib/constants";
 import { safeJsonLd, formatBDT } from "@/lib/utils";
 import { getStoreProfile } from "@/lib/admin/settings";
 
-export function generateStaticParams() {
-  return bundles
-    .filter((bundle) => bundle.status === "published")
-    .map((bundle) => ({ slug: bundle.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -26,7 +22,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const bundle = await getStoreBundle(slug);
-  if (!bundle) return { title: "Bundle not found" };
+  if (!bundle) notFound();
   const demo = isDemoBundle(bundle);
   return {
     title: bundle.seoTitle ?? `${bundle.name} — Complete outfit`,

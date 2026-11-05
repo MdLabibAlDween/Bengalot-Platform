@@ -15,7 +15,11 @@ import { ReviewsCarousel } from "@/components/home/reviews-carousel";
 import { SocialStrip } from "@/components/home/social-strip";
 import { NewsletterSection } from "@/components/home/newsletter-section";
 import { RecentlyViewed } from "@/components/home/recently-viewed";
-import { getHomeSections, type OfferCampaign } from "@/lib/homepage";
+import {
+  getHomeSections,
+  isDemoProductVisible,
+  type OfferCampaign,
+} from "@/lib/homepage";
 import { getActiveOffer } from "@/lib/offers-db";
 import { getFeatureFlags, getGiftCardSettings, getHomepageControl, getMediaMap } from "@/lib/admin/settings";
 import { getSiteContent } from "@/lib/site-content";
@@ -165,6 +169,9 @@ export default async function HomePage() {
   const sections = candidate.filter((section) => featureAllowed(section.key));
   const campaign = activeOffer.campaign;
   const offerCoupon = activeOffer.coupon;
+  const heroSlides = content.home.heroSlides.filter((slide) =>
+    isDemoProductVisible(slide.isDemo)
+  );
 
   return (
     <div className="home-light">
@@ -182,7 +189,7 @@ export default async function HomePage() {
           giftCardMode={giftSettings.mode}
           giftCardImage={media["gift-card-art"]}
           giftCardCopy={content.home.sections.giftcards}
-          heroSlides={content.home.heroSlides}
+          heroSlides={heroSlides}
           featured={dbProducts}
         />
       ))}

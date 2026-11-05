@@ -2,6 +2,7 @@ import "server-only";
 
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { normalizeVariants } from "@/lib/variants";
+import { STORE_SETTINGS } from "@/lib/settings";
 import type { Product } from "@/lib/types";
 
 type Row = {
@@ -78,7 +79,11 @@ export async function getDbProducts(department?: string, category?: string) {
   if (category) query = query.eq("category", category);
   const { data, error } = await query;
   if (error) return [];
-  return (data ?? []).map((row) => mapProduct(row as Row));
+  return (data ?? [])
+    .map((row) => mapProduct(row as Row))
+    .filter(
+      (product) => !STORE_SETTINGS.hideDemoProducts || !product.isDemo
+    );
 }
 
 export async function getDbProduct(slug: string) {
@@ -90,5 +95,8 @@ export async function getDbProduct(slug: string) {
     .eq("slug", slug)
     .eq("status", "published")
     .maybeSingle();
-  return data ? mapProduct(data as Row) : undefined;
+  if (!data) return undefined;
+  const product = mapProduct(data as Row);
+  if (STORE_SETTINGS.hideDemoProducts && product.isDemo) return undefined;
+  return product;
 }

@@ -16,6 +16,12 @@ export function createAdminSupabaseClient() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     {
       auth: { persistSession: false, autoRefreshToken: false },
+      global: {
+        // Catalogue and settings reads must reflect admin changes immediately.
+        // Without this, Next caches Supabase GET responses in the build fetch
+        // cache and deleted products can keep appearing on the storefront.
+        fetch: (input, init) => fetch(input, { ...init, cache: "no-store" }),
+      },
     }
   );
 }

@@ -1446,7 +1446,7 @@ const allProducts: Product[] = seeds.map((seed) => ({
   sizeGuideId: seed.sizeGuideId ?? defaultSizeGuideId(seed.department, seed.category),
 }));
 
-export const products: Product[] = STORE_SETTINGS.hideDemoContent
+export const products: Product[] = STORE_SETTINGS.hideDemoContent || STORE_SETTINGS.hideDemoProducts
   ? allProducts.filter((product) => !product.isDemo)
   : allProducts;
 
@@ -1586,7 +1586,7 @@ export const demoUser = {
 };
 
 const productItem = (slug: string, size: string, color: string, qty = 1) => {
-  const p = getProduct(slug)!;
+  const p = allProducts.find((product) => product.slug === slug)!;
   return {
     productSlug: slug,
     name: p.name,
@@ -1597,7 +1597,7 @@ const productItem = (slug: string, size: string, color: string, qty = 1) => {
   };
 };
 
-export const demoOrders: Order[] = [
+const demoOrderSeeds: Order[] = [
   {
     orderNo: "BG-2610-1842",
     date: "2026-10-24",
@@ -1680,6 +1680,11 @@ export const demoOrders: Order[] = [
     ],
   },
 ];
+
+export const demoOrders: Order[] =
+  STORE_SETTINGS.hideDemoContent || STORE_SETTINGS.hideDemoProducts
+    ? []
+    : demoOrderSeeds;
 
 /* -------------------------------------------------------------------------- */
 /*  Lookbook & editorial                                                      */
