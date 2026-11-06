@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ProductCard } from "@/components/storefront/product-card";
+import { ProductComingSoon } from "@/components/storefront/product-coming-soon";
 import { ProductGrid } from "@/components/storefront/product-grid";
 import { SectionHeading } from "@/components/storefront/section-heading";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -26,7 +27,7 @@ type TabValue = (typeof tabs)[number]["value"];
 
 export function FeaturedProducts({ items }: { items?: Product[] }) {
   const lists =
-    items && items.length > 0
+    items !== undefined
       ? { new: items.slice(0, 8), best: items.slice(8, 16) }
       : {
           new: featuredProducts("new", 8),
@@ -36,8 +37,33 @@ export function FeaturedProducts({ items }: { items?: Product[] }) {
     lists.new.length > 0 ? "new" : "best"
   );
 
-  if (lists.new.length === 0 && lists.best.length === 0) return null;
   const copy = SECTION_COPY.products;
+  const empty = lists.new.length === 0 && lists.best.length === 0;
+
+  if (empty) {
+    return (
+      <section className="bg-[var(--color-ivory)] py-12 md:py-20 lg:py-24">
+        <div className="container-luxe">
+          <SectionHeading
+            contentKey="products"
+            eyebrow={copy.eyebrow}
+            title={copy.title}
+            description={copy.description}
+            linkHref="/shop"
+            linkLabel="Browse departments"
+          />
+          <ProductComingSoon
+            className="mt-7"
+            title="New arrivals are on the way."
+            description="The first real pieces are being prepared now. They will appear here as soon as they are published."
+            actionHref="/shop"
+            actionLabel="Explore the departments"
+          />
+        </div>
+      </section>
+    );
+  }
+
   const active = tabs.find((tab) => tab.value === activeTab) ?? tabs[0];
 
   return (
@@ -81,9 +107,11 @@ export function FeaturedProducts({ items }: { items?: Product[] }) {
                     ))}
                   </ProductGrid>
                 ) : (
-                  <p className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface)] p-8 text-center text-sm text-[var(--color-muted-foreground)]">
-                    New pieces are being added. Explore the departments in the meantime.
-                  </p>
+                  <ProductComingSoon
+                    compact
+                    title="Pieces are being added."
+                    description="Explore the departments in the meantime — the first pieces will appear here as soon as they are published."
+                  />
                 )}
               </TabsContent>
             );

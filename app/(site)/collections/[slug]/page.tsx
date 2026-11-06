@@ -5,8 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { ProductCollection } from "@/components/storefront/product-collection";
 import { collectionConfigs } from "@/lib/collections";
 import { getStoreCollection } from "@/lib/taxonomy-db";
-import { getDbProducts } from "@/lib/catalog-db";
-import { products } from "@/lib/data";
+import { getStoreCatalogue } from "@/lib/catalog-db";
 import { SITE } from "@/lib/constants";
 
 export function generateStaticParams() {
@@ -39,11 +38,7 @@ export default async function CollectionPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const dbProducts = await getDbProducts();
-  const catalogue = [
-    ...dbProducts,
-    ...products.filter((product) => !dbProducts.some((item) => item.slug === product.slug)),
-  ];
+  const catalogue = await getStoreCatalogue();
   const collection = await getStoreCollection(slug, catalogue);
   if (!collection) notFound();
 

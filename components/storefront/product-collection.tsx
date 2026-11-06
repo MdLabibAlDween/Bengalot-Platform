@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { ProductCard } from "@/components/storefront/product-card";
+import { ProductComingSoon } from "@/components/storefront/product-coming-soon";
 import { ProductGrid } from "@/components/storefront/product-grid";
 import { CollectionHero } from "@/components/storefront/collection-hero";
 import { JamdaniField } from "@/components/brand/ornaments";
@@ -71,28 +72,28 @@ export function ProductCollection({
           <div>
             <p className="eyebrow text-indigo">The full collection</p>
             <h2 className="mt-2 font-display text-[2.1rem] leading-none">
-              {products.length} {products.length === 1 ? "piece" : "pieces"}
-              {grouped ? " by department" : ""}
+              {products.length === 0
+                ? "Pieces coming soon"
+                : `${products.length} ${products.length === 1 ? "piece" : "pieces"}${grouped ? " by department" : ""}`}
             </h2>
           </div>
           <span className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-            {grouped ? "Arranged by department" : "One considered collection"}
+            {products.length === 0
+              ? "First drop in preparation"
+              : grouped
+                ? "Arranged by department"
+                : "One considered collection"}
           </span>
         </div>
 
         {products.length === 0 ? (
-          <div className="mx-auto mt-10 max-w-md rounded-2xl border border-dashed border-[var(--line-strong)] px-6 py-8 text-center">
-            <p className="font-display text-2xl">The collection is being prepared.</p>
-            <p className="mt-2 text-[0.8rem] leading-relaxed text-muted-foreground">
-              Explore the departments in the meantime.
-            </p>
-            <Link
-              href="/shop"
-              className="cta-primary mt-5 inline-flex h-10 items-center gap-2 rounded-full px-5 text-xs font-bold uppercase tracking-[0.1em]"
-            >
-              Browse departments <ArrowUpRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
+          <ProductComingSoon
+            className="mx-auto mt-10 max-w-xl"
+            title="The collection is being prepared."
+            description="Explore the departments in the meantime."
+            actionHref="/shop"
+            actionLabel="Browse departments"
+          />
         ) : grouped ? (
           <>
             <div className="mt-5 flex flex-wrap gap-2">

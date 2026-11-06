@@ -10,17 +10,17 @@ import { DepartmentCategoryGrid } from "@/components/storefront/department-categ
 import { DepartmentCategoryProvider } from "@/components/storefront/department-category-context";
 import { DepartmentCategoryStrip } from "@/components/storefront/department-category-strip";
 import { ProductCard } from "@/components/storefront/product-card";
+import { ProductComingSoon } from "@/components/storefront/product-coming-soon";
 import { ProductGrid } from "@/components/storefront/product-grid";
 import { getStoreBundles, getStoreCategories } from "@/lib/taxonomy-db";
 import { getMediaMap } from "@/lib/admin/settings";
 import {
   departments,
   getDepartment,
-  productsFor,
 } from "@/lib/data";
 import { SITE } from "@/lib/constants";
 import { STORE_SETTINGS } from "@/lib/settings";
-import { getDbProducts } from "@/lib/catalog-db";
+import { getStoreCatalogue } from "@/lib/catalog-db";
 
 export function generateStaticParams() {
   return departments.map((department) => ({ department: department.slug }));
@@ -61,16 +61,13 @@ export default async function DepartmentPage({
   if (!department) notFound();
 
   const allCategories = await getStoreCategories(department.slug);
-  const dbProducts = await getDbProducts(department.slug);
+  const catalogue = await getStoreCatalogue();
   const media = await getMediaMap();
   const departmentImage =
     media[`department.${department.slug}`] || media[`department-${department.slug}`];
-  const allProducts = [
-    ...dbProducts,
-    ...productsFor(department.slug).filter(
-      (product) => !dbProducts.some((item) => item.slug === product.slug)
-    ),
-  ];
+  const allProducts = catalogue.filter(
+    (product) => product.department === department.slug
+  );
   const total = allProducts.length;
   const empty = allCategories.filter(
     (category) => !allProducts.some((product) => product.category === category.slug)
@@ -131,9 +128,19 @@ export default async function DepartmentPage({
 
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-ivory/10 pt-5 text-xs font-semibold uppercase tracking-[0.14em] text-ivory/65">
               <span className="flex items-center gap-2">
-                <Layers className="h-3.5 w-3.5 text-gold" /> {total}{" "}
-                {total === 1 ? "piece" : "pieces"} · {allCategories.length}{" "}
-                {allCategories.length === 1 ? "category" : "categories"}
+                <Layers className="h-3.5 w-3.5 text-gold" />{" "}
+                {total > 0 ? (
+                  <>
+                    {total} {total === 1 ? "piece" : "pieces"} ·{" "}
+                    {allCategories.length}{" "}
+                    {allCategories.length === 1 ? "category" : "categories"}
+                  </>
+                ) : (
+                  <>
+                    Pieces coming soon · {allCategories.length}{" "}
+                    {allCategories.length === 1 ? "category" : "categories"}
+                  </>
+                )}
               </span>
               <span className="flex items-center gap-2">
                 <Truck className="h-3.5 w-3.5 text-gold" /> Delivery across Bangladesh
@@ -172,7 +179,9 @@ export default async function DepartmentPage({
                     {department.editorial}
                   </p>
                   <p className="mt-1 font-display text-2xl text-ivory">
-                    {allCategories.length - empty.length} categories
+                    {total === 0
+                      ? "First drop coming soon"
+                      : `${allCategories.length - empty.length} categories`}
                   </p>
                 </div>
                 <span className="rounded-full border border-ivory/20 bg-ivory/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-ivory/80 backdrop-blur">
@@ -203,6 +212,25 @@ export default async function DepartmentPage({
             />
           </div>
         </section>
+
+      {total === 0 && (
+        <section className="border-b border-[var(--border)] py-10 md:py-12">
+          <div className="container-luxe">
+            <div className="mb-5">
+              <p className="eyebrow text-indigo">Just landed</p>
+              <h2 className="mt-2 font-display text-[1.9rem] leading-none sm:text-[2.25rem]">
+                New in {department.name}
+              </h2>
+            </div>
+            <ProductComingSoon
+              title={`The ${department.name} collection is being prepared.`}
+              description={`The first pieces for ${department.name} are being added now. They will appear here as soon as they are published.`}
+              actionHref="/shop"
+              actionLabel="Browse other departments"
+            />
+          </div>
+        </section>
+      )}
 
       {newIn.length > 0 && (
         <section className="border-b border-[var(--border)] py-10 md:py-12">

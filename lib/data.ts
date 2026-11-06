@@ -1450,6 +1450,9 @@ export const products: Product[] = STORE_SETTINGS.hideDemoContent || STORE_SETTI
   ? allProducts.filter((product) => !product.isDemo)
   : allProducts;
 
+/** Full demo seed used by the admin seeding script. */
+export const seedProducts = allProducts;
+
 /* -------------------------------------------------------------------------- */
 /*  Helpers                                                                   */
 /* -------------------------------------------------------------------------- */

@@ -8,10 +8,9 @@ import { SearchForm } from "@/components/storefront/search-form";
 import { JamdaniField } from "@/components/brand/ornaments";
 import {
   departments,
-  products,
   trendingSearches,
 } from "@/lib/data";
-import { getDbProducts } from "@/lib/catalog-db";
+import { getStoreCatalogue } from "@/lib/catalog-db";
 import { SITE, WHATSAPP_LINK } from "@/lib/constants";
 import { WhatsAppIcon } from "@/components/site/whatsapp-icon";
 
@@ -28,11 +27,7 @@ export default async function SearchPage({
 }) {
   const { q = "" } = await searchParams;
   const query = q.trim();
-  const dbProducts = await getDbProducts();
-  const catalogue = [
-    ...dbProducts,
-    ...products.filter((product) => !dbProducts.some((item) => item.slug === product.slug)),
-  ];
+  const catalogue = await getStoreCatalogue();
   const needle = query.toLowerCase();
   const results = needle
     ? catalogue.filter((product) =>

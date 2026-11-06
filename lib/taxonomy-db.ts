@@ -9,6 +9,7 @@ import {
 } from "@/lib/collections";
 import { bundles, publishedBundles } from "@/lib/bundles";
 import { categories, products } from "@/lib/data";
+import { getSetting } from "@/lib/admin/settings";
 import { STORE_SETTINGS } from "@/lib/settings";
 import type { ArtIcon, Bundle, Category, Product } from "@/lib/types";
 import { discountedPrice } from "@/lib/utils";
@@ -324,11 +325,14 @@ export async function getStoreCollectionSummaries(catalogue: Product[] = product
 
 export const getStoreBundles = cache(async (department?: string) => {
   const admin = createAdminSupabaseClient();
-  if (!admin) {
-    return department
-      ? publishedBundles.filter((bundle) => bundle.department === department)
-      : publishedBundles;
-  }
+  const demoHidden = await getSetting<boolean>("demo_catalogue_hidden", false);
+  const fallback = department
+    ? publishedBundles.filter((bundle) => bundle.department === department)
+    : publishedBundles;
+  const availableFallback = demoHidden
+    ? fallback.filter((bundle) => !bundle.isDemo)
+    : fallback;
+  if (!admin) return availableFallback;
   let query = admin
     .from("store_bundles")
     .select("*")
@@ -336,19 +340,14 @@ export const getStoreBundles = cache(async (department?: string) => {
     .order("sort", { ascending: true });
   if (department) query = query.eq("department", department);
   const { data, error } = await query;
-  if (error || !data) {
-    return department
-      ? publishedBundles.filter((bundle) => bundle.department === department)
-      : publishedBundles;
-  }
+  if (error || !data) return availableFallback;
   if (data.length === 0 && !(await taxonomyTableHasRows(admin, "store_bundles"))) {
-    return department
-      ? publishedBundles.filter((bundle) => bundle.department === department)
-      : publishedBundles;
+    return availableFallback;
   }
   return (data as StoreBundleRow[])
     .map(mapBundleRow)
-    .filter((bundle) => !STORE_SETTINGS.hideDemoProducts || !bundle.isDemo);
+    .filter((bundle) => !STORE_SETTINGS.hideDemoProducts || !bundle.isDemo)
+    .filter((bundle) => !demoHidden || !bundle.isDemo);
 });
 
 export async function getAllStoreBundles() {
@@ -365,17 +364,21 @@ export async function getAllStoreBundles() {
 
 export const getStoreBundle = cache(async (slug: string) => {
   const admin = createAdminSupabaseClient();
+  const demoHidden = await getSetting<boolean>("demo_catalogue_hidden", false);
   const { data } = admin
     ? await admin.from("store_bundles").select("*").eq("slug", slug).maybeSingle()
     : { data: null };
   if (!data) {
     if (admin && (await taxonomyTableHasRows(admin, "store_bundles"))) return undefined;
-    return publishedBundles.find((bundle) => bundle.slug === slug);
+    const fallback = publishedBundles.find((bundle) => bundle.slug === slug);
+    if (demoHidden && fallback?.isDemo) return undefined;
+    return fallback;
   }
   const row = data as StoreBundleRow;
   if (row.status !== "published") return undefined;
   const bundle = mapBundleRow(row);
   if (STORE_SETTINGS.hideDemoProducts && bundle.isDemo) return undefined;
+  if (demoHidden && bundle.isDemo) return undefined;
   return bundle;
 });
 

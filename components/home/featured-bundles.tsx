@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { BundleCard } from "@/components/bundle/bundle-card";
+import { ProductComingSoon } from "@/components/storefront/product-coming-soon";
 import { ProductGrid } from "@/components/storefront/product-grid";
 import { SectionHeading } from "@/components/storefront/section-heading";
 import { getStoreBundles } from "@/lib/taxonomy-db";
@@ -9,8 +10,33 @@ import { SECTION_COPY } from "@/lib/homepage";
 
 export async function FeaturedBundles() {
   const bundles = (await getStoreBundles()).slice(0, 3);
-  if (bundles.length === 0) return null;
   const copy = SECTION_COPY.bundles;
+
+  if (bundles.length === 0) {
+    return (
+      <section className="bg-[var(--color-sand)] py-12 md:py-20 lg:py-24">
+        <div className="container-luxe">
+          <SectionHeading
+            contentKey="bundles"
+            eyebrow={copy.eyebrow}
+            title={copy.title}
+            accent={copy.accent}
+            description={copy.description}
+            linkHref="/shop"
+            linkLabel="Browse departments"
+          />
+          <ProductComingSoon
+            className="mt-7"
+            title="Complete outfits are being prepared."
+            description="Bundles will appear here once the first real pieces are published. Every department is still open to explore in the meantime."
+            actionHref="/shop"
+            actionLabel="Explore the departments"
+          />
+        </div>
+      </section>
+    );
+  }
+
   const bundleDepartments = departments.filter((department) =>
     bundles.some((bundle) => bundle.department === department.slug)
   );

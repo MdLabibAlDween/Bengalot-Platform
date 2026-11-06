@@ -1,23 +1,22 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { ArtIconGlyph } from "@/components/brand/product-art";
 import { Breadcrumbs } from "@/components/storefront/breadcrumbs";
 import { CategoryCatalog } from "@/components/storefront/category-catalog";
 import { CategoryChipBar } from "@/components/storefront/category-chip-bar";
 import { ProductCard } from "@/components/storefront/product-card";
+import { ProductComingSoon } from "@/components/storefront/product-coming-soon";
 import { ProductGrid } from "@/components/storefront/product-grid";
 import { SectionHeading } from "@/components/storefront/section-heading";
 import {
   categories,
-  categoryProducts,
   getDepartment,
-  productsFor,
 } from "@/lib/data";
 import { getStoreCategories, getStoreCategory } from "@/lib/taxonomy-db";
 import { SITE } from "@/lib/constants";
-import { getDbProducts } from "@/lib/catalog-db";
+import { getStoreCatalogue } from "@/lib/catalog-db";
 
 export function generateStaticParams() {
   return categories.map((category) => ({
@@ -59,17 +58,17 @@ export default async function CategoryPage({
   const category = await getStoreCategory(deptSlug, catSlug);
   if (!department || !category) notFound();
 
-  const dbProducts = await getDbProducts(department.slug, category.slug);
-  const items = [
-    ...dbProducts,
-    ...categoryProducts(department.slug, category.slug).filter(
-      (product) => !dbProducts.some((item) => item.slug === product.slug)
-    ),
-  ];
+  const catalogue = await getStoreCatalogue();
+  const items = catalogue.filter(
+    (product) =>
+      product.department === department.slug && product.category === category.slug
+  );
   const siblings = await getStoreCategories(department.slug);
-  const moreFromDepartment = [...productsFor(department.slug), ...(await getDbProducts(department.slug))]
-    .filter((product) => product.category !== category.slug)
-    .filter((product, index, array) => array.findIndex((item) => item.slug === product.slug) === index)
+  const moreFromDepartment = catalogue
+    .filter(
+      (product) =>
+        product.department === department.slug && product.category !== category.slug
+    )
     .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
     .slice(0, 4);
 
@@ -112,7 +111,13 @@ export default async function CategoryPage({
                 {category.tagline}
               </p>
               <p className="mt-3 text-[0.56rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                {items.length} {items.length === 1 ? "piece" : "pieces"}
+                {items.length > 0 ? (
+                  <>
+                    {items.length} {items.length === 1 ? "piece" : "pieces"}
+                  </>
+                ) : (
+                  "Pieces coming soon"
+                )}
               </p>
             </div>
             <div className="relative mx-auto hidden w-[130px] sm:block lg:w-[150px]">
@@ -151,21 +156,12 @@ export default async function CategoryPage({
         </section>
       ) : (
         <section className="container-luxe py-12 md:py-16">
-          <div className="rounded-2xl border border-dashed border-[var(--line-strong)] px-6 py-10 text-center">
-            <p className="eyebrow text-indigo">Coming soon</p>
-            <h2 className="mt-3 font-display text-2xl">
-              {category.name} is being prepared.
-            </h2>
-            <p className="mx-auto mt-2 max-w-md text-[0.78rem] leading-relaxed text-muted-foreground">
-              Explore the rest of {department.name} in the meantime.
-            </p>
-            <Link
-              href={`/${department.slug}`}
-              className="mt-5 inline-flex items-center gap-2 rounded-full bg-midnight px-5 py-2.5 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-ivory transition hover:bg-gold hover:text-midnight"
-            >
-              All {department.name} <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
+          <ProductComingSoon
+            title={`The ${category.name} collection is being prepared.`}
+            description={`Explore the rest of ${department.name} in the meantime.`}
+            actionHref={`/${department.slug}`}
+            actionLabel={`All ${department.name}`}
+          />
         </section>
       )}
 

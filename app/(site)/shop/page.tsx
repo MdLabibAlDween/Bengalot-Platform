@@ -8,9 +8,8 @@ import { Reveal } from "@/components/storefront/reveal";
 import {
   categoriesFor,
   departments,
-  products,
 } from "@/lib/data";
-import { getDbProducts } from "@/lib/catalog-db";
+import { getStoreCatalogue } from "@/lib/catalog-db";
 import { getMediaMap } from "@/lib/admin/settings";
 import { SITE, WHATSAPP_LINK } from "@/lib/constants";
 import { WhatsAppIcon } from "@/components/site/whatsapp-icon";
@@ -56,14 +55,10 @@ const collections = [
 ];
 
 export default async function ShopPage() {
-  const [dbProducts, media] = await Promise.all([
-    getDbProducts(),
+  const [catalogue, media] = await Promise.all([
+    getStoreCatalogue(),
     getMediaMap(),
   ]);
-  const catalogue = [
-    ...dbProducts,
-    ...products.filter((product) => !dbProducts.some((item) => item.slug === product.slug)),
-  ];
   return (
     <>
       <section className="relative overflow-hidden border-b border-[var(--border)] bg-[var(--surface-2)]">

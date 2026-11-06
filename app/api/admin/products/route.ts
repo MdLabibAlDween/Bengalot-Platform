@@ -164,22 +164,50 @@ function productPayload(
 export async function DELETE(request: Request) {
   const auth = await requireAdminRoleApi(["super_admin", "manager", "content_editor"]);
   if ("error" in auth) return auth.error;
-  const body = (await request.json().catch(() => null)) as { id?: string } | null;
-  const id = z.string().uuid().safeParse(body?.id);
-  if (!id.success) return badRequest("Invalid product id.");
-  const { error } = await auth.admin.from("products").delete().eq("id", id.data);
+  const deleteSchema = z
+    .object({
+      id: z.string().uuid().optional(),
+      ids: z.array(z.string().uuid()).min(1).max(500).optional(),
+    })
+    .refine((value) => Boolean(value.id) || Boolean(value.ids?.length), {
+      message: "Choose at least one product.",
+    });
+  const parsed = deleteSchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success) {
+    return badRequest(parsed.error.issues[0]?.message ?? "Invalid product id.");
+  }
+  const ids = parsed.data.ids ?? [parsed.data.id!];
+  const { data: deleted, error } = await auth.admin
+    .from("products")
+    .delete()
+    .in("id", ids)
+    .select("id");
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  if ((deleted?.length ?? 0) > 0) {
+    const { count } = await auth.admin
+      .from("products")
+      .select("id", { count: "exact", head: true });
+    await auth.admin.from("settings").upsert(
+      {
+        key: "demo_catalogue_hidden",
+        value: (count ?? 0) === 0,
+        is_public: false,
+      },
+      { onConflict: "key" }
+    );
+  }
   await writeAuditLog({
     actorId: auth.context.user.id,
     actorEmail: auth.context.profile.email,
-    action: "product_deleted",
+    action: ids.length > 1 ? "products_bulk_deleted" : "product_deleted",
     entity: "products",
-    entityId: id.data,
+    entityId: ids.length === 1 ? ids[0] : "multiple",
+    after: { count: deleted?.length ?? 0, ids: ids.slice(0, 100) },
   });
   revalidatePath("/admin/catalogue");
   revalidatePath("/", "layout");
   revalidatePath("/sitemap.xml");
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, deleted: deleted?.length ?? 0 });
 }
 
 export async function POST(request: Request) {

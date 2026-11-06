@@ -237,9 +237,11 @@ export function Hero({
   const products = useMemo(
     () =>
       (slide?.productSlugs ?? [])
-        .map((slug) => liveProducts.get(slug) ?? getProduct(slug))
+        .map((slug) =>
+          catalogue ? liveProducts.get(slug) : liveProducts.get(slug) ?? getProduct(slug)
+        )
         .filter((product): product is Product => Boolean(product)),
-    [slide, liveProducts]
+    [slide, liveProducts, catalogue]
   );
 
   useEffect(() => {

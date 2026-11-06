@@ -3,6 +3,8 @@ import "server-only";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { normalizeVariants } from "@/lib/variants";
 import { STORE_SETTINGS } from "@/lib/settings";
+import { getSetting } from "@/lib/admin/settings";
+import { products as seedProducts } from "@/lib/data";
 import type { Product } from "@/lib/types";
 
 type Row = {
@@ -99,4 +101,24 @@ export async function getDbProduct(slug: string) {
   const product = mapProduct(data as Row);
   if (STORE_SETTINGS.hideDemoProducts && product.isDemo) return undefined;
   return product;
+}
+
+/**
+ * The database is the source of truth once it has products. The static seed is
+ * only used when the catalogue is empty, so deleting demo rows in admin does
+ * not make them reappear from the old seed data.
+ */
+export async function getStoreCatalogue() {
+  const dbProducts = await getDbProducts();
+  if (dbProducts.length > 0) return dbProducts;
+  if (STORE_SETTINGS.hideDemoProducts) return [];
+  const demoHidden = await getSetting<boolean>("demo_catalogue_hidden", false);
+  return demoHidden ? [] : seedProducts;
+}
+
+export async function getStoreProduct(slug: string) {
+  const dbProduct = await getDbProduct(slug);
+  if (dbProduct) return dbProduct;
+  const catalogue = await getStoreCatalogue();
+  return catalogue.find((product) => product.slug === slug);
 }

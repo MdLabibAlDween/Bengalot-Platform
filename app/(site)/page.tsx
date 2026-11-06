@@ -24,7 +24,7 @@ import { getActiveOffer } from "@/lib/offers-db";
 import { getFeatureFlags, getGiftCardSettings, getHomepageControl, getMediaMap } from "@/lib/admin/settings";
 import { getSiteContent } from "@/lib/site-content";
 import { safeJsonLd } from "@/lib/utils";
-import { getDbProducts } from "@/lib/catalog-db";
+import { getStoreCatalogue } from "@/lib/catalog-db";
 import type { HeroSlide, SectionCopy } from "@/lib/homepage";
 import type { Coupon, Product, Reel } from "@/lib/types";
 import { SITE } from "@/lib/constants";
@@ -141,12 +141,12 @@ function Section({
 }
 
 export default async function HomePage() {
-  const [features, control, giftSettings, content, dbProducts, activeOffer, media] = await Promise.all([
+  const [features, control, giftSettings, content, catalogue, activeOffer, media] = await Promise.all([
     getFeatureFlags(),
     getHomepageControl(),
     getGiftCardSettings(),
     getSiteContent(),
-    getDbProducts(),
+    getStoreCatalogue(),
     getActiveOffer(),
     getMediaMap(),
   ]);
@@ -190,7 +190,7 @@ export default async function HomePage() {
           giftCardImage={media["gift-card-art"]}
           giftCardCopy={content.home.sections.giftcards}
           heroSlides={heroSlides}
-          featured={dbProducts}
+          featured={catalogue}
         />
       ))}
     </div>

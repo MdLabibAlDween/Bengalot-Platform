@@ -7,8 +7,7 @@ import { Breadcrumbs } from "@/components/storefront/breadcrumbs";
 import { ProductGrid } from "@/components/storefront/product-grid";
 import { Reveal } from "@/components/storefront/reveal";
 import { getStoreCollectionSummaries } from "@/lib/taxonomy-db";
-import { getDbProducts } from "@/lib/catalog-db";
-import { products } from "@/lib/data";
+import { getStoreCatalogue } from "@/lib/catalog-db";
 import { SITE } from "@/lib/constants";
 
 export const metadata: Metadata = {
@@ -19,11 +18,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CollectionsPage() {
-  const dbProducts = await getDbProducts();
-  const catalogue = [
-    ...dbProducts,
-    ...products.filter((product) => !dbProducts.some((item) => item.slug === product.slug)),
-  ];
+  const catalogue = await getStoreCatalogue();
   const collections = await getStoreCollectionSummaries(catalogue);
 
   return (
@@ -111,7 +106,9 @@ export default async function CollectionsPage() {
                     </h2>
                     <div className="mt-4 flex items-center justify-between gap-3 border-t border-ivory/10 pt-3">
                       <p className="text-[0.56rem] uppercase tracking-[0.14em] text-ivory/45">
-                        {collection.productCount} pieces
+                        {collection.productCount > 0
+                          ? `${collection.productCount} ${collection.productCount === 1 ? "piece" : "pieces"}`
+                          : "Coming soon"}
                       </p>
                       <span className="flex items-center gap-2 text-[0.52rem] font-bold uppercase tracking-[0.12em] text-ivory/70 transition group-hover:text-gold">
                         View collection <span className="h-px w-5 bg-current" />

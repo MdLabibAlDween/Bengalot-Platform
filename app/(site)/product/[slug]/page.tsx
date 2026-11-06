@@ -16,13 +16,11 @@ import { RecentlyViewed } from "@/components/home/recently-viewed";
 import {
   getCategory,
   getDepartment,
-  getProduct,
   getSizeGuide,
-  productsFor,
   reviewsFor,
 } from "@/lib/data";
 import { getStoreCollection, getStoreBundles } from "@/lib/taxonomy-db";
-import { getDbProduct, getDbProducts } from "@/lib/catalog-db";
+import { getStoreCatalogue, getStoreProduct } from "@/lib/catalog-db";
 import { SITE } from "@/lib/constants";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import type { Product, Review } from "@/lib/types";
@@ -31,7 +29,7 @@ import { cn, safeJsonLd } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 async function resolveProduct(slug: string): Promise<Product | undefined> {
-  return (await getDbProduct(slug)) ?? getProduct(slug);
+  return getStoreProduct(slug);
 }
 
 function BrowseTile({ href, label }: { href: string; label: string }) {
@@ -151,13 +149,9 @@ export default async function ProductPage({
     : "Collections";
 
   const audience = product.audience ?? "unisex";
-  const dbDepartmentProducts = await getDbProducts(department.slug);
-  const departmentCatalogue = [
-    ...dbDepartmentProducts,
-    ...productsFor(department.slug).filter(
-      (item) => !dbDepartmentProducts.some((dbItem) => dbItem.slug === item.slug)
-    ),
-  ];
+  const departmentCatalogue = (await getStoreCatalogue()).filter(
+    (item) => item.department === department.slug
+  );
   const eligible = departmentCatalogue.filter(
     (item) =>
       item.slug !== product.slug &&

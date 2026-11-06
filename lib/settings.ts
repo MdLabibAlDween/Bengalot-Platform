@@ -17,8 +17,9 @@ export const STORE_SETTINGS = {
   // Local previews keep the demo catalogue visible. The database default is
   // ON so a production launch hides demo rows until real content is added.
   hideDemoContent: false,
-  // Hide the seeded demo catalogue while real products are being added.
-  hideDemoProducts: true,
+  // Demo catalogue is visible while the storefront is being prepared.
+  // The static seed is only a fallback; the admin catalogue is the source of truth.
+  hideDemoProducts: false,
   showComingSoonCategories: false,
   deliveryInside: 70,
   deliveryOutside: 130,

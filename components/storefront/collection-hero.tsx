@@ -55,7 +55,9 @@ export function CollectionHero({
           All departments
         </Link>
         <span className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-          {products.length} {products.length === 1 ? "piece" : "pieces"}
+          {products.length > 0
+            ? `${products.length} ${products.length === 1 ? "piece" : "pieces"}`
+            : "Pieces coming soon"}
         </span>
       </div>
     </PageHero>

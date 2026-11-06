@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
-import { getDbProducts } from "@/lib/catalog-db";
-import { departments, products } from "@/lib/data";
+import { getStoreCatalogue } from "@/lib/catalog-db";
+import { departments } from "@/lib/data";
 import { isDemoBundle } from "@/lib/bundles";
 import { getStoreBundles, getStoreCategories, getStoreCollections } from "@/lib/taxonomy-db";
 import { getFeatureFlags } from "@/lib/admin/settings";
@@ -32,12 +32,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   // Demo listings stay browsable but must not be indexed or advertised as
-  // purchasable products. Database rows take precedence over the static seed.
-  const catalogue = new Map(products.map((product) => [product.slug, product]));
-  for (const product of await getDbProducts()) {
-    catalogue.set(product.slug, product);
-  }
-  const indexableProducts = [...catalogue.values()].filter((product) => !product.isDemo);
+  // purchasable products. The database is the source of truth once populated.
+  const indexableProducts = (await getStoreCatalogue()).filter(
+    (product) => !product.isDemo
+  );
   const [storeCategories, storeCollections, storeBundles] = await Promise.all([
     getStoreCategories(),
     getStoreCollections(),
