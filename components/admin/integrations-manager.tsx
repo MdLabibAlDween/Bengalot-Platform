@@ -17,6 +17,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { EmailText } from "@/components/site/email-display";
 import { Input, Label, Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import type { IntegrationsConfig } from "@/lib/admin/settings";
@@ -394,7 +395,10 @@ export function IntegrationsManager({
               placeholder="name@domain.com"
               autoComplete="username"
             />
-            <p className="mt-1 text-[0.56rem] text-muted-foreground">Use the full email address, e.g. info@bengalot.com.</p>
+            <p className="mt-1 text-[0.56rem] text-muted-foreground">
+              Use the full email address, e.g.{" "}
+              <EmailText email="info@bengalot.com" fallback="the outgoing email address" />.
+            </p>
           </div>
           <div>
             <Label>Password {secretStatus.smtpPassword && <span className="text-jade">(configured)</span>}</Label>

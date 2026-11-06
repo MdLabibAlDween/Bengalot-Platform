@@ -15,12 +15,13 @@ import { ContactForm } from "@/components/storefront/contact-form";
 import { SITE, WHATSAPP_LINK } from "@/lib/constants";
 import { STORE_SETTINGS } from "@/lib/settings";
 import { getSiteContent } from "@/lib/site-content";
+import { EmailLink, EmailText } from "@/components/site/email-display";
 import { WhatsAppIcon } from "@/components/site/whatsapp-icon";
 
 export const metadata: Metadata = {
   title: "Contact — Let's talk",
   description:
-    "Contact Bengalot on WhatsApp at 01341739202 or support@bengalot.com. Online only, delivering across Bangladesh.",
+    "Contact Bengalot on WhatsApp at 01341739202 or email our support team. Online only, delivering across Bangladesh.",
   alternates: { canonical: `${SITE.url}/contact` },
 };
 
@@ -101,8 +102,8 @@ export default async function ContactPage() {
               <ArrowUpRight className="h-4 w-4 text-muted-foreground transition group-hover:rotate-45 group-hover:text-gold" />
             </a>
 
-            <a
-              href={`mailto:${SITE.email}`}
+            <EmailLink
+              email={SITE.email}
               className="group flex items-start gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 transition hover:border-gold"
             >
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gold/10 text-gold">
@@ -112,13 +113,15 @@ export default async function ContactPage() {
                 <p className="text-[0.55rem] font-bold uppercase tracking-[0.16em] text-muted-foreground">
                   Email support
                 </p>
-                <p className="mt-1 font-display text-xl">{SITE.email}</p>
+                <p className="mt-1 font-display text-xl">
+                  <EmailText email={SITE.email} fallback="Email support" />
+                </p>
                 <p className="mt-0.5 text-[0.68rem] text-muted-foreground">
                   For exchanges, invoices and anything detailed.
                 </p>
               </div>
               <ArrowUpRight className="h-4 w-4 text-muted-foreground transition group-hover:rotate-45 group-hover:text-gold" />
-            </a>
+            </EmailLink>
 
             <div className="flex items-start gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-royal/10 text-royal ">

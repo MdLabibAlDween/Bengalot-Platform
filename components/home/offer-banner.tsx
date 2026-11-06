@@ -40,12 +40,24 @@ export function OfferBanner({
 
   if (!campaign || !coupon || expired) return null;
 
-  const remaining = end ? Math.max(0, end - (now ?? Date.now())) : 0;
+  const remaining = end && now !== null ? Math.max(0, end - now) : 0;
   const units = [
-    { label: "Days", value: Math.floor(remaining / (1000 * 60 * 60 * 24)) },
-    { label: "Hours", value: Math.floor((remaining / (1000 * 60 * 60)) % 24) },
-    { label: "Minutes", value: Math.floor((remaining / (1000 * 60)) % 60) },
-    { label: "Seconds", value: Math.floor((remaining / 1000) % 60) },
+    {
+      label: "Days",
+      value: now === null ? "--" : pad(Math.floor(remaining / (1000 * 60 * 60 * 24))),
+    },
+    {
+      label: "Hours",
+      value: now === null ? "--" : pad(Math.floor((remaining / (1000 * 60 * 60)) % 24)),
+    },
+    {
+      label: "Minutes",
+      value: now === null ? "--" : pad(Math.floor((remaining / (1000 * 60)) % 60)),
+    },
+    {
+      label: "Seconds",
+      value: now === null ? "--" : pad(Math.floor((remaining / 1000) % 60)),
+    },
   ];
 
   const amount =
@@ -164,7 +176,7 @@ export function OfferBanner({
                       className="rounded-xl border border-ivory/10 bg-ivory/[0.06] py-3 text-center sm:py-4"
                     >
                       <p className="font-display text-[1.8rem] tabular-nums leading-none text-ivory sm:text-[2.1rem]">
-                        {now === null ? "--" : pad(unit.value)}
+                        {unit.value}
                       </p>
                       <p className="mt-1.5 text-xs font-bold uppercase tracking-[0.1em] text-gold/80">
                         {unit.label}

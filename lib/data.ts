@@ -2118,8 +2118,8 @@ export const faqs = [
     q: "Do you offer exchanges?",
     a:
       STORE_SETTINGS.exchangeWindowEnabled && STORE_SETTINGS.exchangeWindowDays > 0
-        ? `Yes — unused items with tags intact can be exchanged within ${STORE_SETTINGS.exchangeWindowDays} days of delivery. Contact us on WhatsApp at 01341739202 or email support@bengalot.com to arrange a pickup.`
-        : "Contact us on WhatsApp at 01341739202 or email support@bengalot.com and we will check the options for your item under the current return policy.",
+        ? `Yes — unused items with tags intact can be exchanged within ${STORE_SETTINGS.exchangeWindowDays} days of delivery. Contact us on WhatsApp at 01341739202 or email our support team to arrange a pickup.`
+        : "Contact us on WhatsApp at 01341739202 or email our support team and we will check the options for your item under the current return policy.",
   },
   {
     q: "Are your sarees and panjabis handmade?",

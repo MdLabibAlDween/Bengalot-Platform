@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
+import { EmailLink, EmailText } from "@/components/site/email-display";
 import {
   Dialog,
   DialogContent,
@@ -626,9 +627,12 @@ export function SecurityView() {
 
       <p className="mt-4 text-[0.58rem] leading-relaxed text-muted-foreground">
         Need help with account security? Email{" "}
-        <a href="mailto:support@bengalot.com" className="underline underline-offset-2 hover:text-gold">
-          support@bengalot.com
-        </a>{" "}
+        <EmailLink
+          email="support@bengalot.com"
+          className="underline underline-offset-2 hover:text-gold"
+        >
+          <EmailText email="support@bengalot.com" fallback="our support team" />
+        </EmailLink>{" "}
         or read our{" "}
         <Link href="/privacy-policy" className="underline underline-offset-2 hover:text-gold">
           privacy policy

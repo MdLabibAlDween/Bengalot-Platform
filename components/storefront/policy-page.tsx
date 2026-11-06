@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight, Clock3, Mail, Sparkles } from "lucide-react";
 import { JamdaniField } from "@/components/brand/ornaments";
 import { Breadcrumbs } from "@/components/storefront/breadcrumbs";
+import { EmailText } from "@/components/site/email-display";
 import { SITE, WHATSAPP_LINK } from "@/lib/constants";
 import { STORE_SETTINGS } from "@/lib/settings";
 import { WhatsAppIcon } from "@/components/site/whatsapp-icon";
@@ -110,7 +111,7 @@ export function PolicyPage({
                 <div>
                   <p className="font-display text-lg">Questions about this policy?</p>
                   <p className="mt-1 text-[0.68rem] text-muted-foreground">
-                    Write to {SITE.email} and we will get back to you.
+                    Write to <EmailText email={SITE.email} fallback="our support team" /> and we will get back to you.
                   </p>
                 </div>
               </div>

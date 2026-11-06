@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { InvoicePrintButton } from "@/components/invoice/print-button";
+import { EmailText } from "@/components/site/email-display";
 import { requireAdminPageRole } from "@/lib/admin/auth";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import type { InvoiceRow } from "@/lib/invoices";
@@ -29,6 +30,10 @@ export default async function InvoicePrintPage({
   const footer =
     (invoice.snapshot?.footer as string | undefined) ??
     "Thank you for shopping with Bengalot.";
+  const safeFooter = footer.replace(
+    /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g,
+    "our support team"
+  );
 
   return (
     <div className="min-h-screen bg-white text-[#1a1626] print:bg-white">
@@ -58,7 +63,9 @@ export default async function InvoicePrintPage({
               <br />
               {seller.address ?? "Saltha, Faridpur, Bangladesh"}
               <br />
-              {seller.email ?? ""}
+              {seller.email ? (
+                <EmailText email={seller.email} fallback="" />
+              ) : null}
             </p>
           </div>
           <div className="text-right">
@@ -153,9 +160,13 @@ export default async function InvoicePrintPage({
         </div>
 
         <footer className="mt-10 border-t border-[#e5dfd3] pt-4 text-[0.6rem] leading-relaxed text-[#6b6578]">
-          <p>{footer}</p>
+          <p>{safeFooter}</p>
           <p className="mt-1">
-            Questions? {seller.replyTo ?? seller.email ?? "support@bengalot.com"}
+            Questions?{" "}
+            <EmailText
+              email={seller.replyTo ?? seller.email ?? "support@bengalot.com"}
+              fallback="our support team"
+            />
           </p>
         </footer>
       </div>

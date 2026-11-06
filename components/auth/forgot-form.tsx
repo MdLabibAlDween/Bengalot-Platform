@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
+import { EmailText } from "@/components/site/email-display";
 import { friendlyAuthError, type FriendlyAuthError } from "@/lib/auth-errors";
 
 export function ForgotForm({ emailEnabled = true }: { emailEnabled?: boolean }) {
@@ -83,8 +84,9 @@ export function ForgotForm({ emailEnabled = true }: { emailEnabled?: boolean }) 
       {!emailEnabled && (
         <div className="mt-5 rounded-xl border border-gold/30 bg-gold/[0.06] px-3.5 py-3 text-[0.66rem] leading-relaxed text-muted-foreground">
           <strong className="text-foreground">Password reset opens soon.</strong> We are
-          finishing the email service. Please contact support@bengalot.com if you need help
-          signing in.
+          finishing the email service. Please contact{" "}
+          <EmailText email="support@bengalot.com" fallback="our support team" /> if you
+          need help signing in.
         </div>
       )}
 

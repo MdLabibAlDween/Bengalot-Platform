@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input, Label, Select, Textarea } from "@/components/ui/input";
 import { AccountHeading } from "./account-heading";
 import { SITE, WHATSAPP_LINK } from "@/lib/constants";
+import { EmailLink, EmailText } from "@/components/site/email-display";
 import { WhatsAppIcon } from "@/components/site/whatsapp-icon";
 import { cn } from "@/lib/utils";
 
@@ -112,17 +113,19 @@ export function SupportView() {
             Fastest
           </p>
         </a>
-        <a
-          href={`mailto:${SITE.email}`}
+        <EmailLink
+          email={SITE.email}
           className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 transition hover:border-gold"
         >
           <Mail className="h-5 w-5 text-gold" />
           <p className="mt-3 text-[0.7rem] font-semibold">Email</p>
-          <p className="mt-0.5 truncate text-[0.62rem] text-muted-foreground">{SITE.email}</p>
+          <p className="mt-0.5 truncate text-[0.62rem] text-muted-foreground">
+            <EmailText email={SITE.email} fallback="Email support" />
+          </p>
           <p className="mt-2 text-[0.5rem] font-bold uppercase tracking-[0.1em] text-muted-foreground">
             Reply in 1 day
           </p>
-        </a>
+        </EmailLink>
         <Link
           href="/contact"
           className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 transition hover:border-gold"

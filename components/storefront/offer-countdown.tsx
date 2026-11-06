@@ -25,7 +25,7 @@ export function OfferCountdown({
     return () => window.clearInterval(timer);
   }, [target]);
 
-  if (!target || expired || (Number.isFinite(target) && Date.now() >= target)) {
+  if (!target || expired) {
     return null;
   }
 
