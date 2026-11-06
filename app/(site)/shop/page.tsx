@@ -5,6 +5,7 @@ import { DepartmentArt } from "@/components/brand/product-art";
 import { JamdaniField, SealStamp } from "@/components/brand/ornaments";
 import { Breadcrumbs } from "@/components/storefront/breadcrumbs";
 import { Reveal } from "@/components/storefront/reveal";
+import { ShopCatalogue } from "@/components/storefront/shop-catalogue";
 import {
   categoriesFor,
   departments,
@@ -107,14 +108,26 @@ export default async function ShopPage() {
       </section>
 
       <section className="container-luxe py-10 md:py-14">
-        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+        <div className="mb-3 flex items-center justify-between sm:hidden">
+          <p className="text-[0.56rem] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+            Swipe departments
+          </p>
+          <p className="text-[0.56rem] font-bold uppercase tracking-[0.14em] text-gold-ink">
+            01 — 06
+          </p>
+        </div>
+        <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 md:grid-cols-3 lg:grid-cols-6">
           {departments.map((department, index) => {
             const count = catalogue.filter((product) => product.department === department.slug).length;
             const cats = categoriesFor(department.slug).slice(0, 2);
             const image =
               media[`department.${department.slug}`] || media[`department-${department.slug}`];
             return (
-              <Reveal key={department.slug} delay={(index % 3) * 0.06}>
+              <Reveal
+                key={department.slug}
+                delay={(index % 3) * 0.06}
+                className="min-w-[78%] snap-center sm:min-w-0"
+              >
                 <Link
                   href={`/${department.slug}`}
                   className="group relative block overflow-hidden rounded-[18px] border border-white/10 shadow-[0_24px_50px_-38px_rgba(20,10,50,0.5)] transition-transform duration-500 hover:-translate-y-1"
@@ -180,6 +193,8 @@ export default async function ShopPage() {
           })}
         </div>
       </section>
+
+      <ShopCatalogue catalogue={catalogue} />
 
       <section className="border-t border-[var(--border)] bg-[var(--surface-2)] py-10 md:py-14">
         <div className="container-luxe">
