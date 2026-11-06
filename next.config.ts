@@ -53,6 +53,9 @@ const productionSecurityHeaders =
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   devIndicators: false,
+  // Serve both /path and /path/ with 200 instead of permanent 308 redirects.
+  // This also breaks old cached redirects that could bounce /shop -> /shop/.
+  skipTrailingSlashRedirect: true,
   images: {
     remotePatterns: [
       {

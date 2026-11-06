@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -25,7 +26,14 @@ import { WhatsAppIcon } from "./whatsapp-icon";
 export function Footer() {
   const { t } = useLocale();
   const { features, content } = useSiteConfig();
+  const [emailReady, setEmailReady] = useState(false);
   const footerContent = (content?.footer as { tagline?: string; note?: string } | undefined) ?? {};
+
+  useEffect(() => {
+    // Cloudflare email obfuscation rewrites server HTML and causes hydration
+    // mismatches. Reveal the address only after the client has hydrated.
+    setEmailReady(true);
+  }, []);
 
   const helpLinks = [
     { href: "/track", label: "Track your order" },
@@ -80,11 +88,11 @@ export function Footer() {
                 {SITE.address}
               </p>
               <a
-                href={`mailto:${SITE.email}`}
+                href={emailReady ? `mailto:${SITE.email}` : undefined}
                 className="flex items-center gap-2.5 text-ivory/65 transition hover:text-gold"
               >
                 <Mail className="h-3.5 w-3.5 shrink-0 text-gold" aria-hidden="true" />
-                {SITE.email}
+                {emailReady ? SITE.email : "Email support"}
               </a>
               <a
                 href={WHATSAPP_LINK}
