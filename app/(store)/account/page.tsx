@@ -181,7 +181,7 @@ export default async function AccountOverviewPage() {
                 </h3>
                 <p className="mt-2 max-w-sm text-[0.74rem] leading-relaxed text-muted">
                   Digital tools appear here after payment is confirmed. Start
-                  with the Student OS or a printable planner.
+                  with the Student OS or a focus guide.
                 </p>
                 <Link href="/shop" className="btn btn-primary btn-sm mt-5">
                   Explore digital tools

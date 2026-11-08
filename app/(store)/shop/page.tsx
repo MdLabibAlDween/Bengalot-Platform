@@ -7,7 +7,7 @@ import { getCatalog } from "@/lib/data/catalog";
 export const metadata: Metadata = {
   title: "Shop all study tools",
   description:
-    "Notion templates, printed study cards, printable planners and focus tools from Bengalot. Browse every collection in one place.",
+    "Notion templates, printed study cards, printed planners and focus tools from Bengalot. Browse every collection in one place.",
 };
 
 export default async function ShopPage() {

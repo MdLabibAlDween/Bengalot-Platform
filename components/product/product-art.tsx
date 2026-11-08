@@ -406,7 +406,7 @@ function BundleScene({ product, view }: { product: ArtProduct; view: ArtView }) 
       <div className="relative w-[86%]">
         <div className="absolute -right-[2%] top-[-26%] z-20 w-[32%] rotate-[8deg] rounded-[1.2cqw] border border-white/40 bg-[#ffffff] px-[1.8cqw] py-[1.5cqw] shadow-lg">
           <p className="text-[1.05cqw] font-extrabold uppercase tracking-[0.14em] text-[#0d6f6d]">
-            Save 17%
+            {product.includes.length} resources
           </p>
           <p className="mt-[0.6cqw] font-display text-[1.8cqw] leading-tight text-[#152232]">
             the complete start
@@ -414,7 +414,7 @@ function BundleScene({ product, view }: { product: ArtProduct; view: ArtView }) 
         </div>
         <div className="absolute left-[6%] top-[-16%] z-10 h-[30%] w-[26%] -rotate-[8deg] rounded-[1cqw] border border-white/40 bg-[#f3c95f] p-[1.5cqw] shadow-md">
           <p className="text-[1cqw] font-bold uppercase tracking-[0.12em] text-[#45350b]">
-            Study cards
+            Inside the kit
           </p>
           <div className="mt-[1cqw] h-[0.6cqw] w-[70%] rounded-full bg-[#45350b]/25" />
         </div>
@@ -446,7 +446,9 @@ function BundleScene({ product, view }: { product: ArtProduct; view: ArtView }) 
             Bengalot · complete kit
           </span>
           <span className="h-px flex-1 mx-[3%] bg-cream/20" />
-          <span className="text-[1.1cqw] font-semibold text-cream/60">3 resources</span>
+          <span className="text-[1.1cqw] font-semibold text-cream/60">
+            {product.includes.length} resources
+          </span>
         </div>
       </div>
     </div>

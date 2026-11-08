@@ -16,6 +16,7 @@ export function BuyPanel({ product }: { product: Product }) {
   const [buying, setBuying] = useState(false);
   const router = useRouter();
   const isPhysical = product.type === "physical";
+  const isBundle = product.category_slug === "bundles";
   const soldOut = isPhysical && product.stock <= 0;
 
   useEffect(() => {
@@ -55,7 +56,9 @@ export function BuyPanel({ product }: { product: Product }) {
       </div>
       <p className="mt-1.5 text-[0.68rem] font-medium text-muted">
         {isPhysical
-          ? `In stock · ships in 2–4 days · ${product.stock} available`
+          ? isBundle
+            ? `In stock · ships in 2–4 days · digital tools unlock after payment`
+            : `In stock · ships in 2–4 days · ${product.stock} available`
           : "Digital access opens after payment confirmation"}
       </p>
 
@@ -144,11 +147,22 @@ export function BuyPanel({ product }: { product: Product }) {
               {isPhysical ? "Packed with care" : "Instant access"}
             </p>
             <p className="mt-0.5 text-[0.56rem] leading-relaxed text-muted">
-              {isPhysical ? "Checked before dispatch" : "In your library after payment"}
+              {isPhysical
+                ? isBundle
+                  ? "Ships, then unlocks in your library"
+                  : "Checked before dispatch"
+                : "In your library after payment"}
             </p>
           </div>
         </div>
       </div>
+
+      {isBundle && isPhysical ? (
+        <p className="mt-3 rounded-lg bg-paper px-3 py-2 text-[0.6rem] leading-relaxed text-muted">
+          The printed planners ship to you. The Notion workspace and Deep Work
+          guide are added to your library after payment.
+        </p>
+      ) : null}
     </div>
   );
 }

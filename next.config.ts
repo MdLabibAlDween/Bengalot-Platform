@@ -44,6 +44,15 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  async redirects() {
+    return [
+      {
+        source: "/shop/printable-planners",
+        destination: "/shop/printed-planners",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

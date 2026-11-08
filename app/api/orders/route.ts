@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getBundleDigitalComponents } from "@/lib/bundles";
 import { getResourceLink } from "@/lib/resource-links";
 import { normalizeBdPhone } from "@/lib/utils";
 
@@ -167,19 +168,46 @@ export async function POST(request: Request) {
     if (itemsError) throw itemsError;
 
     if (user) {
-      const digitalItems = resolved.filter(
-        (item) =>
-          item.product.type === "digital" || item.product.type === "bundle",
-      );
-      if (digitalItems.length) {
+      const componentSlugs = [
+        ...new Set(
+          resolved.flatMap((item) =>
+            getBundleDigitalComponents(item.product.slug),
+          ),
+        ),
+      ];
+
+      let componentProducts: ProductRow[] = [];
+      if (componentSlugs.length) {
+        const { data, error } = await supabase
+          .from("products")
+          .select("id,slug,title,type,format,price,stock")
+          .in("slug", componentSlugs);
+        if (error) throw error;
+        componentProducts = (data ?? []) as ProductRow[];
+      }
+
+      const digitalTargets = [
+        ...resolved
+          .filter(
+            (item) =>
+              item.product.type === "digital" || item.product.type === "bundle",
+          )
+          .map((item) => item.product),
+        ...componentProducts,
+      ];
+      const uniqueTargets = [
+        ...new Map(digitalTargets.map((product) => [product.id, product])).values(),
+      ];
+
+      if (uniqueTargets.length) {
         await supabase.from("entitlements").upsert(
-          digitalItems.map((item) => {
-            const resource = getResourceLink(item.product.slug);
+          uniqueTargets.map((product) => {
+            const resource = getResourceLink(product.slug);
             return {
               user_id: user.id,
-              product_id: item.product.id,
+              product_id: product.id,
               order_id: order.id,
-              title: item.product.title,
+              title: product.title,
               access_label: resource.label,
               access_url: resource.url || null,
             };

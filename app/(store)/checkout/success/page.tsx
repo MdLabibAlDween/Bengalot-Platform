@@ -13,6 +13,7 @@ import { notFound } from "next/navigation";
 
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { Order, OrderItem } from "@/lib/types";
+import { hasDigitalContent } from "@/lib/bundles";
 import { formatDate, formatMoney } from "@/lib/utils";
 
 type PageProps = {
@@ -44,7 +45,7 @@ export default async function OrderSuccessPage({ searchParams }: PageProps) {
   const typedOrder = order as Order;
   const typedItems = (items ?? []) as OrderItem[];
   const hasPhysical = typedItems.some((item) => item.type === "physical");
-  const hasDigital = typedItems.some((item) => item.type !== "physical");
+  const hasDigital = typedItems.some((item) => hasDigitalContent(item));
 
   return (
     <div className="bg-cream">

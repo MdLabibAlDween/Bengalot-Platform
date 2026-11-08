@@ -19,6 +19,7 @@ import { useMemo, useState } from "react";
 
 import { useCart } from "@/components/cart/cart-provider";
 import { ProductArt } from "@/components/product/product-art";
+import { hasDigitalContent } from "@/lib/bundles";
 import type { StoreSettings } from "@/lib/types";
 import { cn, formatMoney, normalizeBdPhone } from "@/lib/utils";
 
@@ -70,7 +71,7 @@ export function CheckoutClient({
   const { lines, subtotal, clearCart, hydrated } = useCart();
   const router = useRouter();
   const hasPhysical = lines.some((line) => line.type === "physical");
-  const hasDigital = lines.some((line) => line.type !== "physical");
+  const hasDigital = lines.some((line) => hasDigitalContent(line));
   const requiresAccount = hasDigital && !user;
 
   const [form, setForm] = useState<FormState>({

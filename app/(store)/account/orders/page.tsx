@@ -12,6 +12,7 @@ import Link from "next/link";
 import { ProductArt } from "@/components/product/product-art";
 import { requireUser } from "@/lib/auth";
 import { getAccountSnapshot } from "@/lib/account";
+import { hasDigitalContent } from "@/lib/bundles";
 import { getCatalog } from "@/lib/data/catalog";
 import { orderStatusMeta, orderTimeline } from "@/lib/order-status";
 import { formatDate, formatMoney } from "@/lib/utils";
@@ -48,8 +49,8 @@ export default async function OrdersPage() {
             const hasPhysical = order.order_items.some(
               (item) => item.type === "physical",
             );
-            const hasDigital = order.order_items.some(
-              (item) => item.type !== "physical",
+            const hasDigital = order.order_items.some((item) =>
+              hasDigitalContent(item),
             );
             return (
               <article

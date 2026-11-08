@@ -14,11 +14,15 @@ export const metadata: Metadata = {
 const faqs = [
   {
     title: "How do digital products arrive?",
-    body: "After payment is confirmed, your resource is added to your account library. Notion templates open through a duplicate link, and printable resources appear as PDF downloads. You will also receive a receipt by email.",
+    body: "After payment is confirmed, your resource is added to your account library. Notion templates open through a duplicate link, and downloadable resources appear as PDFs. You will also receive a receipt by email.",
   },
   {
     title: "Can I buy without an account?",
     body: "You can place a physical order as a guest. Digital orders need an account so we have a safe place to deliver access. Creating one takes less than a minute and keeps every resource in one library.",
+  },
+  {
+    title: "Are the planners printed or digital?",
+    body: "The Exam Focus Planner and Weekly Study Planner are printed physical products, delivered across Bangladesh. Notion templates, the Deep Work guide and other digital tools are separate and appear in your account library after purchase.",
   },
   {
     title: "What payment methods do you accept?",

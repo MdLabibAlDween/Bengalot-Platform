@@ -72,6 +72,7 @@ export default async function ProductPage({ params }: PageProps) {
   const related = getRelatedProducts(catalog, product);
   const isFlashcards = (product.preview as { kind?: string }).kind === "flashcards";
   const isPhysical = product.type === "physical";
+  const isBundle = product.category_slug === "bundles";
   const savings = product.compare_at
     ? product.compare_at - product.price
     : 0;
@@ -149,10 +150,12 @@ export default async function ProductPage({ params }: PageProps) {
                 </Link>
               ) : null}
               <span className="chip">
-                {isPhysical
-                  ? "Physical · ships"
-                  : product.type === "bundle"
-                    ? "Digital bundle"
+                {isBundle
+                  ? isPhysical
+                    ? "Printed + digital bundle"
+                    : "Digital bundle"
+                  : isPhysical
+                    ? "Physical · ships"
                     : "Digital · instant access"}
               </span>
             </div>
@@ -227,6 +230,12 @@ export default async function ProductPage({ params }: PageProps) {
                     ? "Your order is checked and packed by hand before it leaves the studio. Delivery is usually 2–4 working days across Bangladesh."
                     : "After payment is confirmed, this resource is added to your personal library. You can return to it whenever you need it — no expiry date."}
                 </p>
+                {isBundle && isPhysical ? (
+                  <p className="mt-3">
+                    The printed planners ship to you. The Notion workspace and
+                    Deep Work guide are added to your library after payment.
+                  </p>
+                ) : null}
               </Accordion>
               <Accordion title="Delivery & access">
                 <div className="space-y-2">
@@ -242,6 +251,13 @@ export default async function ProductPage({ params }: PageProps) {
                       ? "Cash on delivery is available. You can also pay with bKash at checkout."
                       : "If a link or download ever stops working, contact support and we will reset it for you."}
                   </p>
+                  {isBundle && isPhysical ? (
+                    <p className="flex items-start gap-2">
+                      <Download className="mt-0.5 size-4 shrink-0 text-teal" aria-hidden="true" />
+                      Your digital tools appear in the account library after
+                      payment is confirmed. Printed items ship separately.
+                    </p>
+                  ) : null}
                   <p className="flex items-start gap-2">
                     <ShieldCheck className="mt-0.5 size-4 shrink-0 text-teal" aria-hidden="true" />
                     Secure checkout · your details are never shared.
@@ -260,7 +276,9 @@ export default async function ProductPage({ params }: PageProps) {
               </Accordion>
               <Accordion title="Refund note">
                 {isPhysical
-                  ? "If something arrives damaged or is not what you ordered, contact us within 48 hours of delivery and we will make it right. Items should be unused and in their original packaging."
+                  ? isBundle
+                    ? "If a printed item arrives damaged or is not what you ordered, contact us within 48 hours of delivery. The digital components are non-refundable once access has been opened."
+                    : "If something arrives damaged or is not what you ordered, contact us within 48 hours of delivery and we will make it right. Items should be unused and in their original packaging."
                   : "Digital resources are non-refundable once access has been opened, because the file or template cannot be returned. If a link is broken, we will repair or replace it."}
               </Accordion>
             </div>

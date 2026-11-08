@@ -15,7 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const categories = [
     "notion-templates",
     "study-cards",
-    "printable-planners",
+    "printed-planners",
     "focus-productivity",
     "bundles",
   ].map((slug) => ({

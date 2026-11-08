@@ -36,7 +36,7 @@ const layouts: Record<
       "right-[-15%] bottom-[-13%] h-[63%] w-[70%] sm:h-[66%] sm:w-[64%] rotate-[-9deg]",
     productSlug: "english-vocabulary-cards",
   },
-  "printable-planners": {
+  "printed-planners": {
     span: "md:col-span-4",
     height: "min-h-[20rem] md:min-h-[22.5rem]",
     align: "end",

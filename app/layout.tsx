@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     template: "%s · Bengalot",
   },
   description:
-    "Notion templates, printed study cards, printable planners and quiet focus tools for students and independent learners in Bangladesh.",
+    "Notion templates, printed study cards, printed planners and quiet focus tools for students and independent learners in Bangladesh.",
   applicationName: "Bengalot",
   keywords: [
     "Bengalot",

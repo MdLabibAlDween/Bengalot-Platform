@@ -5,6 +5,7 @@ import { Search, SlidersHorizontal, X } from "lucide-react";
 import { useDeferredValue, useMemo, useState } from "react";
 
 import { ProductCard } from "@/components/product/product-card";
+import { productShelfType } from "@/lib/catalog-meta";
 import type { Category, Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -49,7 +50,7 @@ export function ShopBrowser({
     const needle = deferredQuery.trim().toLowerCase();
     const result = products.filter((product) => {
       if (category !== "all" && product.category_slug !== category) return false;
-      if (type !== "all" && product.type !== type) return false;
+      if (type !== "all" && productShelfType(product) !== type) return false;
       if (!needle) return true;
       return [
         product.title,

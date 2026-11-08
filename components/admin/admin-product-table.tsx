@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { ProductArt } from "@/components/product/product-art";
+import { productShelfLabel, productShelfType } from "@/lib/catalog-meta";
 import type { Product } from "@/lib/types";
 import { cn, formatMoney } from "@/lib/utils";
 
@@ -19,7 +20,7 @@ export function AdminProductTable({ products }: { products: Product[] }) {
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return products.filter((product) => {
-      if (type !== "all" && product.type !== type) return false;
+      if (type !== "all" && productShelfType(product) !== type) return false;
       if (status === "published" && !product.is_published) return false;
       if (status === "hidden" && product.is_published) return false;
       if (!needle) return true;
@@ -117,7 +118,7 @@ export function AdminProductTable({ products }: { products: Product[] }) {
                   </td>
                   <td className="px-3 py-3">
                     <span className="rounded-full bg-surface px-2 py-1 text-[0.52rem] font-bold capitalize text-ink-soft">
-                      {product.type}
+                      {productShelfLabel(product)}
                     </span>
                   </td>
                   <td className="price px-3 py-3 text-[0.68rem] font-semibold text-ink">

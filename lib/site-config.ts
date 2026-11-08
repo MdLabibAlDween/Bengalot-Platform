@@ -3,7 +3,7 @@ export const siteConfig = {
   domain: "bengalot.com",
   slogan: "Bring a lot to learning.",
   description:
-    "Notion templates, study cards, printable planners and quiet focus tools for students and independent learners in Bangladesh.",
+    "Notion templates, study cards, printed planners and quiet focus tools for students and independent learners in Bangladesh.",
   supportEmail: "support@bengalot.com",
   whatsappDisplay: "01341739202",
   whatsappNumber: "8801341739202",

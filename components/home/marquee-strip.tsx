@@ -2,7 +2,7 @@ const words = [
   "Bring a lot to learning",
   "Study cards",
   "Notion templates",
-  "Printable planners",
+  "Printed planners",
   "Quiet focus tools",
   "Made in Bangladesh",
 ];

@@ -9,7 +9,7 @@ export async function generateStaticParams() {
   return [
     { slug: "notion-templates" },
     { slug: "study-cards" },
-    { slug: "printable-planners" },
+    { slug: "printed-planners" },
     { slug: "focus-productivity" },
     { slug: "bundles" },
   ];

@@ -1,6 +1,6 @@
 # Bengalot — Bring a lot to learning.
 
-A premium academic learning and productivity storefront for Bangladesh. Bengalot sells Notion templates, printed study cards, printable planners, focus tools and bundles — with a customer learning library, a working cart and checkout, and an admin studio.
+A premium academic learning and productivity storefront for Bangladesh. Bengalot sells Notion templates, printed study cards, printed planners, focus tools and bundles — with a customer learning library, a working cart and checkout, and an admin studio.
 
 ## Stack
 
@@ -21,7 +21,7 @@ pnpm dev
 
 Open <http://localhost:3000>.
 
-The live Supabase project is already seeded. The SQL schema and catalogue seed live in `supabase/migrations/0001_academic_store.sql`.
+The live Supabase project is already seeded. The SQL schema and catalogue seed live in `supabase/migrations/` — `0001_academic_store.sql` creates the store, and `0002_printed_planners.sql` updates the planner collection to physical printed editions.
 
 ## Demo accounts
 
@@ -39,6 +39,7 @@ The sign-in page also has compact demo-fill buttons. Remove or change these acco
 - Editorial homepage with a layered product hero, asymmetric category bento, featured product rail, brand story, flashcard preview, four-step explainer, editable promotion banners, reviews and journal.
 - Shop with search, category, format and sort controls.
 - Product pages with interactive galleries, a flashcard front/back preview, specs, contents and related products.
+- Printed planners with paper, page count and delivery details, plus a printed + digital Student Starter Bundle.
 - Persistent cart and a responsive cart drawer, guest checkout for physical orders, validated checkout, delivery pricing and an order-confirmation page.
 - Customer dashboard with a digital library, order tracking, profile editing and password reset.
 - Admin studio with analytics, revenue chart, product table and live product editor, orders with status updates, and a promotion editor with live preview and accent colours.
@@ -71,7 +72,7 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
 - Pure white is the base; cool paper, lavender, teal, coral and butter provide section contrast without warm brown surfaces.
 - Product art is original browser-rendered SVG/CSS scenes in `components/product/product-art.tsx`.
-- Digital downloads sample PDFs live in `public/resources/`.
+- Digital downloads and sample PDFs live in `public/resources/`.
 - All storefront motion honours `prefers-reduced-motion`; MotionConfig applies the user setting globally and CSS motion is disabled in the reduced-motion media query.
 - Automated axe audits were run across storefront, account and admin pages with no WCAG A/AA violations.
 

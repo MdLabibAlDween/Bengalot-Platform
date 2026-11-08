@@ -34,7 +34,7 @@ export const journalArticles: JournalArticle[] = [
     category: "Study",
     title: "A paper plan for a digital semester",
     excerpt:
-      "Why the most useful part of a digital study system might still be a single printed page.",
+      "Why the most useful part of a digital study system might still be a printed planner.",
     readTime: "6 min read",
     date: "21 October 2026",
     theme: "coral",
@@ -42,9 +42,9 @@ export const journalArticles: JournalArticle[] = [
       "Paper is not anti-digital. It is simply a different distance from the work.",
     paragraphs: [
       "There is a particular kind of tiredness that comes from doing everything inside the same glowing rectangle. Classes, notes, messages, reading, deadlines and rest all arrive through the same screen. A printed page is a useful interruption to that sameness.",
-      "We designed the Weekly Study Planner to be one page — not a small book, not a system with a system. It holds the classes, the two or three pieces of real work that matter, and the rest you are protecting. The constraint is the point. A page that asks for everything gets abandoned by Wednesday.",
+      "We designed the Weekly Study Planner as a tear-off pad of single weekly sheets — not a thick planner, not a system with a system. Each sheet holds the classes, the two or three pieces of real work that matter, and the rest you are protecting. The constraint is the point. A page that asks for everything gets abandoned by Wednesday.",
       "The planner works best beside a digital workspace, not instead of one. Let Notion hold the links, the long notes and the archive. Let paper hold the shape of this week. The screen can stay open without becoming the place where you keep checking whether the week is working.",
-      "Print one page. Put it where you work. At the end of the week, make a note of what you actually finished and carry only that honesty into the next page.",
+      "Tear off one sheet. Put it where you work. At the end of the week, make a note of what you actually finished and carry only that honesty into the next sheet.",
     ],
   },
   {

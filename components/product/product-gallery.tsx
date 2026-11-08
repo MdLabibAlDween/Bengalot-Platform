@@ -5,6 +5,7 @@ import { BookOpen, ImageIcon, ListChecks } from "lucide-react";
 import { useState } from "react";
 
 import { ProductArt } from "@/components/product/product-art";
+import { productShelfLabel } from "@/lib/catalog-meta";
 import type { Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -85,7 +86,7 @@ export function ProductGallery({ product }: { product: Product }) {
             </span>
           ) : null}
           <span className="chip !border-cream/20 !bg-ink/40 !text-cream backdrop-blur">
-            {product.type === "physical" ? "Physical" : product.type === "bundle" ? "Bundle" : "Digital"}
+            {productShelfLabel(product)}
           </span>
         </div>
         <AnimatePresence mode="wait" initial={false}>
@@ -121,7 +122,7 @@ export function ProductGallery({ product }: { product: Product }) {
             onClick={() => setView(item.id)}
             aria-pressed={view === item.id}
             className={cn(
-              "group flex items-center gap-2.5 rounded-xl border p-2 text-left transition-all duration-200",
+              "group flex items-center gap-2 rounded-xl border p-2 text-left transition-all duration-200 sm:gap-2.5",
               view === item.id
                 ? "border-teal bg-teal-soft/40 ring-1 ring-teal/20"
                 : "border-line bg-surface hover:border-line-strong",
@@ -129,7 +130,7 @@ export function ProductGallery({ product }: { product: Product }) {
           >
             <span
               className={cn(
-                "grid size-9 shrink-0 place-items-center rounded-lg border",
+                "grid size-8 shrink-0 place-items-center rounded-lg border sm:size-9",
                 view === item.id
                   ? "border-teal/20 bg-cream text-teal"
                   : "border-line bg-paper text-muted",
@@ -141,7 +142,7 @@ export function ProductGallery({ product }: { product: Product }) {
               <span className="block text-[0.58rem] font-extrabold uppercase tracking-[0.1em] text-muted">
                 0{viewMeta.findIndex((meta) => meta.id === item.id) + 1}
               </span>
-              <span className="block truncate text-[0.74rem] font-semibold text-ink">
+              <span className="block truncate text-[0.66rem] font-semibold text-ink sm:text-[0.74rem]">
                 {item.label}
               </span>
             </span>

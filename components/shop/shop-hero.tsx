@@ -42,8 +42,10 @@ export function ShopHero({
   products: Product[];
 }) {
   if (category) {
-    const representative =
-      products.find((product) => product.category_slug === category.slug) ?? products[0];
+    const categoryProducts = products.filter(
+      (product) => product.category_slug === category.slug,
+    );
+    const representative = categoryProducts[0] ?? products[0];
     const darkText = !isLightHex(category.theme.ink);
     return (
       <section
@@ -71,7 +73,7 @@ export function ShopHero({
               <span>{category.name}</span>
             </nav>
             <p className="mt-7 text-[0.61rem] font-extrabold uppercase tracking-[0.16em] opacity-65">
-              Collection · {products.length} tools
+              Collection · {categoryProducts.length} tools
             </p>
             <h1 className="display-xl mt-3 max-w-[13ch]">
               <MaskedLine immediate>{category.name}</MaskedLine>
@@ -87,7 +89,9 @@ export function ShopHero({
                 {category.name_bn}
               </span>
               <span className="rounded-full border border-current/20 bg-black/5 px-3 py-1.5 text-[0.58rem] font-extrabold uppercase tracking-[0.1em] opacity-75">
-                {products.some((p) => p.type === "physical") ? "Printed in Bangladesh" : "Instant digital access"}
+                {categoryProducts.some((p) => p.type === "physical")
+                  ? "Printed in Bangladesh"
+                  : "Instant digital access"}
               </span>
             </div>
           </div>

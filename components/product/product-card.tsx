@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import { ProductArt } from "@/components/product/product-art";
+import { productShelfLabel } from "@/lib/catalog-meta";
 import type { Product } from "@/lib/types";
 import { cn, formatMoney } from "@/lib/utils";
 
@@ -62,11 +63,7 @@ export function ProductCard({
 
             <div className="absolute right-3.5 top-3.5">
               <span className="chip !border-cream/20 !bg-ink/45 !text-cream backdrop-blur-md">
-                {product.type === "digital"
-                  ? "Digital"
-                  : product.type === "bundle"
-                    ? "Bundle"
-                    : "Physical"}
+                {productShelfLabel(product)}
               </span>
             </div>
 

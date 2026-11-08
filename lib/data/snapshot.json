@@ -40,11 +40,11 @@
     },
     {
       "id": "2d187332-e659-464f-884c-603e9db41371",
-      "slug": "printable-planners",
-      "name": "Printable Planners",
-      "name_bn": "প্রিন্টেবল প্ল্যানার",
-      "tagline": "Paper for a clearer week.",
-      "description": "Print-at-home planners and revision sheets with room to think.",
+      "slug": "printed-planners",
+      "name": "Printed Planners",
+      "name_bn": "মুদ্রিত প্ল্যানার",
+      "tagline": "Paper, made for the week.",
+      "description": "Professionally printed planners and weekly pads, made to be written in.",
       "icon": "calendar",
       "art_key": "planner",
       "theme": {
@@ -182,7 +182,7 @@
       "rating": 4.9,
       "review_count": 184,
       "created_at": "2026-11-08T12:25:35.393898+00:00",
-      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+      "updated_at": "2026-11-08T13:42:48.538724+00:00"
     },
     {
       "id": "ccee7f05-c534-4cb8-b08d-fea39be33ba7",
@@ -261,13 +261,13 @@
         "clients",
         "business"
       ],
-      "featured": true,
+      "featured": false,
       "is_published": true,
       "sort": 2,
       "rating": 4.8,
       "review_count": 63,
       "created_at": "2026-11-08T12:25:35.393898+00:00",
-      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+      "updated_at": "2026-11-08T13:10:02.751832+00:00"
     },
     {
       "id": "f9cec9ab-cdfa-4458-80f3-ba713f102244",
@@ -275,16 +275,16 @@
       "sku": "BG-PLAN-EXAM",
       "title": "Exam Focus Planner",
       "title_bn": "পরীক্ষার ফোকাস প্ল্যানার",
-      "subtitle": "A printable six-week revision planner with daily focus blocks and weekly reviews.",
-      "description": "A printable planner for the weeks that matter most. Break each subject into small topics, plan focused study blocks, and review what actually moved forward every week.",
+      "subtitle": "A printed six-week revision planner with daily focus blocks and weekly reviews.",
+      "description": "A printed planner for the weeks that matter most. Break each subject into small topics, plan focused study blocks, and review what actually moved forward every week. Printed on warm-white paper and delivered across Bangladesh.",
       "category_id": "2d187332-e659-464f-884c-603e9db41371",
-      "category_slug": "printable-planners",
-      "type": "digital",
-      "format": "PDF planner · A4 + Letter",
+      "category_slug": "printed-planners",
+      "type": "physical",
+      "format": "Printed planner · A5",
       "price": 690,
       "compare_at": 890,
-      "stock": 0,
-      "badge": "Save 22%",
+      "stock": 64,
+      "badge": "Printed edition",
       "art_key": "planner",
       "palette": [
         "#2A6F97",
@@ -292,32 +292,31 @@
         "#F6D365"
       ],
       "includes": [
-        "6-week overview",
-        "Daily focus page",
-        "Subject breakdown",
+        "One printed 6-week planner",
+        "Subject breakdown pages",
+        "Daily focus pages",
         "Revision tracker",
-        "Weekly review sheet"
+        "Weekly review pages"
       ],
       "requirements": [
-        "A4 or US Letter printer",
-        "A PDF reader"
+        "No special tools required"
       ],
       "specs": [
         {
           "label": "Format",
-          "value": "A4 + US Letter PDF"
+          "value": "A5 printed planner"
         },
         {
           "label": "Pages",
-          "value": "24 printable pages"
+          "value": "48 pages"
         },
         {
-          "label": "Access",
-          "value": "Instant download"
+          "label": "Paper",
+          "value": "100 GSM warm-white"
         },
         {
-          "label": "Printing",
-          "value": "Home or print shop"
+          "label": "Delivery",
+          "value": "Ships in 2–4 days"
         }
       ],
       "preview": {
@@ -334,7 +333,7 @@
         "planner",
         "exam",
         "revision",
-        "printable"
+        "printed"
       ],
       "featured": true,
       "is_published": true,
@@ -342,7 +341,7 @@
       "rating": 4.9,
       "review_count": 121,
       "created_at": "2026-11-08T12:25:35.393898+00:00",
-      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+      "updated_at": "2026-11-08T17:55:26.426375+00:00"
     },
     {
       "id": "c0d31b53-954f-4898-b29a-485309c85796",
@@ -350,16 +349,16 @@
       "sku": "BG-PLAN-WEEK",
       "title": "Weekly Study Planner",
       "title_bn": "সাপ্তাহিক স্টাডি প্ল্যানার",
-      "subtitle": "A clean one-page weekly plan for classes, deep work and rest.",
-      "description": "A one-page printable planner designed for students who want a realistic plan, not an impossible one. Includes class blocks, deep-work slots, a small task list and a place to protect your rest.",
+      "subtitle": "A printed weekly planner pad for classes, deep work and rest.",
+      "description": "A tear-off pad of weekly planning sheets designed for students who want a realistic plan, not an impossible one. Each sheet holds class blocks, deep-work slots, a small priority list and a place to protect your rest. Tear off the week when it is done.",
       "category_id": "2d187332-e659-464f-884c-603e9db41371",
-      "category_slug": "printable-planners",
-      "type": "digital",
-      "format": "PDF planner · A4 + Letter",
+      "category_slug": "printed-planners",
+      "type": "physical",
+      "format": "Printed planner pad · 52 sheets",
       "price": 490,
       "compare_at": null,
-      "stock": 0,
-      "badge": null,
+      "stock": 80,
+      "badge": "New",
       "art_key": "planner",
       "palette": [
         "#3A5A40",
@@ -367,32 +366,31 @@
         "#F6D365"
       ],
       "includes": [
-        "Weekly overview",
+        "52 tear-off weekly sheets",
+        "Class timetable page",
         "Deep-work blocks",
-        "Class timetable",
         "Priority list",
         "Rest reminder"
       ],
       "requirements": [
-        "A4 or US Letter printer",
-        "A PDF reader"
+        "No special tools required"
       ],
       "specs": [
         {
           "label": "Format",
-          "value": "A4 + US Letter PDF"
+          "value": "A5 tear-off pad"
         },
         {
-          "label": "Pages",
-          "value": "6 printable pages"
+          "label": "Sheets",
+          "value": "52 weekly sheets"
         },
         {
-          "label": "Access",
-          "value": "Instant download"
+          "label": "Paper",
+          "value": "100 GSM warm-white"
         },
         {
-          "label": "Printing",
-          "value": "Home or print shop"
+          "label": "Delivery",
+          "value": "Ships in 2–4 days"
         }
       ],
       "preview": {
@@ -408,7 +406,7 @@
       "tags": [
         "planner",
         "weekly",
-        "printable",
+        "printed",
         "reset"
       ],
       "featured": false,
@@ -417,7 +415,7 @@
       "rating": 4.7,
       "review_count": 46,
       "created_at": "2026-11-08T12:25:35.393898+00:00",
-      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+      "updated_at": "2026-11-08T17:55:26.426375+00:00"
     },
     {
       "id": "364fede7-118a-40ef-b509-32f537ffa22f",
@@ -433,7 +431,7 @@
       "format": "Boxed card deck · 120 cards",
       "price": 890,
       "compare_at": 1090,
-      "stock": 48,
+      "stock": 46,
       "badge": "Bestseller",
       "art_key": "cards",
       "palette": [
@@ -503,7 +501,7 @@
       "rating": 4.9,
       "review_count": 203,
       "created_at": "2026-11-08T12:25:35.393898+00:00",
-      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+      "updated_at": "2026-11-08T13:37:14.833254+00:00"
     },
     {
       "id": "77ce19de-4f3f-442e-a0bd-757271b27e20",
@@ -589,7 +587,7 @@
       "rating": 4.8,
       "review_count": 71,
       "created_at": "2026-11-08T12:25:35.393898+00:00",
-      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+      "updated_at": "2026-11-08T13:10:02.751832+00:00"
     },
     {
       "id": "5d0c9eef-53b6-4f69-9733-1c798e01f8b1",
@@ -626,7 +624,7 @@
       "specs": [
         {
           "label": "Format",
-          "value": "PDF + printable worksheets"
+          "value": "PDF + worksheet pages"
         },
         {
           "label": "Pages",
@@ -657,13 +655,13 @@
         "habits",
         "digital"
       ],
-      "featured": true,
+      "featured": false,
       "is_published": true,
       "sort": 7,
       "rating": 4.9,
       "review_count": 98,
       "created_at": "2026-11-08T12:25:35.393898+00:00",
-      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+      "updated_at": "2026-11-08T18:22:39.315114+00:00"
     },
     {
       "id": "4bdc4012-35a8-4b86-8307-15a16456d118",
@@ -736,7 +734,7 @@
       "rating": 4.8,
       "review_count": 54,
       "created_at": "2026-11-08T12:25:35.393898+00:00",
-      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+      "updated_at": "2026-11-08T13:10:02.751832+00:00"
     },
     {
       "id": "8f3d0514-ddfa-43f9-8f6e-196293cee409",
@@ -744,16 +742,16 @@
       "sku": "BG-BUNDLE-START",
       "title": "Student Starter Bundle",
       "title_bn": "স্টুডেন্ট স্টার্টার বান্ডেল",
-      "subtitle": "The Student OS, Exam Focus Planner and Deep Work guide — together.",
-      "description": "A complete starting point for a calmer semester. Set up your Notion workspace, plan the next six weeks on paper, and use the deep-work guide to protect the time you have.",
+      "subtitle": "Two printed planners and two digital tools for a calmer semester.",
+      "description": "A complete starting point for the semester: the printed Exam Focus Planner for the next six weeks, the tear-off weekly pad for the days in between, the Notion Student OS to hold the whole semester, and the Deep Work guide for the sessions that matter.",
       "category_id": "2b3c6813-8e67-4aee-82d3-16edd981f6b8",
       "category_slug": "bundles",
-      "type": "bundle",
-      "format": "Digital bundle · 3 resources",
+      "type": "physical",
+      "format": "Printed + digital bundle · 4 resources",
       "price": 2290,
-      "compare_at": 2770,
-      "stock": 0,
-      "badge": "Save 17%",
+      "compare_at": 3260,
+      "stock": 32,
+      "badge": "Save 30%",
       "art_key": "bundle",
       "palette": [
         "#E05A3F",
@@ -761,39 +759,39 @@
         "#F6D365"
       ],
       "includes": [
-        "Notion Student OS",
-        "Exam Focus Planner PDF",
-        "Deep Work Study Guide PDF",
-        "All future minor updates"
+        "Printed Exam Focus Planner",
+        "Printed Weekly Study Planner",
+        "Notion Student OS (digital)",
+        "Deep Work Study Guide (digital)"
       ],
       "requirements": [
         "A free Notion account",
-        "A PDF reader",
-        "A printer is optional"
+        "No special tools required"
       ],
       "specs": [
         {
           "label": "Includes",
-          "value": "3 complete resources"
+          "value": "4 resources · 2 printed"
         },
         {
           "label": "Saving",
-          "value": "৳480 vs buying separately"
+          "value": "৳970 vs buying separately"
         },
         {
-          "label": "Access",
-          "value": "Instant, all at once"
+          "label": "Delivery",
+          "value": "Ships in 2–4 days"
         },
         {
-          "label": "Updates",
-          "value": "Free minor updates"
+          "label": "Digital access",
+          "value": "Added after payment"
         }
       ],
       "preview": {
         "kind": "bundle",
         "items": [
+          "Printed Exam Planner",
+          "Printed Weekly Planner",
           "Notion Student OS",
-          "Exam Focus Planner",
           "Deep Work Guide"
         ]
       },
@@ -801,7 +799,7 @@
         "bundle",
         "students",
         "semester",
-        "value"
+        "printed"
       ],
       "featured": true,
       "is_published": true,
@@ -809,7 +807,7 @@
       "rating": 5,
       "review_count": 67,
       "created_at": "2026-11-08T12:25:35.393898+00:00",
-      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+      "updated_at": "2026-11-08T18:15:46.56764+00:00"
     },
     {
       "id": "5c8af2c7-64b9-4de3-aba1-94902b6d826b",
@@ -817,7 +815,7 @@
       "sku": "BG-BUNDLE-ADM",
       "title": "Admission Prep Kit",
       "title_bn": "অ্যাডমিশন প্রেপ কিট",
-      "subtitle": "A focused preparation system for admission tests and university applications.",
+      "subtitle": "A focused digital preparation system for admission tests and university applications.",
       "description": "A structured kit for the admission season: a weekly plan, a revision tracker, a mistake log and a short guide to building a sustainable test-prep routine.",
       "category_id": "2b3c6813-8e67-4aee-82d3-16edd981f6b8",
       "category_slug": "bundles",
@@ -834,7 +832,7 @@
         "#F6D365"
       ],
       "includes": [
-        "Admission preparation planner",
+        "Admission preparation workbook",
         "Revision tracker",
         "Mistake log",
         "Test-day checklist",
@@ -847,7 +845,7 @@
       "specs": [
         {
           "label": "Includes",
-          "value": "5 printable resources"
+          "value": "5 digital resources"
         },
         {
           "label": "Saving",
@@ -865,7 +863,7 @@
       "preview": {
         "kind": "bundle",
         "items": [
-          "Admission Planner",
+          "Admission Workbook",
           "Revision Tracker",
           "Mistake Log",
           "Focus Guide"
@@ -883,7 +881,7 @@
       "rating": 4.8,
       "review_count": 39,
       "created_at": "2026-11-08T12:25:35.393898+00:00",
-      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+      "updated_at": "2026-11-08T17:55:26.426375+00:00"
     }
   ],
   "promotions": [
@@ -891,7 +889,7 @@
       "id": "53192536-d89c-4da4-a7ea-96df0d9e0181",
       "eyebrow": "The semester reset",
       "title": "A quieter way to begin again.",
-      "description": "Pair the Notion Student OS with the Exam Focus Planner and give the next six weeks a shape you can actually keep.",
+      "description": "Pair the Notion Student OS with the printed Exam Focus Planner and give the next six weeks a shape you can actually keep.",
       "cta_label": "Build your semester",
       "cta_href": "/product/student-starter-bundle",
       "art_key": "semester",
@@ -904,7 +902,7 @@
       },
       "sort": 1,
       "is_active": true,
-      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+      "updated_at": "2026-11-08T17:55:26.426375+00:00"
     },
     {
       "id": "2dc38522-1066-45bb-912b-59a3edafa73d",

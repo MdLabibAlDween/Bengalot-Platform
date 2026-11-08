@@ -56,7 +56,7 @@ export function Hero() {
               className="rise-in mt-6 max-w-[31rem] text-[0.98rem] leading-[1.75] text-ink-soft sm:mt-7 sm:text-[1.06rem]"
               style={{ animationDelay: "520ms" }}
             >
-              Notion templates, printed study cards, printable planners and
+              Notion templates, printed study cards, printed planners and
               quiet focus tools — for students who want to do the work without
               carrying the clutter.
             </p>

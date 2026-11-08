@@ -139,7 +139,7 @@ export default async function LibraryPage() {
           </h3>
           <p className="mx-auto mt-2 max-w-sm text-[0.78rem] leading-relaxed text-muted">
             Digital resources appear here once payment is confirmed. Choose a
-            template, planner or a complete bundle to begin.
+            template, focus guide or complete digital bundle to begin.
           </p>
           <Link href="/shop" className="btn btn-primary mt-6">
             Explore digital tools
