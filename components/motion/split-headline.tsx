@@ -15,7 +15,6 @@ const accentClass: Record<NonNullable<Line["accent"]>, string> = {
 export function SplitHeadline({
   lines,
   className,
-  delay = 0.1,
 }: {
   lines: Line[];
   className?: string;
@@ -26,17 +25,12 @@ export function SplitHeadline({
       {lines.map((line, index) => (
         <span
           key={`${line.text}-${index}`}
-          className="block overflow-hidden pb-[0.09em]"
+          className={cn(
+            "block",
+            line.accent ? accentClass[line.accent] : undefined,
+          )}
         >
-          <span
-            className={cn(
-              "line-rise block origin-left",
-              line.accent ? accentClass[line.accent] : undefined,
-            )}
-            style={{ animationDelay: `${delay + index * 0.11}s` }}
-          >
-            {line.text}
-          </span>
+          {line.text}
         </span>
       ))}
     </h1>

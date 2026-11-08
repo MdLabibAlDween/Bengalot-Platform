@@ -555,16 +555,32 @@
   animation: rise-in 780ms var(--ease-out) both;
 }
 
+.hero-enter {
+  animation: hero-enter var(--hero-duration, 900ms) var(--ease-out)
+    var(--hero-delay, 0ms) both;
+  transform-origin: center;
+}
+
 .line-rise {
   animation: line-rise 950ms var(--ease-out) both;
 }
 
-@keyframes line-rise {
+@keyframes hero-enter {
   from {
-    transform: translateY(118%) rotate(2.4deg);
+    transform: translateY(var(--hero-from-y, 30px))
+      rotate(var(--hero-from-rotate, 0deg)) scale(var(--hero-from-scale, 1));
   }
   to {
-    transform: translateY(0) rotate(0);
+    transform: translateY(0) rotate(var(--hero-to-rotate, 0deg)) scale(1);
+  }
+}
+
+@keyframes line-rise {
+  from {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 1;
   }
 }
 
@@ -579,8 +595,8 @@
 
 @keyframes rise-in {
   from {
-    opacity: 0;
-    transform: translateY(18px);
+    opacity: 1;
+    transform: translateY(8px);
   }
   to {
     opacity: 1;

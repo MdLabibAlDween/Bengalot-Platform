@@ -8,7 +8,53 @@ import {
   useTransform,
 } from "motion/react";
 import { Sparkles, Star } from "lucide-react";
-import { useRef } from "react";
+import { useRef, type CSSProperties, type ReactNode } from "react";
+
+import { cn } from "@/lib/utils";
+
+type HeroEnterVars = CSSProperties & {
+  "--hero-delay"?: string;
+  "--hero-duration"?: string;
+  "--hero-from-y"?: string;
+  "--hero-from-rotate"?: string;
+  "--hero-to-rotate"?: string;
+  "--hero-from-scale"?: string;
+};
+
+function HeroEnter({
+  children,
+  className,
+  delay = 0,
+  duration = 900,
+  fromY = 30,
+  fromRotate = 0,
+  toRotate = 0,
+  fromScale = 1,
+}: {
+  children: ReactNode;
+  className?: string;
+  delay?: number;
+  duration?: number;
+  fromY?: number;
+  fromRotate?: number;
+  toRotate?: number;
+  fromScale?: number;
+}) {
+  const style: HeroEnterVars = {
+    "--hero-delay": `${delay}ms`,
+    "--hero-duration": `${duration}ms`,
+    "--hero-from-y": `${fromY}px`,
+    "--hero-from-rotate": `${fromRotate}deg`,
+    "--hero-to-rotate": `${toRotate}deg`,
+    "--hero-from-scale": `${fromScale}`,
+  };
+
+  return (
+    <div className={cn("hero-enter", className)} style={style}>
+      {children}
+    </div>
+  );
+}
 
 function FloatingChip({
   children,
@@ -95,10 +141,11 @@ export function HeroArt() {
         className="absolute right-[1%] top-[1%] z-10 w-[37%] sm:right-[2%] sm:w-[36%]"
       >
         <div className="animate-[float-soft_11s_ease-in-out_infinite] [animation-delay:1.1s]">
-          <motion.div
-            initial={{ opacity: 0, y: 46, rotate: 12 }}
-            animate={{ opacity: 1, y: 0, rotate: 6 }}
-            transition={{ duration: 0.9, delay: 0.36, ease: [0.16, 1, 0.3, 1] }}
+          <HeroEnter
+            delay={360}
+            fromY={46}
+            fromRotate={12}
+            toRotate={6}
             className="relative aspect-[3/3.8] overflow-hidden rounded-[1.6rem] bg-[linear-gradient(160deg,#e6def3_0%,#cec4e2_100%)] shadow-[0_34px_60px_-30px_rgba(52,42,72,0.55)]"
           >
             <span className="absolute inset-y-0 left-[10%] w-px bg-ink/10" />
@@ -133,7 +180,7 @@ export function HeroArt() {
                 </span>
               </div>
             </div>
-          </motion.div>
+          </HeroEnter>
         </div>
       </motion.div>
 
@@ -143,10 +190,11 @@ export function HeroArt() {
         className="absolute right-[-1%] top-[51%] z-40 w-[50%] sm:right-[0%] sm:w-[49%]"
       >
         <div className="animate-[float-soft_9s_ease-in-out_infinite] [animation-delay:0.4s]">
-          <motion.div
-            initial={{ opacity: 0, y: 30, rotate: -4 }}
-            animate={{ opacity: 1, y: 0, rotate: -2 }}
-            transition={{ duration: 0.9, delay: 0.62, ease: [0.16, 1, 0.3, 1] }}
+          <HeroEnter
+            delay={620}
+            fromY={30}
+            fromRotate={-4}
+            toRotate={-2}
             className="overflow-hidden rounded-[1.35rem] border border-white/80 bg-cream shadow-[0_30px_58px_-28px_rgba(16,28,42,0.55)]"
           >
             <div className="flex items-center gap-1.5 border-b border-line bg-paper px-4 py-2.5">
@@ -198,7 +246,7 @@ export function HeroArt() {
                 ))}
               </div>
             </div>
-          </motion.div>
+          </HeroEnter>
         </div>
       </motion.div>
 
@@ -211,10 +259,11 @@ export function HeroArt() {
           <div className="relative aspect-[3/3.7]">
             <div className="absolute inset-0 -rotate-[13deg] rounded-[1.2rem] border border-ink/5 bg-[#0d6f6d] shadow-xl" />
             <div className="absolute inset-0 rotate-[5deg] rounded-[1.2rem] border border-ink/5 bg-coral shadow-lg" />
-            <motion.div
-              initial={{ opacity: 0, y: 46, rotate: -8 }}
-              animate={{ opacity: 1, y: 0, rotate: -3 }}
-              transition={{ duration: 0.9, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            <HeroEnter
+              delay={500}
+              fromY={46}
+              fromRotate={-8}
+              toRotate={-3}
               className="absolute inset-0 overflow-hidden rounded-[1.2rem] border border-line bg-[#ffffff] p-[8%] shadow-[0_30px_60px_-26px_rgba(16,28,42,0.48)]"
             >
               <div className="flex items-center justify-between">
@@ -241,7 +290,7 @@ export function HeroArt() {
                 </span>
                 <span className="text-[0.46rem] font-bold text-ink/60">01 / 120</span>
               </div>
-            </motion.div>
+            </HeroEnter>
           </div>
         </div>
       </motion.div>
@@ -252,10 +301,13 @@ export function HeroArt() {
         className="absolute bottom-[0%] right-[1%] z-40 w-[27%] sm:bottom-[-2%] sm:right-[3%] sm:w-[24%]"
       >
         <div className="animate-[float-soft_8.5s_ease-in-out_infinite] [animation-delay:1.5s]">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8, rotate: 14 }}
-            animate={{ opacity: 1, scale: 1, rotate: 7 }}
-            transition={{ duration: 0.8, delay: 0.78, ease: [0.34, 1.4, 0.64, 1] }}
+          <HeroEnter
+            delay={780}
+            duration={800}
+            fromY={12}
+            fromRotate={14}
+            toRotate={7}
+            fromScale={0.8}
             className="relative aspect-square rounded-full border border-line bg-[radial-gradient(circle_at_35%_28%,#ffffff,#dfe7e4)] p-[12%] shadow-[0_24px_44px_-20px_rgba(16,28,42,0.5)]"
           >
             <span className="absolute left-1/2 top-[2%] h-[8%] w-[12%] -translate-x-1/2 rounded-t-full border border-line bg-cream" />
@@ -270,22 +322,23 @@ export function HeroArt() {
                 one hour
               </span>
             </div>
-          </motion.div>
+          </HeroEnter>
         </div>
       </motion.div>
 
       {/* labels */}
-      <motion.div
-        initial={{ opacity: 0, x: -14 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.7, delay: 1.05, ease: [0.16, 1, 0.3, 1] }}
+      <HeroEnter
+        delay={1050}
+        duration={700}
+        fromY={8}
+        toRotate={0}
         className="absolute left-0 top-[3%] z-40"
       >
         <span className="inline-flex items-center gap-2 rounded-full border border-line bg-cream/90 px-3 py-1.5 text-[0.55rem] font-bold uppercase tracking-[0.12em] text-ink shadow-sm backdrop-blur">
           <span className="size-1.5 animate-[pulse-dot_2.4s_ease-in-out_infinite] rounded-full bg-teal" />
           Tools for a clearer day
         </span>
-      </motion.div>
+      </HeroEnter>
 
       <FloatingChip className="left-[31%] top-[8%] hidden sm:block" delay="2s">
         350 GSM paper
