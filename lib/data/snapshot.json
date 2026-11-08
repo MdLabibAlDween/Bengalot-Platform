@@ -1,0 +1,1013 @@
+{
+  "categories": [
+    {
+      "id": "2979958a-0241-4dd3-8d81-1f53735c82ba",
+      "slug": "notion-templates",
+      "name": "Notion Templates",
+      "name_bn": "নোশন টেমপ্লেট",
+      "tagline": "A calmer place for everything.",
+      "description": "Ready-to-duplicate workspaces for study, planning and independent work.",
+      "icon": "layout",
+      "art_key": "notion",
+      "theme": {
+        "to": "#0E7C7B",
+        "ink": "#FFFFFF",
+        "from": "#0B4F4A",
+        "accent": "#F6D365"
+      },
+      "sort": 1,
+      "is_published": true,
+      "created_at": "2026-11-08T12:25:35.393898+00:00"
+    },
+    {
+      "id": "fade2d7f-f9c2-45bf-85ba-89230eac44ee",
+      "slug": "study-cards",
+      "name": "Study Cards",
+      "name_bn": "স্টাডি কার্ড",
+      "tagline": "Turn rereading into recall.",
+      "description": "Printed flashcard decks for focused recall, revision and everyday learning.",
+      "icon": "cards",
+      "art_key": "cards",
+      "theme": {
+        "to": "#F6D365",
+        "ink": "#132A2A",
+        "from": "#F2C14E",
+        "accent": "#E05A3F"
+      },
+      "sort": 2,
+      "is_published": true,
+      "created_at": "2026-11-08T12:25:35.393898+00:00"
+    },
+    {
+      "id": "2d187332-e659-464f-884c-603e9db41371",
+      "slug": "printable-planners",
+      "name": "Printable Planners",
+      "name_bn": "প্রিন্টেবল প্ল্যানার",
+      "tagline": "Paper for a clearer week.",
+      "description": "Print-at-home planners and revision sheets with room to think.",
+      "icon": "calendar",
+      "art_key": "planner",
+      "theme": {
+        "to": "#E8E2F3",
+        "ink": "#2E2A45",
+        "from": "#CFC6E6",
+        "accent": "#0E7C7B"
+      },
+      "sort": 3,
+      "is_published": true,
+      "created_at": "2026-11-08T12:25:35.393898+00:00"
+    },
+    {
+      "id": "ea1f9e5a-5a54-4848-a662-3434fa213c6c",
+      "slug": "focus-productivity",
+      "name": "Focus & Productivity",
+      "name_bn": "ফোকাস ও প্রোডাক্টিভিটি",
+      "tagline": "Protect the hour you have.",
+      "description": "Guides, timers and small tools for calmer deep work.",
+      "icon": "timer",
+      "art_key": "timer",
+      "theme": {
+        "to": "#F6A77A",
+        "ink": "#2B1B17",
+        "from": "#F0755A",
+        "accent": "#F6D365"
+      },
+      "sort": 4,
+      "is_published": true,
+      "created_at": "2026-11-08T12:25:35.393898+00:00"
+    },
+    {
+      "id": "2b3c6813-8e67-4aee-82d3-16edd981f6b8",
+      "slug": "bundles",
+      "name": "Bundles",
+      "name_bn": "বান্ডেল",
+      "tagline": "A whole system, together.",
+      "description": "Complete study systems, thoughtfully priced.",
+      "icon": "stack",
+      "art_key": "bundle",
+      "theme": {
+        "to": "#28425C",
+        "ink": "#FFFFFF",
+        "from": "#16243A",
+        "accent": "#F6D365"
+      },
+      "sort": 5,
+      "is_published": true,
+      "created_at": "2026-11-08T12:25:35.393898+00:00"
+    }
+  ],
+  "products": [
+    {
+      "id": "d1f2beec-fd0b-4285-8243-7b473678a838",
+      "slug": "notion-student-os",
+      "sku": "BG-NOTION-OS",
+      "title": "Notion Student OS",
+      "title_bn": "নোশন স্টুডেন্ট ওএস",
+      "subtitle": "One calm workspace for classes, assignments, revision and deadlines.",
+      "description": "A complete student workspace built around the way a real semester works. Every course, reading, assignment and exam has a home, and the daily dashboard shows only what needs your attention today.",
+      "category_id": "2979958a-0241-4dd3-8d81-1f53735c82ba",
+      "category_slug": "notion-templates",
+      "type": "digital",
+      "format": "Notion template",
+      "price": 1490,
+      "compare_at": 1990,
+      "stock": 0,
+      "badge": "Bestseller",
+      "art_key": "notion",
+      "palette": [
+        "#0B4F4A",
+        "#0E7C7B",
+        "#F6D365"
+      ],
+      "includes": [
+        "Course dashboard",
+        "Assignment tracker",
+        "Revision planner",
+        "Exam countdown",
+        "Reading log",
+        "Weekly review page"
+      ],
+      "requirements": [
+        "A free Notion account",
+        "Notion web or desktop app"
+      ],
+      "specs": [
+        {
+          "label": "Pages",
+          "value": "18 linked pages"
+        },
+        {
+          "label": "Works with",
+          "value": "Notion free plan"
+        },
+        {
+          "label": "Access",
+          "value": "Instant duplicate link"
+        },
+        {
+          "label": "Updates",
+          "value": "Free minor updates"
+        }
+      ],
+      "preview": {
+        "kind": "notion",
+        "modules": [
+          {
+            "meta": "3 focused tasks",
+            "title": "Today"
+          },
+          {
+            "meta": "6 courses · 14 weeks",
+            "title": "Semester 4"
+          },
+          {
+            "meta": "12 topics due",
+            "title": "Revision queue"
+          },
+          {
+            "meta": "Sunday · 25 min",
+            "title": "Weekly review"
+          }
+        ]
+      },
+      "tags": [
+        "notion",
+        "students",
+        "semester",
+        "dashboard"
+      ],
+      "featured": true,
+      "is_published": true,
+      "sort": 1,
+      "rating": 4.9,
+      "review_count": 184,
+      "created_at": "2026-11-08T12:25:35.393898+00:00",
+      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+    },
+    {
+      "id": "ccee7f05-c534-4cb8-b08d-fea39be33ba7",
+      "slug": "notion-freelance-os",
+      "sku": "BG-NOTION-FREE",
+      "title": "Notion Freelance OS",
+      "title_bn": "নোশন ফ্রিল্যান্স ওএস",
+      "subtitle": "A simple client, project and invoice tracker for independent work.",
+      "description": "A lightweight operating system for freelancers and solo professionals. Track leads, active projects, deliverables, invoices and follow-ups without turning your workspace into a second job.",
+      "category_id": "2979958a-0241-4dd3-8d81-1f53735c82ba",
+      "category_slug": "notion-templates",
+      "type": "digital",
+      "format": "Notion template",
+      "price": 1990,
+      "compare_at": null,
+      "stock": 0,
+      "badge": "New",
+      "art_key": "notion",
+      "palette": [
+        "#243B53",
+        "#3E6B89",
+        "#F6D365"
+      ],
+      "includes": [
+        "Client CRM",
+        "Project board",
+        "Proposal checklist",
+        "Invoice tracker",
+        "Weekly pipeline review"
+      ],
+      "requirements": [
+        "A free Notion account"
+      ],
+      "specs": [
+        {
+          "label": "Pages",
+          "value": "14 linked pages"
+        },
+        {
+          "label": "Works with",
+          "value": "Notion free plan"
+        },
+        {
+          "label": "Access",
+          "value": "Instant duplicate link"
+        },
+        {
+          "label": "Updates",
+          "value": "Free minor updates"
+        }
+      ],
+      "preview": {
+        "kind": "notion",
+        "modules": [
+          {
+            "meta": "6 live leads",
+            "title": "Pipeline"
+          },
+          {
+            "meta": "4 in progress",
+            "title": "Projects"
+          },
+          {
+            "meta": "2 awaiting payment",
+            "title": "Invoices"
+          },
+          {
+            "meta": "12.5 billable hrs",
+            "title": "This week"
+          }
+        ]
+      },
+      "tags": [
+        "notion",
+        "freelance",
+        "clients",
+        "business"
+      ],
+      "featured": true,
+      "is_published": true,
+      "sort": 2,
+      "rating": 4.8,
+      "review_count": 63,
+      "created_at": "2026-11-08T12:25:35.393898+00:00",
+      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+    },
+    {
+      "id": "f9cec9ab-cdfa-4458-80f3-ba713f102244",
+      "slug": "exam-focus-planner",
+      "sku": "BG-PLAN-EXAM",
+      "title": "Exam Focus Planner",
+      "title_bn": "পরীক্ষার ফোকাস প্ল্যানার",
+      "subtitle": "A printable six-week revision planner with daily focus blocks and weekly reviews.",
+      "description": "A printable planner for the weeks that matter most. Break each subject into small topics, plan focused study blocks, and review what actually moved forward every week.",
+      "category_id": "2d187332-e659-464f-884c-603e9db41371",
+      "category_slug": "printable-planners",
+      "type": "digital",
+      "format": "PDF planner · A4 + Letter",
+      "price": 690,
+      "compare_at": 890,
+      "stock": 0,
+      "badge": "Save 22%",
+      "art_key": "planner",
+      "palette": [
+        "#2A6F97",
+        "#8ECAE6",
+        "#F6D365"
+      ],
+      "includes": [
+        "6-week overview",
+        "Daily focus page",
+        "Subject breakdown",
+        "Revision tracker",
+        "Weekly review sheet"
+      ],
+      "requirements": [
+        "A4 or US Letter printer",
+        "A PDF reader"
+      ],
+      "specs": [
+        {
+          "label": "Format",
+          "value": "A4 + US Letter PDF"
+        },
+        {
+          "label": "Pages",
+          "value": "24 printable pages"
+        },
+        {
+          "label": "Access",
+          "value": "Instant download"
+        },
+        {
+          "label": "Printing",
+          "value": "Home or print shop"
+        }
+      ],
+      "preview": {
+        "kind": "planner",
+        "spread": "Week 03",
+        "subjects": [
+          "Biology",
+          "Chemistry",
+          "Math",
+          "English"
+        ]
+      },
+      "tags": [
+        "planner",
+        "exam",
+        "revision",
+        "printable"
+      ],
+      "featured": true,
+      "is_published": true,
+      "sort": 3,
+      "rating": 4.9,
+      "review_count": 121,
+      "created_at": "2026-11-08T12:25:35.393898+00:00",
+      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+    },
+    {
+      "id": "c0d31b53-954f-4898-b29a-485309c85796",
+      "slug": "weekly-study-planner",
+      "sku": "BG-PLAN-WEEK",
+      "title": "Weekly Study Planner",
+      "title_bn": "সাপ্তাহিক স্টাডি প্ল্যানার",
+      "subtitle": "A clean one-page weekly plan for classes, deep work and rest.",
+      "description": "A one-page printable planner designed for students who want a realistic plan, not an impossible one. Includes class blocks, deep-work slots, a small task list and a place to protect your rest.",
+      "category_id": "2d187332-e659-464f-884c-603e9db41371",
+      "category_slug": "printable-planners",
+      "type": "digital",
+      "format": "PDF planner · A4 + Letter",
+      "price": 490,
+      "compare_at": null,
+      "stock": 0,
+      "badge": null,
+      "art_key": "planner",
+      "palette": [
+        "#3A5A40",
+        "#A3B18A",
+        "#F6D365"
+      ],
+      "includes": [
+        "Weekly overview",
+        "Deep-work blocks",
+        "Class timetable",
+        "Priority list",
+        "Rest reminder"
+      ],
+      "requirements": [
+        "A4 or US Letter printer",
+        "A PDF reader"
+      ],
+      "specs": [
+        {
+          "label": "Format",
+          "value": "A4 + US Letter PDF"
+        },
+        {
+          "label": "Pages",
+          "value": "6 printable pages"
+        },
+        {
+          "label": "Access",
+          "value": "Instant download"
+        },
+        {
+          "label": "Printing",
+          "value": "Home or print shop"
+        }
+      ],
+      "preview": {
+        "kind": "planner",
+        "spread": "Week 12",
+        "subjects": [
+          "Classes",
+          "Deep work",
+          "Reading",
+          "Rest"
+        ]
+      },
+      "tags": [
+        "planner",
+        "weekly",
+        "printable",
+        "reset"
+      ],
+      "featured": false,
+      "is_published": true,
+      "sort": 4,
+      "rating": 4.7,
+      "review_count": 46,
+      "created_at": "2026-11-08T12:25:35.393898+00:00",
+      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+    },
+    {
+      "id": "364fede7-118a-40ef-b509-32f537ffa22f",
+      "slug": "english-vocabulary-cards",
+      "sku": "BG-CARD-ENG",
+      "title": "English Vocabulary Cards",
+      "title_bn": "ইংরেজি ভোকাবুলারি কার্ড",
+      "subtitle": "120 printed cards for building everyday English vocabulary.",
+      "description": "A boxed deck of 120 vocabulary cards made for Bangladeshi learners. Each card gives a clear word, a simple meaning, a natural example sentence and a pronunciation hint — sized for quick daily review at home or on the move.",
+      "category_id": "fade2d7f-f9c2-45bf-85ba-89230eac44ee",
+      "category_slug": "study-cards",
+      "type": "physical",
+      "format": "Boxed card deck · 120 cards",
+      "price": 890,
+      "compare_at": 1090,
+      "stock": 48,
+      "badge": "Bestseller",
+      "art_key": "cards",
+      "palette": [
+        "#E05A3F",
+        "#F0755A",
+        "#F6D365"
+      ],
+      "includes": [
+        "120 FSC-certified cards",
+        "6 topic dividers",
+        "Quick-start guide",
+        "Sturdy storage box"
+      ],
+      "requirements": [
+        "No special tools required"
+      ],
+      "specs": [
+        {
+          "label": "Cards",
+          "value": "120 · 350 GSM"
+        },
+        {
+          "label": "Size",
+          "value": "88 × 126 mm"
+        },
+        {
+          "label": "Finish",
+          "value": "Soft-touch matte"
+        },
+        {
+          "label": "Delivery",
+          "value": "Ships in 2–4 days"
+        }
+      ],
+      "preview": {
+        "kind": "flashcards",
+        "cards": [
+          {
+            "back": "Finding something good without looking for it.",
+            "hint": "/ˌser.ənˈdɪp.ə.ti/",
+            "front": "serendipity",
+            "example": "A happy serendipity brought me to that little bookshop."
+          },
+          {
+            "back": "Done consciously and intentionally.",
+            "hint": "/dɪˈlɪb.ər.ət/",
+            "front": "deliberate",
+            "example": "She made a deliberate choice to study before sunrise."
+          },
+          {
+            "back": "The force that keeps something moving forward.",
+            "hint": "/məˈmen.təm/",
+            "front": "momentum",
+            "example": "One small win gave the whole week momentum."
+          }
+        ]
+      },
+      "tags": [
+        "flashcards",
+        "english",
+        "vocabulary",
+        "physical"
+      ],
+      "featured": true,
+      "is_published": true,
+      "sort": 5,
+      "rating": 4.9,
+      "review_count": 203,
+      "created_at": "2026-11-08T12:25:35.393898+00:00",
+      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+    },
+    {
+      "id": "77ce19de-4f3f-442e-a0bd-757271b27e20",
+      "slug": "ict-basics-cards",
+      "sku": "BG-CARD-ICT",
+      "title": "ICT Basics Cards",
+      "title_bn": "আইসিটি বেসিকস কার্ড",
+      "subtitle": "90 printed cards covering practical ICT terms for school and college.",
+      "description": "A compact revision deck for ICT fundamentals. Each card pairs a term with a plain-language definition and a short example, so revision stays active instead of turning into rereading.",
+      "category_id": "fade2d7f-f9c2-45bf-85ba-89230eac44ee",
+      "category_slug": "study-cards",
+      "type": "physical",
+      "format": "Boxed card deck · 90 cards",
+      "price": 990,
+      "compare_at": null,
+      "stock": 36,
+      "badge": "New",
+      "art_key": "cards",
+      "palette": [
+        "#264653",
+        "#2A9D8F",
+        "#E9C46A"
+      ],
+      "includes": [
+        "90 FSC-certified cards",
+        "5 topic dividers",
+        "Quick-start guide",
+        "Storage box"
+      ],
+      "requirements": [
+        "No special tools required"
+      ],
+      "specs": [
+        {
+          "label": "Cards",
+          "value": "90 · 350 GSM"
+        },
+        {
+          "label": "Size",
+          "value": "88 × 126 mm"
+        },
+        {
+          "label": "Finish",
+          "value": "Soft-touch matte"
+        },
+        {
+          "label": "Delivery",
+          "value": "Ships in 2–4 days"
+        }
+      ],
+      "preview": {
+        "kind": "flashcards",
+        "cards": [
+          {
+            "back": "The maximum amount of data that can travel through a connection at one time.",
+            "hint": "Networking",
+            "front": "Bandwidth",
+            "example": "The video call lagged because the bandwidth was shared."
+          },
+          {
+            "back": "A small, fast store of data kept close at hand to speed things up.",
+            "hint": "Computing",
+            "front": "Cache",
+            "example": "Clearing the cache made the website load correctly."
+          },
+          {
+            "back": "A shared set of rules that lets devices communicate.",
+            "hint": "Networking",
+            "front": "Protocol",
+            "example": "HTTPS is the protocol used for secure web pages."
+          }
+        ]
+      },
+      "tags": [
+        "flashcards",
+        "ict",
+        "revision",
+        "physical"
+      ],
+      "featured": false,
+      "is_published": true,
+      "sort": 6,
+      "rating": 4.8,
+      "review_count": 71,
+      "created_at": "2026-11-08T12:25:35.393898+00:00",
+      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+    },
+    {
+      "id": "5d0c9eef-53b6-4f69-9733-1c798e01f8b1",
+      "slug": "deep-work-study-guide",
+      "sku": "BG-GUIDE-DEEP",
+      "title": "Deep Work Study Guide",
+      "title_bn": "ডিপ ওয়ার্ক স্টাডি গাইড",
+      "subtitle": "A short, practical guide to building a distraction-light study routine.",
+      "description": "A compact guide for students who can sit down to study but keep losing the thread. Learn how to prepare a session, choose one clear target, protect your attention and finish with a short review that makes the next session easier.",
+      "category_id": "ea1f9e5a-5a54-4848-a662-3434fa213c6c",
+      "category_slug": "focus-productivity",
+      "type": "digital",
+      "format": "PDF guide + worksheets",
+      "price": 590,
+      "compare_at": null,
+      "stock": 0,
+      "badge": null,
+      "art_key": "guide",
+      "palette": [
+        "#2B2D42",
+        "#4A4E69",
+        "#EF8354"
+      ],
+      "includes": [
+        "32-page illustrated guide",
+        "Session planning worksheet",
+        "Distraction audit",
+        "Weekly review template"
+      ],
+      "requirements": [
+        "A PDF reader",
+        "A printer is optional"
+      ],
+      "specs": [
+        {
+          "label": "Format",
+          "value": "PDF + printable worksheets"
+        },
+        {
+          "label": "Pages",
+          "value": "32 pages"
+        },
+        {
+          "label": "Read time",
+          "value": "About 45 minutes"
+        },
+        {
+          "label": "Access",
+          "value": "Instant download"
+        }
+      ],
+      "preview": {
+        "kind": "guide",
+        "quote": "Focus is not a personality trait. It is a room you learn to prepare.",
+        "chapters": [
+          "Before the session",
+          "One clear target",
+          "Protecting attention",
+          "The ten-minute review"
+        ]
+      },
+      "tags": [
+        "focus",
+        "guide",
+        "habits",
+        "digital"
+      ],
+      "featured": true,
+      "is_published": true,
+      "sort": 7,
+      "rating": 4.9,
+      "review_count": 98,
+      "created_at": "2026-11-08T12:25:35.393898+00:00",
+      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+    },
+    {
+      "id": "4bdc4012-35a8-4b86-8307-15a16456d118",
+      "slug": "bengalot-focus-timer",
+      "sku": "BG-FOCUS-TIMER",
+      "title": "Bengalot Focus Timer",
+      "title_bn": "বেঙ্গলট ফোকাস টাইমার",
+      "subtitle": "A quiet 60-minute timer with a soft finish and a physical start dial.",
+      "description": "A screen-free focus timer for study sessions. Turn the dial to the time you want, keep your phone out of the room, and let the soft chime mark the end of one honest block.",
+      "category_id": "ea1f9e5a-5a54-4848-a662-3434fa213c6c",
+      "category_slug": "focus-productivity",
+      "type": "physical",
+      "format": "Physical timer · 60 minutes",
+      "price": 1590,
+      "compare_at": 1890,
+      "stock": 22,
+      "badge": "Limited run",
+      "art_key": "timer",
+      "palette": [
+        "#3D405B",
+        "#6D597A",
+        "#F2CC8F"
+      ],
+      "includes": [
+        "One focus timer",
+        "Quick-start card",
+        "One-year warranty card",
+        "Recycled gift box"
+      ],
+      "requirements": [
+        "One AA battery (included)"
+      ],
+      "specs": [
+        {
+          "label": "Timer",
+          "value": "60 minutes, silent dial"
+        },
+        {
+          "label": "Finish",
+          "value": "Ceramic-feel matte"
+        },
+        {
+          "label": "Size",
+          "value": "90 × 90 × 45 mm"
+        },
+        {
+          "label": "Delivery",
+          "value": "Ships in 2–4 days"
+        }
+      ],
+      "preview": {
+        "kind": "timer",
+        "marks": [
+          "5",
+          "15",
+          "25",
+          "45"
+        ],
+        "timer": "25:00"
+      },
+      "tags": [
+        "timer",
+        "focus",
+        "physical",
+        "desk"
+      ],
+      "featured": false,
+      "is_published": true,
+      "sort": 8,
+      "rating": 4.8,
+      "review_count": 54,
+      "created_at": "2026-11-08T12:25:35.393898+00:00",
+      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+    },
+    {
+      "id": "8f3d0514-ddfa-43f9-8f6e-196293cee409",
+      "slug": "student-starter-bundle",
+      "sku": "BG-BUNDLE-START",
+      "title": "Student Starter Bundle",
+      "title_bn": "স্টুডেন্ট স্টার্টার বান্ডেল",
+      "subtitle": "The Student OS, Exam Focus Planner and Deep Work guide — together.",
+      "description": "A complete starting point for a calmer semester. Set up your Notion workspace, plan the next six weeks on paper, and use the deep-work guide to protect the time you have.",
+      "category_id": "2b3c6813-8e67-4aee-82d3-16edd981f6b8",
+      "category_slug": "bundles",
+      "type": "bundle",
+      "format": "Digital bundle · 3 resources",
+      "price": 2290,
+      "compare_at": 2770,
+      "stock": 0,
+      "badge": "Save 17%",
+      "art_key": "bundle",
+      "palette": [
+        "#E05A3F",
+        "#0E7C7B",
+        "#F6D365"
+      ],
+      "includes": [
+        "Notion Student OS",
+        "Exam Focus Planner PDF",
+        "Deep Work Study Guide PDF",
+        "All future minor updates"
+      ],
+      "requirements": [
+        "A free Notion account",
+        "A PDF reader",
+        "A printer is optional"
+      ],
+      "specs": [
+        {
+          "label": "Includes",
+          "value": "3 complete resources"
+        },
+        {
+          "label": "Saving",
+          "value": "৳480 vs buying separately"
+        },
+        {
+          "label": "Access",
+          "value": "Instant, all at once"
+        },
+        {
+          "label": "Updates",
+          "value": "Free minor updates"
+        }
+      ],
+      "preview": {
+        "kind": "bundle",
+        "items": [
+          "Notion Student OS",
+          "Exam Focus Planner",
+          "Deep Work Guide"
+        ]
+      },
+      "tags": [
+        "bundle",
+        "students",
+        "semester",
+        "value"
+      ],
+      "featured": true,
+      "is_published": true,
+      "sort": 9,
+      "rating": 5,
+      "review_count": 67,
+      "created_at": "2026-11-08T12:25:35.393898+00:00",
+      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+    },
+    {
+      "id": "5c8af2c7-64b9-4de3-aba1-94902b6d826b",
+      "slug": "admission-prep-kit",
+      "sku": "BG-BUNDLE-ADM",
+      "title": "Admission Prep Kit",
+      "title_bn": "অ্যাডমিশন প্রেপ কিট",
+      "subtitle": "A focused preparation system for admission tests and university applications.",
+      "description": "A structured kit for the admission season: a weekly plan, a revision tracker, a mistake log and a short guide to building a sustainable test-prep routine.",
+      "category_id": "2b3c6813-8e67-4aee-82d3-16edd981f6b8",
+      "category_slug": "bundles",
+      "type": "bundle",
+      "format": "Digital bundle · 5 resources",
+      "price": 2490,
+      "compare_at": null,
+      "stock": 0,
+      "badge": null,
+      "art_key": "bundle",
+      "palette": [
+        "#6D597A",
+        "#B56576",
+        "#F6D365"
+      ],
+      "includes": [
+        "Admission preparation planner",
+        "Revision tracker",
+        "Mistake log",
+        "Test-day checklist",
+        "Focus guide"
+      ],
+      "requirements": [
+        "A PDF reader",
+        "A printer is optional"
+      ],
+      "specs": [
+        {
+          "label": "Includes",
+          "value": "5 printable resources"
+        },
+        {
+          "label": "Saving",
+          "value": "৳640 vs buying separately"
+        },
+        {
+          "label": "Access",
+          "value": "Instant download"
+        },
+        {
+          "label": "Best for",
+          "value": "Admission season"
+        }
+      ],
+      "preview": {
+        "kind": "bundle",
+        "items": [
+          "Admission Planner",
+          "Revision Tracker",
+          "Mistake Log",
+          "Focus Guide"
+        ]
+      },
+      "tags": [
+        "bundle",
+        "admission",
+        "exam",
+        "prep"
+      ],
+      "featured": false,
+      "is_published": true,
+      "sort": 10,
+      "rating": 4.8,
+      "review_count": 39,
+      "created_at": "2026-11-08T12:25:35.393898+00:00",
+      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+    }
+  ],
+  "promotions": [
+    {
+      "id": "53192536-d89c-4da4-a7ea-96df0d9e0181",
+      "eyebrow": "The semester reset",
+      "title": "A quieter way to begin again.",
+      "description": "Pair the Notion Student OS with the Exam Focus Planner and give the next six weeks a shape you can actually keep.",
+      "cta_label": "Build your semester",
+      "cta_href": "/product/student-starter-bundle",
+      "art_key": "semester",
+      "theme": {
+        "to": "#0E7C7B",
+        "ink": "#FFFFFF",
+        "from": "#123F3B",
+        "accent": "#F6D365",
+        "surface": "#123F3B"
+      },
+      "sort": 1,
+      "is_active": true,
+      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+    },
+    {
+      "id": "2dc38522-1066-45bb-912b-59a3edafa73d",
+      "eyebrow": "Small cards, big recall",
+      "title": "Better questions. Better remembering.",
+      "description": "Two hundred printed prompts made for the fifteen minutes between classes. Active recall, without the screen.",
+      "cta_label": "Explore study cards",
+      "cta_href": "/shop/study-cards",
+      "art_key": "cards",
+      "theme": {
+        "to": "#F6A77A",
+        "ink": "#2B1B17",
+        "from": "#F0755A",
+        "accent": "#F6D365",
+        "surface": "#F0755A"
+      },
+      "sort": 2,
+      "is_active": true,
+      "updated_at": "2026-11-08T12:25:35.393898+00:00"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "d34498e8-d32f-4d0d-9080-7708ca5aab17",
+      "product_id": "d1f2beec-fd0b-4285-8243-7b473678a838",
+      "author": "Nadia R.",
+      "city": "Dhaka",
+      "rating": 5,
+      "body": "I stopped keeping five different lists. The daily page is the first thing I open after breakfast.",
+      "is_approved": true,
+      "created_at": "2026-11-08T12:25:35.393898+00:00"
+    },
+    {
+      "id": "eb5f8491-fdb9-43ef-8534-1ae43aa2880d",
+      "product_id": "364fede7-118a-40ef-b509-32f537ffa22f",
+      "author": "Tanvir H.",
+      "city": "Chattogram",
+      "rating": 5,
+      "body": "The paper feels beautiful and the examples sound like real life. I keep ten cards in my bag for the bus.",
+      "is_approved": true,
+      "created_at": "2026-11-08T12:25:35.393898+00:00"
+    },
+    {
+      "id": "d2ef2276-e914-4c0e-ba67-8d459907bbbc",
+      "product_id": "f9cec9ab-cdfa-4458-80f3-ba713f102244",
+      "author": "Ayesha K.",
+      "city": "Sylhet",
+      "rating": 5,
+      "body": "Six weeks was exactly the container I needed. The weekly review page is the quiet hero.",
+      "is_approved": true,
+      "created_at": "2026-11-08T12:25:35.393898+00:00"
+    },
+    {
+      "id": "317b04bf-1300-4740-9f67-b78b79011d51",
+      "product_id": "5d0c9eef-53b6-4f69-9733-1c798e01f8b1",
+      "author": "Mahin S.",
+      "city": "Rajshahi",
+      "rating": 4,
+      "body": "Short, honest and practical. The ten-minute review has changed how I start the next session.",
+      "is_approved": true,
+      "created_at": "2026-11-08T12:25:35.393898+00:00"
+    },
+    {
+      "id": "bcc79c8c-c5d3-4bf9-9b6d-7519349a9860",
+      "product_id": "4bdc4012-35a8-4b86-8307-15a16456d118",
+      "author": "Farhan A.",
+      "city": "Dhaka",
+      "rating": 5,
+      "body": "No screen, no notifications. My phone stays in another room now. It is a small object with a big effect.",
+      "is_approved": true,
+      "created_at": "2026-11-08T12:25:35.393898+00:00"
+    },
+    {
+      "id": "d7fcf84f-b628-4351-981e-ed9a97e8f588",
+      "product_id": "8f3d0514-ddfa-43f9-8f6e-196293cee409",
+      "author": "Nusrat J.",
+      "city": "Khulna",
+      "rating": 5,
+      "body": "The whole system fits together. I bought it before exams and I am still using it this semester.",
+      "is_approved": true,
+      "created_at": "2026-11-08T12:25:35.393898+00:00"
+    }
+  ],
+  "settings": {
+    "store": {
+      "city": "Saltha, Faridpur",
+      "name": "Bengalot",
+      "slogan": "Bring a lot to learning.",
+      "currency": "BDT",
+      "whatsapp": "01341739202",
+      "announcement": "Free delivery over ৳2,000 · Digital access after payment",
+      "supportEmail": "support@bengalot.com",
+      "deliveryInside": 70,
+      "deliveryOutside": 130,
+      "freeDeliveryThreshold": 2000
+    },
+    "announcements": [
+      "New: the Semester Reset bundle is here",
+      "Cash on delivery across Bangladesh",
+      "Digital resources open instantly in your library"
+    ],
+    "featured_promotion": {
+      "promotionSlug": "semester-reset"
+    }
+  }
+}
