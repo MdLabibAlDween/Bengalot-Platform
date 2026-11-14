@@ -366,7 +366,7 @@ values
   (select id from public.categories where slug = 'study-cards'), 'study-cards', 'physical', 'Boxed card deck · 120 cards', 890, 1090, 48, 'Bestseller', 'cards', '["#E05A3F","#F0755A","#F6D365"]',
   array['120 FSC-certified cards','6 topic dividers','Quick-start guide','Sturdy storage box'],
   array['No special tools required'],
-  '[{"label":"Cards","value":"120 · 350 GSM"},{"label":"Size","value":"88 × 126 mm"},{"label":"Finish","value":"Soft-touch matte"},{"label":"Delivery","value":"Ships in 2–4 days"}]',
+  '[{"label":"Cards","value":"120 · durable stock"},{"label":"Size","value":"88 × 126 mm"},{"label":"Finish","value":"Soft-touch matte"},{"label":"Delivery","value":"Ships in 2–4 days"}]',
   '{"kind":"flashcards","cards":[{"front":"serendipity","hint":"/ˌser.ənˈdɪp.ə.ti/","back":"Finding something good without looking for it.","example":"A happy serendipity brought me to that little bookshop."},{"front":"deliberate","hint":"/dɪˈlɪb.ər.ət/","back":"Done consciously and intentionally.","example":"She made a deliberate choice to study before sunrise."},{"front":"momentum","hint":"/məˈmen.təm/","back":"The force that keeps something moving forward.","example":"One small win gave the whole week momentum."}]}',
   array['flashcards','english','vocabulary','physical'], true, 5, 4.9, 203
 ),
@@ -377,7 +377,7 @@ values
   (select id from public.categories where slug = 'study-cards'), 'study-cards', 'physical', 'Boxed card deck · 90 cards', 990, null, 36, 'New', 'cards', '["#264653","#2A9D8F","#E9C46A"]',
   array['90 FSC-certified cards','5 topic dividers','Quick-start guide','Storage box'],
   array['No special tools required'],
-  '[{"label":"Cards","value":"90 · 350 GSM"},{"label":"Size","value":"88 × 126 mm"},{"label":"Finish","value":"Soft-touch matte"},{"label":"Delivery","value":"Ships in 2–4 days"}]',
+  '[{"label":"Cards","value":"90 · durable stock"},{"label":"Size","value":"88 × 126 mm"},{"label":"Finish","value":"Soft-touch matte"},{"label":"Delivery","value":"Ships in 2–4 days"}]',
   '{"kind":"flashcards","cards":[{"front":"Bandwidth","hint":"Networking","back":"The maximum amount of data that can travel through a connection at one time.","example":"The video call lagged because the bandwidth was shared."},{"front":"Cache","hint":"Computing","back":"A small, fast store of data kept close at hand to speed things up.","example":"Clearing the cache made the website load correctly."},{"front":"Protocol","hint":"Networking","back":"A shared set of rules that lets devices communicate.","example":"HTTPS is the protocol used for secure web pages."}]}',
   array['flashcards','ict','revision','physical'], false, 6, 4.8, 71
 ),

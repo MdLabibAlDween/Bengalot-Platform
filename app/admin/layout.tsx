@@ -33,7 +33,7 @@ export default async function AdminLayout({
           aria-hidden="true"
         />
         <div className="relative flex items-center gap-2.5 px-2 py-2">
-          <LogoMark size={30} />
+          <LogoMark size={30} inverted />
           <div>
             <p className="font-display text-[1.25rem] leading-none tracking-[-0.04em] text-cream">
               Bengalot

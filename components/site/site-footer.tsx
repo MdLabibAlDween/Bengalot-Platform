@@ -181,7 +181,7 @@ export function SiteFooter({ categories }: { categories: Category[] }) {
         aria-hidden="true"
         className="pointer-events-none absolute -bottom-24 right-4 z-0 rotate-[-8deg] opacity-[0.09] lg:right-16"
       >
-        <LogoMark size={340} />
+        <LogoMark size={340} inverted />
       </div>
     </footer>
   );

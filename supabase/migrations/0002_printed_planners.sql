@@ -40,7 +40,7 @@ set
   specs = '[
     {"label":"Format","value":"A5 printed planner"},
     {"label":"Pages","value":"48 pages"},
-    {"label":"Paper","value":"100 GSM warm-white"},
+    {"label":"Paper","value":"Warm-white, quality paper"},
     {"label":"Delivery","value":"Ships in 2–4 days"}
   ]'::jsonb,
   tags = array['planner','exam','revision','printed'],
@@ -68,7 +68,7 @@ set
   specs = '[
     {"label":"Format","value":"A5 tear-off pad"},
     {"label":"Sheets","value":"52 weekly sheets"},
-    {"label":"Paper","value":"100 GSM warm-white"},
+    {"label":"Paper","value":"Warm-white, quality paper"},
     {"label":"Delivery","value":"Ships in 2–4 days"}
   ]'::jsonb,
   tags = array['planner','weekly','printed','reset'],

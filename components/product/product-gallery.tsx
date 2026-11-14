@@ -19,6 +19,30 @@ const viewMeta: { id: View; label: string; icon: typeof ImageIcon }[] = [
   { id: "contents", label: "Contents", icon: ListChecks },
 ];
 
+function GalleryFrame({
+  product,
+  children,
+}: {
+  product: Product;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="relative aspect-[4/4.9] overflow-hidden rounded-[1.8rem] border border-line bg-surface shadow-[0_30px_70px_-42px_rgba(21,34,50,0.4)] sm:aspect-[4/4.6]">
+      <div className="pointer-events-none absolute left-4 top-4 z-20 flex flex-wrap gap-1.5">
+        {product.badge ? (
+          <span className="chip !border-cream/30 !bg-cream/90 !text-ink">
+            {product.badge}
+          </span>
+        ) : null}
+        <span className="chip !border-cream/20 !bg-ink/40 !text-cream backdrop-blur">
+          {productShelfLabel(product)}
+        </span>
+      </div>
+      {children}
+    </div>
+  );
+}
+
 function ContentsView({ product }: { product: Product }) {
   const palette = product.palette;
   return (
@@ -80,29 +104,31 @@ function ArtGallery({ product }: { product: Product }) {
 
   return (
     <>
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={view}
-          className="absolute inset-0"
-          initial={reduceMotion ? false : { opacity: 0, scale: 1.025 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={reduceMotion ? undefined : { opacity: 0, scale: 0.99 }}
-          transition={{ duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
-        >
-          {view === "contents" ? (
-            <ContentsView product={product} />
-          ) : (
-            <ProductArt
-              product={product}
-              view={view === "inside" ? "back" : "front"}
-              showCaption
-            />
-          )}
-        </motion.div>
-      </AnimatePresence>
-      <span className="absolute right-4 top-4 z-20 rounded-full border border-cream/25 bg-ink/35 px-3 py-1.5 text-[0.52rem] font-bold uppercase tracking-[0.12em] text-cream/80 backdrop-blur">
-        View {viewMeta.findIndex((item) => item.id === view) + 1} / 3
-      </span>
+      <GalleryFrame product={product}>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={view}
+            className="absolute inset-0"
+            initial={reduceMotion ? false : { opacity: 0, scale: 1.025 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={reduceMotion ? undefined : { opacity: 0, scale: 0.99 }}
+            transition={{ duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {view === "contents" ? (
+              <ContentsView product={product} />
+            ) : (
+              <ProductArt
+                product={product}
+                view={view === "inside" ? "back" : "front"}
+                showCaption
+              />
+            )}
+          </motion.div>
+        </AnimatePresence>
+        <span className="pointer-events-none absolute right-4 top-4 z-20 rounded-full border border-cream/25 bg-ink/35 px-3 py-1.5 text-[0.52rem] font-bold uppercase tracking-[0.12em] text-cream/80 backdrop-blur">
+          View {viewMeta.findIndex((item) => item.id === view) + 1} / 3
+        </span>
+      </GalleryFrame>
 
       <div className="mt-3 grid grid-cols-3 gap-2.5">
         {viewMeta.map((item) => (
@@ -173,36 +199,38 @@ function PhotoGallery({ product, photos }: { product: Product; photos: string[] 
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setZoom(true)}
-        className="group absolute inset-0 cursor-zoom-in"
-        aria-label={`Zoom photo ${active + 1} of ${photos.length}`}
-      >
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={current}
-            className="absolute inset-0"
-            initial={reduceMotion ? false : { opacity: 0, scale: 1.02 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={reduceMotion ? undefined : { opacity: 0 }}
-            transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <Image
-              src={current}
-              alt={`${product.title} — photo ${active + 1} of ${photos.length}`}
-              fill
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover"
-              priority={active === 0}
-            />
-          </motion.div>
-        </AnimatePresence>
-        <span className="absolute right-4 top-4 z-20 flex items-center gap-1.5 rounded-full border border-cream/25 bg-ink/35 px-3 py-1.5 text-[0.52rem] font-bold uppercase tracking-[0.12em] text-cream/85 backdrop-blur">
-          <ImageIcon className="size-3" aria-hidden="true" />
-          {active + 1} / {photos.length} · Tap to zoom
-        </span>
-      </button>
+      <GalleryFrame product={product}>
+        <button
+          type="button"
+          onClick={() => setZoom(true)}
+          className="group absolute inset-0 cursor-zoom-in"
+          aria-label={`Zoom photo ${active + 1} of ${photos.length}`}
+        >
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={current}
+              className="absolute inset-0"
+              initial={reduceMotion ? false : { opacity: 0, scale: 1.02 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={reduceMotion ? undefined : { opacity: 0 }}
+              transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <Image
+                src={current}
+                alt={`${product.title} — photo ${active + 1} of ${photos.length}`}
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+                preload={active === 0}
+              />
+            </motion.div>
+          </AnimatePresence>
+          <span className="pointer-events-none absolute right-4 top-4 z-20 flex items-center gap-1.5 rounded-full border border-cream/25 bg-ink/35 px-3 py-1.5 text-[0.52rem] font-bold uppercase tracking-[0.12em] text-cream/85 backdrop-blur">
+            <ImageIcon className="size-3" aria-hidden="true" />
+            {active + 1} / {photos.length} · Tap to zoom
+          </span>
+        </button>
+      </GalleryFrame>
 
       {photos.length > 1 ? (
         <div className="no-scrollbar mt-3 flex gap-2 overflow-x-auto pb-1">
@@ -322,23 +350,11 @@ export function ProductGallery({ product }: { product: Product }) {
 
   return (
     <div>
-      <div className="relative aspect-[4/4.9] overflow-hidden rounded-[1.8rem] border border-line bg-surface shadow-[0_30px_70px_-42px_rgba(21,34,50,0.4)] sm:aspect-[4/4.6]">
-        <div className="absolute left-4 top-4 z-20 flex flex-wrap gap-1.5">
-          {product.badge ? (
-            <span className="chip !border-cream/30 !bg-cream/90 !text-ink">
-              {product.badge}
-            </span>
-          ) : null}
-          <span className="chip !border-cream/20 !bg-ink/40 !text-cream backdrop-blur">
-            {productShelfLabel(product)}
-          </span>
-        </div>
-        {photos.length ? (
-          <PhotoGallery product={product} photos={photos} />
-        ) : (
-          <ArtGallery product={product} />
-        )}
-      </div>
+      {photos.length ? (
+        <PhotoGallery product={product} photos={photos} />
+      ) : (
+        <ArtGallery product={product} />
+      )}
     </div>
   );
 }

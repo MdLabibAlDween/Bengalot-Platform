@@ -341,7 +341,7 @@ export function HeroArt() {
       </HeroEnter>
 
       <FloatingChip className="left-[31%] top-[8%] hidden sm:block" delay="2s">
-        350 GSM paper
+        Durable paper
       </FloatingChip>
     </div>
   );

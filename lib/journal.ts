@@ -48,9 +48,9 @@ export const journalArticles: JournalArticle[] = [
     ],
   },
   {
-    slug: "why-350-gsm",
+    slug: "why-durable-study-cards",
     category: "Design",
-    title: "Why we print study cards in 350 GSM",
+    title: "Why we print study cards on durable, quality paper",
     excerpt:
       "The small decisions behind a deck that feels good enough to use every day.",
     readTime: "4 min read",
@@ -60,7 +60,7 @@ export const journalArticles: JournalArticle[] = [
       "A learning tool has to survive the bag, the commute and the third month.",
     paragraphs: [
       "A study card is not a poster. It is handled, shuffled, dropped, wedged into a book and returned to a box. The paper has to be light enough to carry but substantial enough to feel worth keeping. We tested thinner stock first. It worked, technically. It simply did not make you want to pick it up.",
-      "350 GSM sits in the useful middle. It is dense enough to hold a soft-touch matte finish, opaque enough that the answer does not show through from the other side, and still pleasant to write on with a pencil. The corners are rounded because a deck that lives in a bag should not punish the bag.",
+      "Our paper sits in the useful middle: dense, durable and genuinely good quality. It holds a soft-touch matte finish, stays opaque enough that the answer does not show through from the other side, and is still pleasant to write on with a pencil. The corners are rounded because a deck that lives in a bag should not punish the bag.",
       "We also chose a box rather than a band. A band is cheaper and photographs well. A box survives. The cards stay in order, the dividers have somewhere to live, and the whole thing can sit on a shelf without becoming a pile.",
       "These are small choices. But the tools we return to are often the ones that quietly respect the way they will be used. That is the standard we want for every Bengalot object.",
     ],

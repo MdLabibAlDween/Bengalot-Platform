@@ -42,7 +42,7 @@ export function FlashcardFeature({ product }: { product: Product }) {
             <div className="mt-8 grid max-w-lg grid-cols-3 divide-x divide-line border-y border-line py-4">
               {[
                 ["120", "printed cards"],
-                ["350", "GSM paper"],
+                ["Durable", "quality paper"],
                 ["06", "topic dividers"],
               ].map(([value, label]) => (
                 <div key={label} className="px-4 first:pl-0">

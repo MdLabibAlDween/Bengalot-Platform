@@ -458,7 +458,7 @@ export default async function ProductPage({ params }: PageProps) {
                 </p>
                 <ul className="mt-6 space-y-3">
                   {[
-                    ["350 GSM", "Dense, matte-finish paper that survives the bag."],
+                    ["Durable paper", "Dense, matte-finish paper that survives the bag."],
                     ["Rounded corners", "Made to be handled, not just displayed."],
                     ["Topic dividers", "Keep the deck ordered without extra work."],
                   ].map(([label, copy]) => (

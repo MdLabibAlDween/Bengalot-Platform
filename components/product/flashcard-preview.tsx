@@ -132,7 +132,7 @@ export function FlashcardPreview({
                   Bengalot study cards
                 </span>
                 <span className="mt-0.5 block text-[0.48rem] font-semibold uppercase tracking-[0.14em] text-muted/45">
-                  350 GSM · made to be handled
+                  Durable paper · made to be handled
                 </span>
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-cream px-3 py-1.5 text-[0.52rem] font-bold uppercase tracking-[0.1em] text-ink-soft transition-colors group-hover:border-teal/40">
