@@ -41,6 +41,7 @@ The sign-in page also has compact demo-fill buttons. Remove or change these acco
 - Product pages with interactive galleries, a flashcard front/back preview, specs, contents and related products. Every content block — title, Bangla title, story copy, type, format, SKU, specs, contents, requirements, tags, artwork, sort order and the advanced preview JSON — is editable in the studio.
 - Bundles are first-class products: the studio lets you choose which digital components a bundle unlocks in the customer library, and printed components are described in "What you get".
 - Promo codes at checkout: percentage or fixed discounts with an optional minimum subtotal, discount cap and expiry. Codes are created in the studio and re-validated on the server when the order is placed.
+- Transactional email through Purelymail SMTP: order receipts, contact auto-replies and newsletter welcomes. Email is optional — when credentials are blank the storefront keeps working and sends are skipped.
 - Persistent cart and a responsive cart drawer, guest checkout for physical orders, validated checkout, delivery pricing, promo codes and an order-confirmation page. Guest confirmation pages need an http-only access cookie that is issued when the order is placed.
 - Customer dashboard with a digital library, order tracking, profile editing and password reset.
 - Admin studio with analytics, revenue chart, product table and live product editor, orders with status updates, and a promotion editor with live preview and accent colours. Cancelling an order restores physical stock, and a delivered cash-on-delivery order is marked paid automatically.
@@ -57,6 +58,7 @@ The sign-in page also has compact demo-fill buttons. Remove or change these acco
 | `pnpm typecheck` | Generate route types and run TypeScript |
 | `pnpm verify:flows` | Place and clean up test COD + promo orders against a running server |
 | `pnpm verify:images` | Upload a test photo, create and clean up a temp product |
+| `pnpm verify:mail` | Check the Purelymail SMTP login and send a test email |
 
 `pnpm verify:flows` creates two temporary cash-on-delivery orders (one plain, one bundle with a promo code), checks the stored totals, marks one delivered and then cancels it to restore stock. Run it while `pnpm dev` is active. `pnpm verify:images` uploads a generated photo, creates a temporary product with it, checks the product page, shop and studio render the photo, then deletes everything.
 
@@ -66,16 +68,26 @@ Photos are uploaded in the studio product editor (drag and drop or file picker) 
 
 ## Environment
 
-Only Supabase connection details belong in `.env.local`:
+Supabase connection details and optional email credentials belong in `.env.local`:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# Purelymail SMTP (optional — mail is skipped safely when these are blank)
+MAIL_HOST=smtp.purelymail.com
+MAIL_PORT=465
+MAIL_SECURE=true
+MAIL_USER=
+MAIL_PASS=
+MAIL_FROM="Bengalot <support@bengalot.com>"
+MAIL_REPLY_TO=support@bengalot.com
+MAIL_SUPPORT_EMAIL=support@bengalot.com
 ```
 
-`SUPABASE_SERVICE_ROLE_KEY` is server-only. It is used by order creation and admin route handlers after server-side role checks. Never expose it to the browser.
+`SUPABASE_SERVICE_ROLE_KEY` is server-only. It is used by order creation and admin route handlers after server-side role checks. Never expose it to the browser. `MAIL_*` values are also server-only. Create the mailbox and SMTP password in Purelymail, then run `pnpm verify:mail` to test the connection.
 
 ## Design notes
 
@@ -91,4 +103,5 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 - Connect a real bKash/payment workflow; the current flow records orders and grants library access for signed-in digital purchases.
 - Review the privacy and terms copy with the owner.
 - Review the seeded promo codes in `/admin/promo-codes` before going live.
+- Fill `MAIL_USER`/`MAIL_PASS` with a Purelymail mailbox and run `pnpm verify:mail` before taking real orders.
 - Add real product photography only when the owner supplies it; the art system is designed to work without photos.

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import { sendContactAcknowledgement } from "@/lib/mail";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 const schema = z.object({
@@ -22,6 +23,13 @@ export async function POST(request: Request) {
     const supabase = createSupabaseAdminClient();
     const { error } = await supabase.from("contact_messages").insert(parsed.data);
     if (error) throw error;
+
+    const supportEmail =
+      process.env.MAIL_SUPPORT_EMAIL?.trim() || "support@bengalot.com";
+    await sendContactAcknowledgement({
+      ...parsed.data,
+      supportEmail,
+    });
 
     return NextResponse.json({
       message: "Thank you — we usually reply within one working day.",

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import { sendNewsletterWelcome } from "@/lib/mail";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 const schema = z.object({
@@ -17,12 +18,16 @@ export async function POST(request: Request) {
       );
     }
 
+    const email = parsed.data.email.toLowerCase();
     const supabase = createSupabaseAdminClient();
     const { error } = await supabase
       .from("newsletter_subscribers")
-      .insert({ email: parsed.data.email.toLowerCase(), source: "footer" });
+      .insert({ email, source: "footer" });
 
     if (error && error.code !== "23505") throw error;
+    if (!error) {
+      await sendNewsletterWelcome(email);
+    }
 
     return NextResponse.json({
       message:

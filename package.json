@@ -12,7 +12,8 @@
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
     "verify:flows": "node scripts/verify-store-flows.mjs",
-    "verify:images": "node scripts/verify-image-flow.mjs"
+    "verify:images": "node scripts/verify-image-flow.mjs",
+    "verify:mail": "node scripts/verify-mail.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -22,6 +23,7 @@
     "lucide-react": "^1.66.0",
     "motion": "^12.23.12",
     "next": "16.4.3",
+    "nodemailer": "^10.5.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "server-only": "^0.0.1",
@@ -31,6 +33,7 @@
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^22.20.5",
+    "@types/nodemailer": "^8.0.2",
     "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
