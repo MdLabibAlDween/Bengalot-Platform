@@ -212,7 +212,14 @@ export async function POST(request: Request) {
     let appliedPromo: string | null = null;
     if (body.promoCode) {
       const codes = await getPromoCodes();
-      const promo = evaluatePromoCode(codes, body.promoCode, subtotal);
+      const promo = evaluatePromoCode(
+        codes,
+        body.promoCode,
+        lines.map((item) => ({
+          slug: item.product.slug,
+          lineTotal: item.lineTotal,
+        })),
+      );
       if (!promo.ok) {
         return NextResponse.json(
           { message: promo.message, fields: { promoCode: [promo.message] } },

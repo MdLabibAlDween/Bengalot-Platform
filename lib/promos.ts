@@ -48,6 +48,15 @@ function normaliseCode(input: unknown): PromoCode | null {
         : null,
     active: row.active !== false,
     expiresAt: cleanText(row.expiresAt, 10) || null,
+    productSlugs: Array.isArray(row.productSlugs)
+      ? [
+          ...new Set(
+            row.productSlugs.filter(
+              (slug): slug is string => typeof slug === "string" && slug.length > 0,
+            ),
+          ),
+        ].slice(0, 50)
+      : [],
   };
 }
 
@@ -97,10 +106,15 @@ function expiryTime(value: string | null) {
   return Number.isNaN(parsed.getTime()) ? null : parsed.getTime();
 }
 
+export type PromoLine = {
+  slug: string;
+  lineTotal: number;
+};
+
 export function evaluatePromoCode(
   codes: PromoCode[],
   input: string,
-  subtotal: number,
+  lines: PromoLine[],
 ): PromoEvaluation {
   const code = input.trim().toUpperCase();
   if (!code) return { ok: false, message: "Enter a promo code." };
@@ -115,22 +129,37 @@ export function evaluatePromoCode(
     return { ok: false, message: "That promo code has expired." };
   }
 
-  if (subtotal < promo.minSubtotal) {
+  const eligibleLines = promo.productSlugs.length
+    ? lines.filter((line) => promo.productSlugs.includes(line.slug))
+    : lines;
+  const eligibleSubtotal = eligibleLines.reduce(
+    (total, line) => total + line.lineTotal,
+    0,
+  );
+
+  if (eligibleSubtotal <= 0) {
     return {
       ok: false,
-      message: `This code needs a subtotal of at least ৳${promo.minSubtotal.toLocaleString("en-BD")}.`,
+      message: "That code does not apply to anything in your bag.",
+    };
+  }
+
+  if (eligibleSubtotal < promo.minSubtotal) {
+    return {
+      ok: false,
+      message: `This code needs at least ৳${promo.minSubtotal.toLocaleString("en-BD")} from the eligible products.`,
     };
   }
 
   const rawDiscount =
     promo.type === "percent"
-      ? Math.round((subtotal * promo.value) / 100)
+      ? Math.round((eligibleSubtotal * promo.value) / 100)
       : promo.value;
   const capped =
     promo.maxDiscount !== null
       ? Math.min(rawDiscount, promo.maxDiscount)
       : rawDiscount;
-  const discount = Math.min(Math.max(capped, 0), subtotal);
+  const discount = Math.min(Math.max(capped, 0), eligibleSubtotal);
 
   if (discount <= 0) {
     return { ok: false, message: "That promo code does not apply to this order." };

@@ -185,7 +185,13 @@ export function CheckoutClient({
       const response = await fetch("/api/promos/validate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code, subtotal }),
+        body: JSON.stringify({
+          code,
+          items: lines.map((line) => ({
+            slug: line.slug,
+            quantity: line.quantity,
+          })),
+        }),
       });
       const data = (await response.json()) as {
         message?: string;

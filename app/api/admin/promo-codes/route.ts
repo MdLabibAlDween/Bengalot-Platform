@@ -29,6 +29,7 @@ const promoCodeSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/)
     .nullable()
     .optional(),
+  productSlugs: z.array(z.string().trim().min(1).max(140)).max(50).optional(),
 });
 
 const schema = z.array(promoCodeSchema).max(50);

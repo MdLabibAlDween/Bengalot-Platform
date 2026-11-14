@@ -37,7 +37,7 @@ The original demo customer has been removed. The bootstrap demo owner account (`
 - Shop with search, category, format and sort controls.
 - Product pages with interactive galleries, a flashcard front/back preview, specs, contents and related products. Every content block — title, Bangla title, story copy, type, format, SKU, specs, contents, requirements, tags, artwork, sort order and the advanced preview JSON — is editable in the studio.
 - Bundles are first-class products: the studio lets you choose which digital components a bundle unlocks in the customer library, and printed components are described in "What you get".
-- Promo codes at checkout: percentage or fixed discounts with an optional minimum subtotal, discount cap and expiry. Codes are created in the studio and re-validated on the server when the order is placed.
+- Promo codes at checkout: percentage or fixed discounts with an optional minimum subtotal, discount cap and expiry. A code can apply to the whole bag or only selected products; product-specific discounts are calculated on the eligible items only and re-validated on the server when the order is placed.
 - Journal, Our Story and FAQ are editable in the studio Content section, along with the announcement bar and footer social links. Article bodies, FAQ items, announcement copy and social URLs can all change without a deploy.
 - Homepage promotion banners are fully editable, including an optional uploaded image that replaces the generated artwork on the right side of the card.
 - Customer accounts include a saved address book. Addresses can be added, edited, made default or removed in `/account/addresses`, and checkout fills the whole delivery form with one click.

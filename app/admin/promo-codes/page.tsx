@@ -3,12 +3,24 @@ import { TicketPercent } from "lucide-react";
 import { PromoCodeEditor } from "@/components/admin/promo-code-editor";
 import { requireStaff } from "@/lib/auth";
 import { getPromoCodes } from "@/lib/promos";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import type { Product } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPromoCodesPage() {
   await requireStaff("/admin/promo-codes");
-  const codes = await getPromoCodes();
+  const [codes, productsResult] = await Promise.all([
+    getPromoCodes(),
+    createSupabaseAdminClient()
+      .from("products")
+      .select("id,title,slug,is_published")
+      .order("sort", { ascending: true }),
+  ]);
+  const products = (productsResult.data ?? []) as Pick<
+    Product,
+    "id" | "title" | "slug" | "is_published"
+  >[];
   const active = codes.filter((code) => code.active).length;
 
   return (
@@ -37,7 +49,7 @@ export default async function AdminPromoCodesPage() {
         </div>
       </div>
 
-      <PromoCodeEditor codes={codes} />
+      <PromoCodeEditor codes={codes} products={products} />
     </div>
   );
 }

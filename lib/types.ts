@@ -213,6 +213,8 @@ export type PromoCode = {
   maxDiscount: number | null;
   active: boolean;
   expiresAt: string | null;
+  /** Empty means the code applies to every product. */
+  productSlugs: string[];
 };
 
 export type SavedAddress = {

@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-import type { PromoCode } from "@/lib/types";
+import type { Product, PromoCode } from "@/lib/types";
 import { formatMoney } from "@/lib/utils";
 
 type EditorRow = PromoCode;
@@ -24,13 +24,20 @@ const blankPromo: EditorRow = {
   maxDiscount: null,
   active: true,
   expiresAt: null,
+  productSlugs: [],
 };
 
 function toRows(codes: PromoCode[]): EditorRow[] {
-  return codes.map((promo) => ({ ...promo }));
+  return codes.map((promo) => ({ ...promo, productSlugs: promo.productSlugs ?? [] }));
 }
 
-export function PromoCodeEditor({ codes }: { codes: PromoCode[] }) {
+export function PromoCodeEditor({
+  codes,
+  products,
+}: {
+  codes: PromoCode[];
+  products: Pick<Product, "id" | "title" | "slug" | "is_published">[];
+}) {
   const [rows, setRows] = useState<EditorRow[]>(toRows(codes));
   const [state, setState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -57,6 +64,20 @@ export function PromoCodeEditor({ codes }: { codes: PromoCode[] }) {
 
   function removeRow(index: number) {
     setRows((current) => current.filter((_, rowIndex) => rowIndex !== index));
+    setState("idle");
+    setMessage("");
+  }
+
+  function toggleProduct(index: number, slug: string) {
+    setRows((current) =>
+      current.map((row, rowIndex) => {
+        if (rowIndex !== index) return row;
+        const productSlugs = row.productSlugs.includes(slug)
+          ? row.productSlugs.filter((item) => item !== slug)
+          : [...row.productSlugs, slug];
+        return { ...row, productSlugs };
+      }),
+    );
     setState("idle");
     setMessage("");
   }
@@ -304,6 +325,38 @@ export function PromoCodeEditor({ codes }: { codes: PromoCode[] }) {
                   className="field"
                 />
               </div>
+            </div>
+
+            <div className="mt-3 rounded-xl border border-line bg-surface p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-[0.55rem] font-extrabold uppercase tracking-[0.1em] text-muted">
+                  Applies to
+                </p>
+                <span className="text-[0.56rem] font-semibold text-teal">
+                  {row.productSlugs.length
+                    ? `${row.productSlugs.length} selected product${row.productSlugs.length === 1 ? "" : "s"}`
+                    : "All products"}
+                </span>
+              </div>
+              <div className="mt-2 grid max-h-40 gap-1 overflow-y-auto sm:grid-cols-2">
+                {products.map((product) => (
+                  <label
+                    key={product.slug}
+                    className="flex cursor-pointer items-center gap-2 rounded-lg px-1.5 py-1 text-[0.6rem] text-ink-soft hover:bg-paper"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={row.productSlugs.includes(product.slug)}
+                      onChange={() => toggleProduct(index, product.slug)}
+                      className="size-3.5 accent-[var(--teal)]"
+                    />
+                    <span className="truncate">{product.title}</span>
+                  </label>
+                ))}
+              </div>
+              <p className="mt-2 text-[0.55rem] leading-relaxed text-muted">
+                Leave every box empty to apply this code to the whole bag.
+              </p>
             </div>
 
             <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-paper px-3.5 py-2.5">
