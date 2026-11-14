@@ -57,11 +57,19 @@ export type FaqPageContent = {
   cards: FaqCard[];
 };
 
+export type SocialLinks = {
+  instagram: string;
+  facebook: string;
+  youtube: string;
+  whatsapp: string;
+};
+
 export type PageContent = {
   announcement: AnnouncementContent;
   journal: JournalPageContent;
   about: AboutPageContent;
   faq: FaqPageContent;
+  social: SocialLinks;
 };
 
 export const defaultPageContent: PageContent = {
@@ -182,6 +190,12 @@ export const defaultPageContent: PageContent = {
       },
     ],
   },
+  social: {
+    instagram: "",
+    facebook: "",
+    youtube: "",
+    whatsapp: "https://wa.me/8801341739202",
+  },
 };
 
 function text(value: unknown, fallback: string) {
@@ -201,6 +215,13 @@ function textLines(value: unknown, fallback: string[]) {
 
 function theme(value: unknown): JournalArticle["theme"] {
   return value === "coral" || value === "lavender" ? value : "teal";
+}
+
+function socialUrl(value: unknown, fallback: string) {
+  if (typeof value !== "string") return fallback;
+  const url = value.trim();
+  if (!url) return "";
+  return /^https?:\/\//i.test(url) ? url.slice(0, 300) : fallback;
 }
 
 function normaliseArticle(
@@ -232,6 +253,7 @@ export function normalisePageContent(value: unknown): PageContent {
   const journal = (input.journal ?? {}) as Partial<JournalPageContent>;
   const about = (input.about ?? {}) as Partial<AboutPageContent>;
   const faq = (input.faq ?? {}) as Partial<FaqPageContent>;
+  const social = (input.social ?? {}) as Partial<SocialLinks>;
 
   const fallbackArticles = defaultPageContent.journal.articles;
   const rawArticles = Array.isArray(journal.articles) ? journal.articles : [];
@@ -326,6 +348,15 @@ export function normalisePageContent(value: unknown): PageContent {
       intro: text(faq.intro, defaultPageContent.faq.intro),
       items: faqItems,
       cards: faqCards,
+    },
+    social: {
+      instagram: socialUrl(
+        social.instagram,
+        defaultPageContent.social.instagram,
+      ),
+      facebook: socialUrl(social.facebook, defaultPageContent.social.facebook),
+      youtube: socialUrl(social.youtube, defaultPageContent.social.youtube),
+      whatsapp: socialUrl(social.whatsapp, defaultPageContent.social.whatsapp),
     },
   };
 }

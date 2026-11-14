@@ -299,6 +299,67 @@ export async function sendContactNotification({
   });
 }
 
+export async function sendPasswordReset({
+  email,
+  name,
+  resetUrl,
+}: {
+  email: string;
+  name: string;
+  resetUrl: string;
+}) {
+  return sendMail("support", {
+    to: email,
+    subject: "Reset your Bengalot password",
+    text: [
+      `Hello ${name},`,
+      "",
+      "We received a request to reset your Bengalot password.",
+      "Open this link to choose a new password:",
+      resetUrl,
+      "",
+      "The link can only be used once. If you did not ask for this, you can ignore this email.",
+      "",
+      "— Bengalot support",
+    ].join("\n"),
+    html: layout({
+      heading: "Choose a new password.",
+      intro: `Hello ${name}, we received a request to reset your Bengalot password. This link can only be used once.`,
+      body: `<p style="margin:0 0 18px;"><a href="${escapeHtml(resetUrl)}" style="display:inline-block;background:#152232;color:#ffffff;text-decoration:none;padding:13px 20px;border-radius:999px;font-size:13px;font-weight:700;">Reset my password</a></p>
+        <p style="margin:0;font-size:12px;line-height:1.7;color:#56625d;">If the button does not work, paste this link into your browser:<br /><span style="word-break:break-all;color:#0d6f6d;">${escapeHtml(resetUrl)}</span></p>`,
+      footer: "If you did not ask for this, you can safely ignore this email.",
+    }),
+  });
+}
+
+export async function sendAccountWelcome({
+  email,
+  name,
+}: {
+  email: string;
+  name: string;
+}) {
+  return sendMail("info", {
+    to: email,
+    subject: "Welcome to your Bengalot account",
+    text: [
+      `Welcome, ${name}.`,
+      "",
+      "Your Bengalot account is ready. Digital products you buy will appear in your private library, alongside your order history.",
+      "",
+      "Sign in any time at https://bengalot.com/login",
+      "",
+      "— Bengalot",
+    ].join("\n"),
+    html: layout({
+      heading: "Your account is ready.",
+      intro: `Welcome, ${name}. Digital products you buy will appear in your private library, alongside your order history.`,
+      body: `<p style="margin:0 0 18px;"><a href="https://bengalot.com/login" style="display:inline-block;background:#0d6f6d;color:#ffffff;text-decoration:none;padding:13px 20px;border-radius:999px;font-size:13px;font-weight:700;">Open my account</a></p>
+        <p style="margin:0;font-size:13px;line-height:1.7;color:#2f3d4d;">Everything you own stays tied to this profile — no access codes to lose.</p>`,
+    }),
+  });
+}
+
 export async function sendNewsletterWelcome(email: string) {
   return sendMail("info", {
     to: email,

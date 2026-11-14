@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Loader2,
   LockKeyhole,
+  MapPin,
   ShieldCheck,
   Smartphone,
   TicketPercent,
@@ -22,7 +23,7 @@ import { useMemo, useState } from "react";
 import { useCart } from "@/components/cart/cart-provider";
 import { ProductArt } from "@/components/product/product-art";
 import { hasDigitalContent } from "@/lib/bundles";
-import type { StoreSettings } from "@/lib/types";
+import type { SavedAddress, StoreSettings } from "@/lib/types";
 import { cn, formatMoney, normalizeBdPhone } from "@/lib/utils";
 
 const districts = [
@@ -67,26 +68,30 @@ export function CheckoutClient({
   settings,
   user,
   zinipayEnabled,
+  savedAddresses,
 }: {
   settings: StoreSettings;
   user: { email: string; name: string } | null;
   zinipayEnabled: boolean;
+  savedAddresses: SavedAddress[];
 }) {
   const { lines, subtotal, clearCart, hydrated } = useCart();
   const router = useRouter();
   const hasPhysical = lines.some((line) => line.type === "physical");
   const hasDigital = lines.some((line) => hasDigitalContent(line));
   const requiresAccount = hasDigital && !user;
+  const defaultAddress =
+    savedAddresses.find((address) => address.isDefault) ?? savedAddresses[0];
 
   const [form, setForm] = useState<FormState>({
-    fullName: user?.name ?? "",
+    fullName: defaultAddress?.fullName || user?.name || "",
     email: user?.email ?? "",
-    phone: "",
-    address: "",
-    city: "",
-    district: settings.city.toLowerCase().includes("faridpur")
-      ? "Faridpur"
-      : "Dhaka",
+    phone: defaultAddress?.phone || "",
+    address: defaultAddress?.address || "",
+    city: defaultAddress?.city || "",
+    district:
+      defaultAddress?.district ||
+      (settings.city.toLowerCase().includes("faridpur") ? "Faridpur" : "Dhaka"),
     notes: "",
     paymentMethod:
       hasDigital && zinipayEnabled
@@ -148,6 +153,23 @@ export function CheckoutClient({
     setErrors((current) => ({ ...current, [key]: undefined }));
     setServerError("");
   }
+
+  function applyAddress(address: SavedAddress) {
+    setForm((current) => ({
+      ...current,
+      fullName: address.fullName,
+      phone: address.phone,
+      address: address.address,
+      city: address.city,
+      district: address.district,
+    }));
+    setErrors({});
+    setServerError("");
+  }
+
+  const districtOptions = Array.from(
+    new Set([...districts, ...savedAddresses.map((entry) => entry.district)]),
+  );
 
   async function applyPromo() {
     const code = promoInput.trim();
@@ -457,6 +479,32 @@ export function CheckoutClient({
                   </span>
                 ) : null}
               </div>
+              {savedAddresses.length ? (
+                <div className="mt-4 rounded-xl border border-line bg-paper p-3">
+                  <p className="flex items-center gap-1.5 text-[0.56rem] font-extrabold uppercase tracking-[0.1em] text-muted">
+                    <MapPin className="size-3 text-teal" aria-hidden="true" />
+                    Saved addresses — fill in one click
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {savedAddresses.map((address) => (
+                      <button
+                        key={address.id}
+                        type="button"
+                        onClick={() => applyAddress(address)}
+                        className="rounded-xl border border-line bg-surface px-3 py-2 text-left transition-colors hover:border-teal/50 hover:bg-teal-soft/20"
+                      >
+                        <span className="block text-[0.62rem] font-bold text-ink">
+                          {address.label}
+                          {address.isDefault ? " · default" : ""}
+                        </span>
+                        <span className="mt-0.5 block max-w-[14rem] truncate text-[0.56rem] text-muted">
+                          {address.address}, {address.city}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
               <div className="mt-5 grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
                   <label htmlFor="address" className="field-label">
@@ -504,7 +552,7 @@ export function CheckoutClient({
                     className={cn("field", errors.district && "border-coral")}
                     aria-invalid={Boolean(errors.district)}
                   >
-                    {districts.map((district) => (
+                    {districtOptions.map((district) => (
                       <option key={district} value={district}>
                         {district}
                       </option>

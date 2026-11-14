@@ -214,6 +214,17 @@ export type PromoCode = {
   expiresAt: string | null;
 };
 
+export type SavedAddress = {
+  id: string;
+  label: string;
+  fullName: string;
+  phone: string;
+  address: string;
+  city: string;
+  district: string;
+  isDefault: boolean;
+};
+
 export type Profile = {
   id: string;
   email: string;

@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+
 export function RegisterForm({ nextPath }: { nextPath?: string }) {
   const router = useRouter();
   const [fullName, setFullName] = useState("");
@@ -41,8 +43,36 @@ export function RegisterForm({ nextPath }: { nextPath?: string }) {
       if (!response.ok) throw new Error(data.message ?? "Unable to create account.");
       if (!data.ok && data.message) throw new Error(data.message);
 
+      // Always establish the new session as this customer in the browser. This
+      // prevents an already-signed-in studio account from carrying over.
+      const supabase = createSupabaseBrowserClient();
+      const { data: signIn, error: signInError } =
+        await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
+
+      if (signInError || !signIn.user) {
+        throw new Error(
+          "Your account was created, but sign-in failed. Please sign in manually.",
+        );
+      }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", signIn.user.id)
+        .maybeSingle();
+
+      if (profile?.role && profile.role !== "customer") {
+        await supabase.auth.signOut();
+        throw new Error(
+          "This account is a studio account. Sign in from the studio link instead.",
+        );
+      }
+
       router.refresh();
-      router.push(nextPath && nextPath.startsWith("/") ? nextPath : "/account");
+      router.push(nextPath && nextPath.startsWith("/") && !nextPath.startsWith("/admin") ? nextPath : "/account");
     } catch (registerError) {
       setError(
         registerError instanceof Error

@@ -3,8 +3,6 @@
 import { Loader2, Mail } from "lucide-react";
 import { useState } from "react";
 
-import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
-
 export function PasswordReset({ email }: { email: string }) {
   const [state, setState] = useState<"idle" | "loading" | "done" | "error">(
     "idle",
@@ -13,17 +11,30 @@ export function PasswordReset({ email }: { email: string }) {
 
   async function handleReset() {
     setState("loading");
-    const supabase = createSupabaseBrowserClient();
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/login`,
-    });
-    if (error) {
+    setMessage("");
+    try {
+      const response = await fetch("/api/auth/password-reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = (await response.json()) as { message?: string };
+      if (!response.ok) {
+        throw new Error(data.message ?? "The reset email could not be sent.");
+      }
+      setState("done");
+      setMessage(
+        data.message ??
+          "If an account exists for that email, a reset link is on its way.",
+      );
+    } catch (error) {
       setState("error");
-      setMessage("The reset email could not be sent just now.");
-      return;
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "The reset email could not be sent just now.",
+      );
     }
-    setState("done");
-    setMessage("A reset link is on its way to your inbox.");
   }
 
   return (

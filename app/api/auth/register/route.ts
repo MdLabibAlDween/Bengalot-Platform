@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { z } from "zod";
 
+import { sendAccountWelcome } from "@/lib/mail";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const schema = z.object({
   fullName: z.string().trim().min(2).max(120),
@@ -22,37 +22,45 @@ export async function POST(request: Request) {
 
     const { fullName, email, password } = parsed.data;
     const admin = createSupabaseAdminClient();
-    const { error: createError } = await admin.auth.admin.createUser({
+    const { data: created, error: createError } = await admin.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
       user_metadata: { full_name: fullName },
     });
 
-    if (createError) {
-      const message = createError.message.toLowerCase().includes("already")
+    if (createError || !created.user) {
+      const message = createError?.message.toLowerCase().includes("already")
         ? "An account with this email already exists. Try signing in."
-        : createError.message;
+        : createError?.message ?? "The account could not be created.";
       return NextResponse.json({ message }, { status: 400 });
     }
 
-    const server = await createSupabaseServerClient();
-    const { error: signInError } = await server.auth.signInWithPassword({
-      email,
-      password,
+    // Sign-up always creates a customer profile. Studio roles are assigned
+    // only from the owner-only Users screen.
+    const { error: profileError } = await admin.from("profiles").upsert(
+      {
+        id: created.user.id,
+        email,
+        full_name: fullName,
+        role: "customer",
+      },
+      { onConflict: "id" },
+    );
+
+    if (profileError) throw profileError;
+
+    after(() =>
+      sendAccountWelcome({
+        email,
+        name: fullName.split(" ")[0] || "there",
+      }),
+    );
+
+    return NextResponse.json({
+      ok: true,
+      message: "Your account is ready. Signing you in…",
     });
-
-    if (signInError) {
-      return NextResponse.json(
-        {
-          message:
-            "Your account was created. Please sign in to continue.",
-        },
-        { status: 201 },
-      );
-    }
-
-    return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("Registration failed", error);
     return NextResponse.json(

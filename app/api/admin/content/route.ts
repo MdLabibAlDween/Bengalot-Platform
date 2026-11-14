@@ -75,6 +75,12 @@ const schema = z.object({
     items: z.array(faqItemSchema).min(1).max(40),
     cards: z.array(faqCardSchema).min(1).max(3),
   }),
+  social: z.object({
+    instagram: z.string().trim().max(300),
+    facebook: z.string().trim().max(300),
+    youtube: z.string().trim().max(300),
+    whatsapp: z.string().trim().max(300),
+  }),
 });
 
 export async function GET() {

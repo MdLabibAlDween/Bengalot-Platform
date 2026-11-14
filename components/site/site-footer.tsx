@@ -7,6 +7,7 @@ import Link from "next/link";
 
 import { Logo, LogoMark } from "@/components/brand/logo";
 import { FooterNewsletter } from "@/components/site/footer-newsletter";
+import { getPageContent } from "@/lib/page-content.server";
 import type { Category } from "@/lib/types";
 
 function InstagramIcon({ className }: { className?: string }) {
@@ -41,7 +42,15 @@ function YoutubeIcon({ className }: { className?: string }) {
   );
 }
 
-export function SiteFooter({ categories }: { categories: Category[] }) {
+export async function SiteFooter({ categories }: { categories: Category[] }) {
+  const { social } = await getPageContent();
+  const socialLinks = [
+    { href: social.instagram, label: "Instagram", Icon: InstagramIcon },
+    { href: social.facebook, label: "Facebook", Icon: FacebookIcon },
+    { href: social.youtube, label: "YouTube", Icon: YoutubeIcon },
+    { href: social.whatsapp, label: "WhatsApp", Icon: MessageCircle },
+  ].filter((link) => Boolean(link.href));
+
   return (
     <footer className="relative overflow-hidden bg-navy text-cream">
       <div
@@ -60,24 +69,22 @@ export function SiteFooter({ categories }: { categories: Category[] }) {
             Thoughtful tools for study, focus and the long game. Designed in
             Bangladesh, made to be used every day.
           </p>
-          <div className="mt-6 flex items-center gap-2">
-            {[
-              { href: "https://instagram.com", label: "Instagram", Icon: InstagramIcon },
-              { href: "https://facebook.com", label: "Facebook", Icon: FacebookIcon },
-              { href: "https://youtube.com", label: "YouTube", Icon: YoutubeIcon },
-            ].map(({ href, label, Icon }) => (
-              <a
-                key={label}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={label}
-                className="grid size-9.5 place-items-center rounded-full border border-cream/15 text-cream/65 transition-all hover:border-butter/50 hover:text-butter"
-              >
-                <Icon className="size-4" aria-hidden="true" />
-              </a>
-            ))}
-          </div>
+          {socialLinks.length ? (
+            <div className="mt-6 flex items-center gap-2">
+              {socialLinks.map(({ href, label, Icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="grid size-9.5 place-items-center rounded-full border border-cream/15 text-cream/65 transition-all hover:border-butter/50 hover:text-butter"
+                >
+                  <Icon className="size-4" aria-hidden="true" />
+                </a>
+              ))}
+            </div>
+          ) : null}
         </div>
 
         <div>

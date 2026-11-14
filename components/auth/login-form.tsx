@@ -6,20 +6,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
-import { cn } from "@/lib/utils";
-
-const demoAccounts = [
-  {
-    label: "Customer demo",
-    email: "nadia@bengalot.com",
-    password: "BengalotStudy!2026",
-  },
-  {
-    label: "Admin demo",
-    email: "admin@bengalot.com",
-    password: "BengalotAdmin!2026",
-  },
-];
 
 export function LoginForm({ nextPath }: { nextPath?: string }) {
   const router = useRouter();
@@ -53,12 +39,9 @@ export function LoginForm({ nextPath }: { nextPath?: string }) {
         profile?.role === "staff" ||
         profile?.role === "admin" ||
         profile?.role === "owner";
-      const destination =
-        nextPath && nextPath.startsWith("/")
-          ? nextPath
-          : isStaff
-            ? "/admin"
-            : "/account";
+      const safeNext =
+        nextPath && nextPath.startsWith("/") ? nextPath : undefined;
+      const destination = safeNext ?? (isStaff ? "/admin" : "/account");
 
       router.refresh();
       router.push(destination);
@@ -70,12 +53,6 @@ export function LoginForm({ nextPath }: { nextPath?: string }) {
       );
       setLoading(false);
     }
-  }
-
-  function fillDemo(account: (typeof demoAccounts)[number]) {
-    setEmail(account.email);
-    setPassword(account.password);
-    setError("");
   }
 
   return (
@@ -108,9 +85,12 @@ export function LoginForm({ nextPath }: { nextPath?: string }) {
             <label htmlFor="login-password" className="field-label">
               Password
             </label>
-            <span className="mb-1.5 text-[0.6rem] font-medium text-muted">
-              Forgot? Use WhatsApp support
-            </span>
+            <Link
+              href="/forgot-password"
+              className="mb-1.5 text-[0.6rem] font-semibold text-teal underline decoration-teal/30 underline-offset-4"
+            >
+              Forgot password?
+            </Link>
           </div>
           <div className="relative">
             <LockKeyhole
@@ -171,30 +151,6 @@ export function LoginForm({ nextPath }: { nextPath?: string }) {
         >
           Create an account
         </Link>
-      </div>
-
-      <div className="mt-7 rounded-xl border border-dashed border-line-strong bg-paper p-3.5">
-        <p className="text-[0.55rem] font-extrabold uppercase tracking-[0.13em] text-muted">
-          Preview the experience
-        </p>
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {demoAccounts.map((account) => (
-            <button
-              key={account.email}
-              type="button"
-              onClick={() => fillDemo(account)}
-              className={cn(
-                "rounded-full border border-line bg-cream px-2.5 py-1.5 text-[0.58rem] font-semibold text-ink-soft transition-colors hover:border-teal hover:text-teal",
-              )}
-            >
-              {account.label}
-            </button>
-          ))}
-        </div>
-        <p className="mt-2 text-[0.58rem] leading-relaxed text-muted">
-          Fills the demo credentials. Use “Customer demo” for the learning
-          library, or “Admin demo” for the studio dashboard.
-        </p>
       </div>
     </div>
   );

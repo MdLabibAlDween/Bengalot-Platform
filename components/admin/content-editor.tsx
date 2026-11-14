@@ -8,6 +8,7 @@ import {
   Megaphone,
   Plus,
   Save,
+  Share2,
   Trash2,
 } from "lucide-react";
 import { useState } from "react";
@@ -18,16 +19,18 @@ import type {
   FaqPageContent,
   JournalPageContent,
   PageContent,
+  SocialLinks,
 } from "@/lib/page-content";
 import type { JournalArticle } from "@/lib/journal";
 
-type Tab = "announcement" | "journal" | "about" | "faq";
+type Tab = "announcement" | "journal" | "about" | "faq" | "social";
 
 const tabs: { id: Tab; label: string; icon: typeof Megaphone }[] = [
   { id: "announcement", label: "Announcement", icon: Megaphone },
   { id: "journal", label: "Journal", icon: FileText },
   { id: "about", label: "Our story", icon: FileText },
   { id: "faq", label: "FAQ", icon: HelpCircle },
+  { id: "social", label: "Social links", icon: Share2 },
 ];
 
 function splitParagraphs(value: string) {
@@ -91,6 +94,17 @@ export function ContentEditor({ content }: { content: PageContent }) {
     setDraft((current) => ({
       ...current,
       faq: { ...current.faq, [key]: value },
+    }));
+    setState("idle");
+  }
+
+  function updateSocial<K extends keyof SocialLinks>(
+    key: K,
+    value: SocialLinks[K],
+  ) {
+    setDraft((current) => ({
+      ...current,
+      social: { ...current.social, [key]: value },
     }));
     setState("idle");
   }
@@ -774,6 +788,57 @@ export function ContentEditor({ content }: { content: PageContent }) {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+      ) : null}
+
+      {tab === "social" ? (
+        <section className="rounded-[1.2rem] border border-line bg-cream p-5">
+          <p className="text-[0.55rem] font-extrabold uppercase tracking-[0.13em] text-muted">
+            Footer social links
+          </p>
+          <p className="mt-2 max-w-[42rem] text-[0.68rem] leading-relaxed text-muted">
+            Paste the full URL for each profile. An empty field hides that icon
+            from the footer — no placeholder links are shown.
+          </p>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            {([
+              ["instagram", "Instagram"],
+              ["facebook", "Facebook"],
+              ["youtube", "YouTube"],
+              ["whatsapp", "WhatsApp"],
+            ] as const).map(([key, label]) => (
+              <div key={key}>
+                <label htmlFor={`social-${key}`} className="field-label">
+                  {label}
+                </label>
+                <input
+                  id={`social-${key}`}
+                  value={draft.social[key]}
+                  onChange={(event) => updateSocial(key, event.target.value)}
+                  className="field"
+                  placeholder={`https://${key === "whatsapp" ? "wa.me/8801XXXXXXXXX" : `${key}.com/your-profile`}`}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="mt-5 flex flex-wrap items-center gap-2 rounded-xl border border-line bg-paper px-4 py-3">
+            <span className="text-[0.55rem] font-bold uppercase tracking-[0.1em] text-muted">
+              Preview
+            </span>
+            {(["instagram", "facebook", "youtube", "whatsapp"] as const)
+              .filter((key) => draft.social[key])
+              .map((key) => (
+                <span
+                  key={key}
+                  className="rounded-full border border-line bg-surface px-2.5 py-1 text-[0.55rem] font-semibold capitalize text-ink-soft"
+                >
+                  {key}
+                </span>
+              ))}
+            {!Object.values(draft.social).some(Boolean) ? (
+              <span className="text-[0.58rem] text-muted">No social icons will show.</span>
+            ) : null}
           </div>
         </section>
       ) : null}

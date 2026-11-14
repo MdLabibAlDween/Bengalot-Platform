@@ -149,6 +149,10 @@ export default async function AdminOverviewPage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <Link href="/admin/users" className="btn btn-outline btn-sm">
+            <Users className="size-3.5" aria-hidden="true" />
+            Manage users
+          </Link>
           <Link href="/admin/promotions" className="btn btn-outline btn-sm">
             <Megaphone className="size-3.5" aria-hidden="true" />
             Edit promotions
@@ -340,8 +344,8 @@ export default async function AdminOverviewPage() {
               {activeOrders.length} order{activeOrders.length === 1 ? "" : "s"} in motion.
             </p>
             <p className="mt-2 text-[0.66rem] leading-relaxed text-cream/85">
-              Digital access is confirmed by hand. Keep an eye on the bKash
-              queue during launch week.
+              Digital access is confirmed by ZiniPay automatically. Check the
+              orders queue and user library for anything that needs a human.
             </p>
             <Link
               href="/admin/orders"

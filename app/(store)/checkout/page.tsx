@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { CheckoutClient } from "@/components/checkout/checkout-client";
+import { normaliseAddresses } from "@/lib/addresses";
 import { getCurrentUser } from "@/lib/auth";
 import { getCatalog } from "@/lib/data/catalog";
 import { isZinipayConfigured } from "@/lib/zinipay";
@@ -18,6 +19,11 @@ export default async function CheckoutPage() {
     <CheckoutClient
       settings={catalog.settings}
       zinipayEnabled={isZinipayConfigured()}
+      savedAddresses={
+        current?.user
+          ? normaliseAddresses(current.user.user_metadata?.addresses)
+          : []
+      }
       user={
         current?.user
           ? {

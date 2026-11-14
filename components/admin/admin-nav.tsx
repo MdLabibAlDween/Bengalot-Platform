@@ -8,6 +8,7 @@ import {
   Package,
   ShoppingCart,
   TicketPercent,
+  UsersRound,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -18,6 +19,7 @@ const links = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
+  { href: "/admin/users", label: "Users", icon: UsersRound },
   { href: "/admin/promotions", label: "Promotions", icon: Megaphone },
   { href: "/admin/promo-codes", label: "Promo codes", icon: TicketPercent },
   { href: "/admin/content", label: "Content", icon: FileText },

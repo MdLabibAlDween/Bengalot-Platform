@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 
 import { AuthShell } from "@/components/auth/auth-shell";
 import { RegisterForm } from "@/components/auth/register-form";
-import { getCurrentUser } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "Create an account",
@@ -17,8 +15,6 @@ export default async function RegisterPage({
   searchParams: Promise<{ next?: string }>;
 }) {
   const { next } = await searchParams;
-  const current = await getCurrentUser();
-  if (current) redirect(next?.startsWith("/") ? next : "/account");
 
   return (
     <AuthShell

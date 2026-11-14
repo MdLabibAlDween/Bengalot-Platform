@@ -23,16 +23,13 @@ Open <http://localhost:3000>.
 
 The live Supabase project is already seeded. The SQL schema and catalogue seed live in `supabase/migrations/` — `0001_academic_store.sql` creates the store, and `0002_printed_planners.sql` updates the planner collection to physical printed editions.
 
-## Demo accounts
+## Accounts and studio access
 
-These accounts exist for reviewing the experience:
+Customers create their own account from `/register`, then keep digital purchases in `/account/library`. Sign-in, forgot-password, reset-password and address-book pages all use real Supabase Auth data.
 
-| Role | Email | Password |
-| --- | --- | --- |
-| Customer | `nadia@bengalot.com` | `BengalotStudy!2026` |
-| Owner / admin | `admin@bengalot.com` | `BengalotAdmin!2026` |
+Studio access is managed from **Admin → Users**. The owner can create customer or team accounts, change roles, send password-reset links, delete accounts, and grant, refresh or revoke each customer's library access. New registrations are always created as `customer` — studio roles are only assigned inside the owner-only Users screen.
 
-The sign-in page also has compact demo-fill buttons. Remove or change these accounts before a real launch.
+The original demo customer has been removed. The bootstrap demo owner account (`admin@bengalot.com`) should be replaced: sign in, create your own owner account from Users, sign in with it, then delete the demo owner from the same screen.
 
 ## What is included
 
@@ -41,7 +38,9 @@ The sign-in page also has compact demo-fill buttons. Remove or change these acco
 - Product pages with interactive galleries, a flashcard front/back preview, specs, contents and related products. Every content block — title, Bangla title, story copy, type, format, SKU, specs, contents, requirements, tags, artwork, sort order and the advanced preview JSON — is editable in the studio.
 - Bundles are first-class products: the studio lets you choose which digital components a bundle unlocks in the customer library, and printed components are described in "What you get".
 - Promo codes at checkout: percentage or fixed discounts with an optional minimum subtotal, discount cap and expiry. Codes are created in the studio and re-validated on the server when the order is placed.
-- Journal, Our Story and FAQ are editable in the studio Content section, along with the announcement bar at the top of the storefront. Article bodies, FAQ items and the announcement copy can all change without a deploy.
+- Journal, Our Story and FAQ are editable in the studio Content section, along with the announcement bar and footer social links. Article bodies, FAQ items, announcement copy and social URLs can all change without a deploy.
+- Customer accounts include a saved address book. Addresses can be added, edited, made default or removed in `/account/addresses`, and checkout fills the whole delivery form with one click.
+- The owner-only Users screen manages real customer and studio accounts: create accounts, change roles, send reset links, delete accounts, and grant, refresh or revoke each customer's digital library access.
 - Digital products can carry a delivery PDF uploaded in the studio. The customer receives it in their account library only after payment is confirmed — use it for the Notion template link, download link or setup instructions.
 - Transactional email through Purelymail SMTP: order receipts, contact auto-replies and newsletter welcomes. Email is optional — when credentials are blank the storefront keeps working and sends are skipped.
 - ZiniPay hosted checkout for digital orders: bKash, Nagad, Rocket and Upay. Invoices are created server-side, verified before fulfilment, and digital access is only released after ZiniPay confirms the payment. Unpaid orders can retry from the confirmation page.
@@ -64,6 +63,7 @@ The sign-in page also has compact demo-fill buttons. Remove or change these acco
 | `pnpm verify:mail` | Check the Purelymail SMTP login and send a test email |
 | `pnpm verify:zinipay` | Check the ZiniPay key; optionally create a sandbox invoice |
 | `pnpm verify:content` | Save and restore page content, then verify a delivery PDF + entitlement |
+| `pnpm verify:users` | Create/role/reset/grant/revoke/delete a temp user, plus address + social checks |
 
 `pnpm verify:flows` creates two temporary cash-on-delivery orders (one plain, one bundle with a promo code), checks the stored totals, marks one delivered and then cancels it to restore stock. Run it while `pnpm dev` is active. `pnpm verify:images` uploads a generated photo, creates a temporary product with it, checks the product page, shop and studio render the photo, then deletes everything.
 

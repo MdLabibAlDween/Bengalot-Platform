@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import {
   BookOpen,
   LayoutDashboard,
+  MapPin,
   Package,
   UserRound,
 } from "lucide-react";
@@ -16,6 +17,7 @@ const links = [
   { href: "/account", label: "Overview", icon: LayoutDashboard },
   { href: "/account/library", label: "My library", icon: BookOpen },
   { href: "/account/orders", label: "Orders", icon: Package },
+  { href: "/account/addresses", label: "Addresses", icon: MapPin },
   { href: "/account/profile", label: "Profile", icon: UserRound },
 ];
 
@@ -24,7 +26,7 @@ export function AccountNav({ libraryCount }: { libraryCount: number }) {
 
   return (
     <nav aria-label="Account navigation">
-      <ul className="grid grid-cols-4 gap-1 lg:flex lg:flex-col">
+      <ul className="grid grid-cols-5 gap-1 lg:flex lg:flex-col">
         {links.map((link) => {
           const active =
             link.href === "/account"
