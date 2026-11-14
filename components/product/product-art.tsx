@@ -1,6 +1,8 @@
+import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
+import { productCoverImage } from "@/lib/product-media";
 import type { Product } from "@/lib/types";
 
 type ArtProduct = Pick<
@@ -487,6 +489,31 @@ export function ProductArt({
   showCaption?: boolean;
   children?: ReactNode;
 }) {
+  const photo = productCoverImage(product);
+
+  if (photo) {
+    return (
+      <div
+        role="img"
+        aria-label={`${product.title} — product photo`}
+        className={cn(
+          "relative isolate h-full w-full overflow-hidden rounded-[inherit] bg-sand",
+          className,
+        )}
+      >
+        <Image
+          src={photo}
+          alt={`${product.title} — product photo`}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+        />
+        {showCaption ? <Caption product={product} /> : null}
+        {children}
+      </div>
+    );
+  }
+
   const palette = product.palette?.length
     ? product.palette
     : ["#0d6f6d", "#0e7c7b", "#f6d365"];

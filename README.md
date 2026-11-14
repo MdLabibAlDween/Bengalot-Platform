@@ -56,8 +56,13 @@ The sign-in page also has compact demo-fill buttons. Remove or change these acco
 | `pnpm lint` | ESLint |
 | `pnpm typecheck` | Generate route types and run TypeScript |
 | `pnpm verify:flows` | Place and clean up test COD + promo orders against a running server |
+| `pnpm verify:images` | Upload a test photo, create and clean up a temp product |
 
-`pnpm verify:flows` creates two temporary cash-on-delivery orders (one plain, one bundle with a promo code), checks the stored totals, marks one delivered and then cancels it to restore stock. Run it while `pnpm dev` is active.
+`pnpm verify:flows` creates two temporary cash-on-delivery orders (one plain, one bundle with a promo code), checks the stored totals, marks one delivered and then cancels it to restore stock. Run it while `pnpm dev` is active. `pnpm verify:images` uploads a generated photo, creates a temporary product with it, checks the product page, shop and studio render the photo, then deletes everything.
+
+## Product photos
+
+Photos are uploaded in the studio product editor (drag and drop or file picker) and stored in the public `product-images` Supabase Storage bucket, which is created automatically on first upload. The first photo is the cover and is used across the shop, cart, search and product page; the original SVG artwork remains the fallback while a product has no photos. Removing a photo in the editor and saving deletes the file from storage.
 
 ## Environment
 

@@ -236,6 +236,8 @@ export type CartLine = {
   palette: string[];
   quantity: number;
   stock: number;
+  /** Cover photo uploaded in the studio, if the product has one. */
+  image?: string;
   /** Whether this line carries digital access, including physical bundles. */
   has_digital_content?: boolean;
 };

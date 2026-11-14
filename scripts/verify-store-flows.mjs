@@ -192,6 +192,7 @@ const bundlePayload = {
     ...student.preview,
     productSlugs: ["notion-student-os", "deep-work-study-guide"],
   },
+  images: Array.isArray(student.preview?.images) ? student.preview.images : [],
 };
 
 const bundleSave = await adminApi("/api/admin/products", bundlePayload);

@@ -1,4 +1,4 @@
-import { ArrowUpRight, Package, Star, TrendingUp } from "lucide-react";
+import { ArrowUpRight, Package, Plus, Star, TicketPercent, TrendingUp } from "lucide-react";
 import Link from "next/link";
 
 import { AdminProductTable } from "@/components/admin/admin-product-table";
@@ -36,10 +36,20 @@ export default async function AdminProductsPage() {
             publication status without touching code.
           </p>
         </div>
-        <Link href="/admin/promotions" className="btn btn-outline btn-sm">
-          <ArrowUpRight className="size-3.5" aria-hidden="true" />
-          Homepage banners
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link href="/admin/products/new" className="btn btn-primary btn-sm">
+            <Plus className="size-3.5" aria-hidden="true" />
+            Add product
+          </Link>
+          <Link href="/admin/promo-codes" className="btn btn-outline btn-sm">
+            <TicketPercent className="size-3.5" aria-hidden="true" />
+            Promo codes
+          </Link>
+          <Link href="/admin/promotions" className="btn btn-outline btn-sm">
+            <ArrowUpRight className="size-3.5" aria-hidden="true" />
+            Homepage banners
+          </Link>
+        </div>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">

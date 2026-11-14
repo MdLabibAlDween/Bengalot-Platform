@@ -619,7 +619,7 @@ export function CheckoutClient({
                           format: line.format,
                           art_key: line.art_key,
                           palette: line.palette,
-                          preview: {},
+                          preview: line.image ? { images: [line.image] } : {},
                           includes: [],
                         }}
                       />

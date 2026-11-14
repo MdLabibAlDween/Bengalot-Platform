@@ -2,22 +2,28 @@
 
 import {
   ArrowLeft,
+  ArrowRight,
   Check,
+  ImagePlus,
   Layers,
   Loader2,
   Plus,
   Save,
+  Star,
   Trash2,
+  UploadCloud,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { ProductArt } from "@/components/product/product-art";
 import { getBundleComponentSlugs, isBundleProduct } from "@/lib/bundles";
 import { productTypeLabel } from "@/lib/catalog-meta";
+import { productCoverImage } from "@/lib/product-media";
 import type { Category, Product, ProductSpec } from "@/lib/types";
-import { formatMoney } from "@/lib/utils";
+import { cn, formatMoney } from "@/lib/utils";
 
 const artKeys = [
   { value: "notion", label: "Notion workspace" },
@@ -29,6 +35,29 @@ const artKeys = [
 ];
 
 const typeOptions = ["digital", "physical", "bundle"] as const;
+
+const categoryArtDefaults: Record<string, { art_key: string; palette: string[] }> = {
+  "notion-templates": {
+    art_key: "notion",
+    palette: ["#0B4F4A", "#0E7C7B", "#F6D365"],
+  },
+  "study-cards": {
+    art_key: "cards",
+    palette: ["#E05A3F", "#F0755A", "#F6D365"],
+  },
+  "printed-planners": {
+    art_key: "planner",
+    palette: ["#2A6F97", "#8ECAE6", "#F6D365"],
+  },
+  "focus-productivity": {
+    art_key: "guide",
+    palette: ["#2B2D42", "#4A4E69", "#EF8354"],
+  },
+  bundles: {
+    art_key: "bundle",
+    palette: ["#E05A3F", "#0E7C7B", "#F6D365"],
+  },
+};
 
 function lines(value: string) {
   return value
@@ -44,16 +73,21 @@ function tags(value: string) {
     .filter(Boolean);
 }
 
+type Upload = { id: string; name: string };
+
 export function ProductEditor({
   product,
   categories,
   products,
+  mode = "edit",
 }: {
   product: Product;
   categories: Category[];
   products: Product[];
+  mode?: "edit" | "create";
 }) {
   const router = useRouter();
+  const isCreate = mode === "create";
   const isBundle = isBundleProduct(product);
   const existingComponents = getBundleComponentSlugs(product);
 
@@ -82,17 +116,28 @@ export function ProductEditor({
     preview: JSON.stringify(
       Object.fromEntries(
         Object.entries(product.preview ?? {}).filter(
-          ([key]) => key !== "productSlugs",
+          ([key]) => key !== "images" && key !== "productSlugs",
         ),
       ),
       null,
       2,
     ),
   });
+  const [images, setImages] = useState<string[]>(
+    Array.isArray((product.preview as { images?: unknown })?.images)
+      ? ((product.preview as { images: unknown[] }).images as string[]).filter(
+          (url) => typeof url === "string",
+        )
+      : [],
+  );
+  const [uploads, setUploads] = useState<Upload[]>([]);
+  const [uploadError, setUploadError] = useState("");
+  const [dragging, setDragging] = useState(false);
   const [bundleComponents, setBundleComponents] =
     useState<string[]>(existingComponents);
   const [state, setState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [message, setMessage] = useState("");
+  const fileInput = useRef<HTMLInputElement>(null);
 
   function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -100,13 +145,23 @@ export function ProductEditor({
     setMessage("");
   }
 
-  function updateColor(index: number, value: string) {
+  function updateCategory(slug: string) {
     setForm((current) => {
-      const palette = [...current.palette];
-      palette[index] = value;
-      return { ...current, palette };
+      if (isCreate) {
+        const fallback = categoryArtDefaults[slug];
+        if (fallback) {
+          return {
+            ...current,
+            category_slug: slug,
+            art_key: fallback.art_key,
+            palette: [...fallback.palette],
+          };
+        }
+      }
+      return { ...current, category_slug: slug };
     });
     setState("idle");
+    setMessage("");
   }
 
   function updateSpec(index: number, key: keyof ProductSpec, value: string) {
@@ -145,21 +200,111 @@ export function ProductEditor({
     setMessage("");
   }
 
+  async function uploadFiles(fileList: FileList | File[]) {
+    const files = Array.from(fileList).filter((file) => file.size > 0);
+    if (!files.length) return;
+
+    const capacity = 12 - images.length - uploads.length;
+    const accepted = files.slice(0, Math.max(capacity, 0));
+    if (!accepted.length) {
+      setUploadError("A product can hold up to 12 photos.");
+      return;
+    }
+
+    setUploadError("");
+    const placeholders = accepted.map((file) => ({
+      id: crypto.randomUUID(),
+      name: file.name,
+    }));
+    setUploads((current) => [...current, ...placeholders]);
+
+    for (const [index, file] of accepted.entries()) {
+      const placeholder = placeholders[index];
+      if (!placeholder) continue;
+      try {
+        const body = new FormData();
+        body.append("file", file);
+        const response = await fetch("/api/admin/uploads", {
+          method: "POST",
+          body,
+        });
+        const data = (await response.json()) as { url?: string; message?: string };
+        if (!response.ok || !data.url) {
+          throw new Error(data.message ?? "The image could not be uploaded.");
+        }
+        setImages((current) => [...current, data.url as string]);
+        setUploads((current) => current.filter((item) => item.id !== placeholder.id));
+      } catch (error) {
+        setUploads((current) => current.filter((item) => item.id !== placeholder.id));
+        setUploadError(
+          error instanceof Error ? error.message : "The image could not be uploaded.",
+        );
+      }
+    }
+  }
+
+  function setCover(index: number) {
+    setImages((current) => {
+      const next = [...current];
+      const [cover] = next.splice(index, 1);
+      return cover ? [cover, ...next] : next;
+    });
+  }
+
+  function moveImage(index: number, direction: -1 | 1) {
+    setImages((current) => {
+      const next = [...current];
+      const target = index + direction;
+      if (target < 0 || target >= next.length) return current;
+      const currentImage = next[index];
+      const targetImage = next[target];
+      if (!currentImage || !targetImage) return current;
+      next[index] = targetImage;
+      next[target] = currentImage;
+      return next;
+    });
+  }
+
+  function removeImage(index: number) {
+    setImages((current) => current.filter((_, itemIndex) => itemIndex !== index));
+  }
+
   const bundleCandidates = products.filter(
     (candidate) =>
       candidate.slug !== product.slug &&
       (candidate.type === "digital" || candidate.type === "bundle"),
   );
 
-  const previewObject = useMemo(() => {
+  const parsedPreview = useMemo(() => {
     try {
       return JSON.parse(form.preview || "{}") as Record<string, unknown>;
     } catch {
-      return product.preview as Record<string, unknown>;
+      return {};
     }
-  }, [form.preview, product.preview]);
+  }, [form.preview]);
 
-  const includesList = lines(form.includes);
+  const previewInvalid = useMemo(() => {
+    try {
+      const parsed = JSON.parse(form.preview || "{}");
+      return (
+        !parsed || typeof parsed !== "object" || Array.isArray(parsed)
+      );
+    } catch {
+      return true;
+    }
+  }, [form.preview]);
+
+  const mergedPreview = useMemo(() => {
+    const next = { ...parsedPreview };
+    if (isBundle) {
+      next.kind = "bundle";
+      next.productSlugs = bundleComponents;
+    }
+    if (images.length) {
+      next.images = images;
+    }
+    return next;
+  }, [parsedPreview, isBundle, bundleComponents, images]);
 
   const previewProduct: Product = {
     ...product,
@@ -178,26 +323,21 @@ export function ProductEditor({
     is_published: form.is_published,
     art_key: form.art_key,
     palette: form.palette,
-    includes: includesList,
-    preview: isBundle
-      ? { ...previewObject, productSlugs: bundleComponents }
-      : previewObject,
+    includes: lines(form.includes),
+    preview: mergedPreview,
   };
+
+  const hasPhotos = images.length > 0 || uploads.length > 0;
+  const coverImage = productCoverImage(previewProduct);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setState("saving");
     setMessage("");
 
-    let parsedPreview: Record<string, unknown>;
-    try {
-      parsedPreview = JSON.parse(form.preview || "{}") as Record<string, unknown>;
-      if (!parsedPreview || typeof parsedPreview !== "object" || Array.isArray(parsedPreview)) {
-        throw new Error("Preview content must be a JSON object.");
-      }
-    } catch {
+    if (previewInvalid) {
       setState("error");
-      setMessage("The preview content is not valid JSON. Fix it before saving.");
+      setMessage("The advanced artwork data is not valid JSON. Fix it before saving.");
       return;
     }
 
@@ -206,7 +346,8 @@ export function ProductEditor({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          slug: product.slug,
+          mode,
+          ...(isCreate ? {} : { slug: product.slug }),
           title: form.title,
           title_bn: form.title_bn || null,
           subtitle: form.subtitle,
@@ -223,7 +364,7 @@ export function ProductEditor({
           is_published: form.is_published,
           art_key: form.art_key,
           palette: form.palette,
-          includes: includesList,
+          includes: lines(form.includes),
           requirements: lines(form.requirements),
           specs: form.specs
             .map((spec) => ({
@@ -233,13 +374,23 @@ export function ProductEditor({
             .filter((spec) => spec.label && spec.value),
           tags: tags(form.tags),
           sort: Number(form.sort) || 0,
-          preview: isBundle
-            ? { ...parsedPreview, kind: "bundle", productSlugs: bundleComponents }
-            : parsedPreview,
+          preview: parsedPreview,
+          images,
         }),
       });
-      const data = (await response.json()) as { message?: string; ok?: boolean };
-      if (!response.ok) throw new Error(data.message ?? "Could not save.");
+      const data = (await response.json()) as {
+        message?: string;
+        ok?: boolean;
+        slug?: string;
+      };
+      if (!response.ok || !data.ok) throw new Error(data.message ?? "Could not save.");
+
+      if (isCreate && data.slug) {
+        router.push(`/admin/products/${data.slug}`);
+        router.refresh();
+        return;
+      }
+
       setState("saved");
       setMessage("Saved. The storefront will show these changes.");
       router.refresh();
@@ -262,16 +413,27 @@ export function ProductEditor({
             All products
           </Link>
           <h1 className="mt-3 font-display text-[2rem] leading-none tracking-[-0.04em] text-ink sm:text-[2.5rem]">
-            Edit: <span className="display-italic text-teal">{product.title}</span>
+            {isCreate ? (
+              <>
+                Add a{" "}
+                <span className="display-italic text-teal">new product.</span>
+              </>
+            ) : (
+              <>
+                Edit:{" "}
+                <span className="display-italic text-teal">{product.title}</span>
+              </>
+            )}
           </h1>
           <p className="mt-2 text-[0.68rem] text-muted">
-            The product page, card artwork and bundle access all update from
-            here. Nothing changes until you save.
+            {isCreate
+              ? "Upload photos, describe the product and publish. The web address is created from the title."
+              : "Photos, story, price and bundle access — everything the product page needs. Nothing changes until you save."}
           </p>
         </div>
         <button
           type="submit"
-          disabled={state === "saving"}
+          disabled={state === "saving" || uploads.length > 0}
           className="btn btn-primary btn-sm"
         >
           {state === "saving" ? (
@@ -281,7 +443,13 @@ export function ProductEditor({
           ) : (
             <Save className="size-3.5" aria-hidden="true" />
           )}
-          {state === "saving" ? "Saving" : state === "saved" ? "Saved" : "Save changes"}
+          {state === "saving"
+            ? "Saving"
+            : state === "saved"
+              ? "Saved"
+              : isCreate
+                ? "Create product"
+                : "Save changes"}
         </button>
       </div>
 
@@ -300,6 +468,186 @@ export function ProductEditor({
 
       <div className="grid gap-5 xl:grid-cols-[1.2fr_0.8fr] xl:items-start">
         <div className="space-y-4">
+          <section className="rounded-[1.2rem] border border-line bg-cream p-5">
+            <div className="flex items-center justify-between">
+              <p className="text-[0.55rem] font-extrabold uppercase tracking-[0.13em] text-muted">
+                Photos
+              </p>
+              <span className="text-[0.56rem] text-muted">
+                {images.length}/12
+              </span>
+            </div>
+
+            <div
+              onDragOver={(event) => {
+                event.preventDefault();
+                setDragging(true);
+              }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={(event) => {
+                event.preventDefault();
+                setDragging(false);
+                if (event.dataTransfer.files.length) {
+                  void uploadFiles(event.dataTransfer.files);
+                }
+              }}
+              className={cn(
+                "mt-4 rounded-[1rem] border border-dashed px-4 py-5 text-center transition-colors",
+                dragging ? "border-teal bg-teal-soft/30" : "border-line-strong bg-paper",
+              )}
+            >
+              <span className="mx-auto grid size-10 place-items-center rounded-full bg-surface shadow-sm">
+                <UploadCloud className="size-4.5 text-teal" aria-hidden="true" />
+              </span>
+              <p className="mt-2 text-[0.72rem] font-semibold text-ink">
+                Drag photos here, or
+              </p>
+              <label
+                htmlFor="product-photos"
+                className="btn btn-outline btn-sm mt-2 inline-flex cursor-pointer"
+              >
+                <ImagePlus className="size-3.5" aria-hidden="true" />
+                Choose photos
+              </label>
+              <input
+                ref={fileInput}
+                id="product-photos"
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/avif"
+                multiple
+                className="sr-only"
+                onChange={(event) => {
+                  if (event.target.files?.length) {
+                    void uploadFiles(event.target.files);
+                  }
+                  event.target.value = "";
+                }}
+              />
+              <p className="mt-2 text-[0.58rem] text-muted">
+                JPG, PNG, WebP or AVIF · up to 6MB each · the first photo is the cover
+              </p>
+            </div>
+
+            {uploadError ? (
+              <p className="mt-2 text-[0.62rem] font-medium text-coral" role="alert">
+                {uploadError}
+              </p>
+            ) : null}
+
+            {hasPhotos ? (
+              <ul className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
+                {images.map((url, index) => (
+                  <li
+                    key={url}
+                    className="group relative overflow-hidden rounded-xl border border-line bg-surface"
+                  >
+                    <div className="relative aspect-square">
+                      <Image
+                        src={url}
+                        alt={`${form.title || "Product"} photo ${index + 1}`}
+                        fill
+                        sizes="200px"
+                        className="object-cover"
+                      />
+                    </div>
+                    {index === 0 ? (
+                      <span className="absolute left-1.5 top-1.5 inline-flex items-center gap-1 rounded-full bg-ink/85 px-2 py-0.5 text-[0.5rem] font-bold uppercase tracking-[0.08em] text-cream backdrop-blur">
+                        <Star className="size-2.5" aria-hidden="true" />
+                        Cover
+                      </span>
+                    ) : null}
+                    <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-gradient-to-t from-black/70 to-transparent p-1.5 opacity-100 transition-opacity lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100">
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => moveImage(index, -1)}
+                          disabled={index === 0}
+                          className="grid size-6 place-items-center rounded-full bg-white/90 text-ink transition-opacity disabled:opacity-30"
+                          aria-label="Move photo earlier"
+                        >
+                          <ArrowLeft className="size-3" aria-hidden="true" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveImage(index, 1)}
+                          disabled={index === images.length - 1}
+                          className="grid size-6 place-items-center rounded-full bg-white/90 text-ink transition-opacity disabled:opacity-30"
+                          aria-label="Move photo later"
+                        >
+                          <ArrowRight className="size-3" aria-hidden="true" />
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {index !== 0 ? (
+                          <button
+                            type="button"
+                            onClick={() => setCover(index)}
+                            className="rounded-full bg-white/90 px-2 py-1 text-[0.52rem] font-bold uppercase tracking-[0.06em] text-ink"
+                          >
+                            Cover
+                          </button>
+                        ) : null}
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="grid size-6 place-items-center rounded-full bg-white/90 text-coral"
+                          aria-label="Remove photo"
+                        >
+                          <Trash2 className="size-3" aria-hidden="true" />
+                        </button>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+                {uploads.map((upload) => (
+                  <li
+                    key={upload.id}
+                    className="relative grid aspect-square place-items-center overflow-hidden rounded-xl border border-line bg-paper"
+                    title={upload.name}
+                  >
+                    <Loader2 className="size-5 animate-spin text-teal" aria-hidden="true" />
+                    <p className="absolute inset-x-1 bottom-1 truncate text-[0.5rem] text-muted">
+                      {upload.name}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+
+            {!coverImage ? (
+              <p className="mt-3 rounded-lg bg-paper px-3 py-2 text-[0.6rem] leading-relaxed text-muted">
+                No photos yet — the storefront shows original Bengalot artwork
+                instead. Pick the scene below.
+              </p>
+            ) : null}
+
+            {!hasPhotos ? (
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="product-art" className="field-label">
+                    Fallback artwork
+                  </label>
+                  <select
+                    id="product-art"
+                    value={form.art_key}
+                    onChange={(event) => update("art_key", event.target.value)}
+                    className="field"
+                  >
+                    {artKeys.map((art) => (
+                      <option key={art.value} value={art.value}>
+                        {art.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <p className="self-end rounded-lg bg-paper px-3 py-2 text-[0.58rem] leading-relaxed text-muted">
+                  Colours are chosen automatically for the collection — no need
+                  to manage them by hand.
+                </p>
+              </div>
+            ) : null}
+          </section>
+
           <section className="rounded-[1.2rem] border border-line bg-cream p-5">
             <p className="text-[0.55rem] font-extrabold uppercase tracking-[0.13em] text-muted">
               The story
@@ -361,9 +709,7 @@ export function ProductEditor({
                   <select
                     id="product-category"
                     value={form.category_slug}
-                    onChange={(event) =>
-                      update("category_slug", event.target.value)
-                    }
+                    onChange={(event) => updateCategory(event.target.value)}
                     className="field"
                   >
                     {categories.map((category) => (
@@ -634,51 +980,6 @@ export function ProductEditor({
 
           <section className="rounded-[1.2rem] border border-line bg-cream p-5">
             <p className="text-[0.55rem] font-extrabold uppercase tracking-[0.13em] text-muted">
-              Artwork
-            </p>
-            <div className="mt-4 space-y-4">
-              <div>
-                <label htmlFor="product-art" className="field-label">
-                  Scene
-                </label>
-                <select
-                  id="product-art"
-                  value={form.art_key}
-                  onChange={(event) => update("art_key", event.target.value)}
-                  className="field"
-                >
-                  {artKeys.map((art) => (
-                    <option key={art.value} value={art.value}>
-                      {art.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <span className="field-label">Colour palette</span>
-                <div className="flex flex-wrap gap-2">
-                  {form.palette.map((color, index) => (
-                    <label
-                      key={`${index}-${color}`}
-                      className="flex items-center gap-2 rounded-lg border border-line bg-surface px-2 py-1.5"
-                    >
-                      <input
-                        type="color"
-                        value={color}
-                        onChange={(event) => updateColor(index, event.target.value)}
-                        className="size-6 cursor-pointer rounded border-0 bg-transparent p-0"
-                        aria-label={`Palette colour ${index + 1}`}
-                      />
-                      <span className="font-mono text-[0.6rem] text-ink-soft">{color}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="rounded-[1.2rem] border border-line bg-cream p-5">
-            <p className="text-[0.55rem] font-extrabold uppercase tracking-[0.13em] text-muted">
               Visibility
             </p>
             <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
@@ -719,18 +1020,18 @@ export function ProductEditor({
 
           <details className="group rounded-[1.2rem] border border-line bg-cream p-5">
             <summary className="cursor-pointer text-[0.55rem] font-extrabold uppercase tracking-[0.13em] text-muted">
-              Advanced preview content (JSON)
+              Advanced artwork data (JSON) — optional
             </summary>
             <p className="mt-3 text-[0.64rem] leading-relaxed text-muted">
-              This powers the artwork modules and the flashcard preview. Keep it
-              as valid JSON — the page will not save otherwise.
+              Powers artwork modules and the flashcard preview. Leave it alone
+              unless you need it — keep it valid JSON.
             </p>
             <textarea
-              rows={10}
+              rows={8}
               value={form.preview}
               onChange={(event) => update("preview", event.target.value)}
               className="field mt-3 resize-y font-mono !text-[0.66rem]"
-              aria-label="Preview content JSON"
+              aria-label="Advanced artwork data JSON"
             />
           </details>
         </div>
@@ -768,8 +1069,9 @@ export function ProductEditor({
               </p>
             </div>
             <div className="mt-3 rounded-lg bg-paper px-3 py-2 text-[0.58rem] leading-relaxed text-muted">
-              This artwork is original SVG rendered in the browser — no photo
-              upload is required.
+              {coverImage
+                ? "Your uploaded cover photo is live on cards, the shop and the product page."
+                : "Original SVG artwork is shown until you upload a photo."}
             </div>
           </div>
         </aside>
