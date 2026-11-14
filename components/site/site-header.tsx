@@ -264,10 +264,6 @@ export function SiteHeader({ categories, products, user }: HeaderProps) {
           </nav>
 
           <div className="ml-auto flex items-center gap-0.5 sm:gap-1">
-            <span className="mr-1 hidden items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-[0.58rem] font-bold uppercase tracking-[0.1em] text-muted xl:flex">
-              <span className="size-1.5 rounded-full bg-teal" />
-              BDT ৳
-            </span>
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
