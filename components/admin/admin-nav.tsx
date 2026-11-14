@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import {
+  FileText,
   LayoutDashboard,
   Megaphone,
   Package,
@@ -19,6 +20,7 @@ const links = [
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { href: "/admin/promotions", label: "Promotions", icon: Megaphone },
   { href: "/admin/promo-codes", label: "Promo codes", icon: TicketPercent },
+  { href: "/admin/content", label: "Content", icon: FileText },
 ];
 
 export function AdminNav({
@@ -35,7 +37,7 @@ export function AdminNav({
         className={cn(
           variant === "sidebar"
             ? "space-y-1"
-            : "grid grid-cols-5 gap-1",
+            : "grid grid-cols-3 gap-1",
         )}
       >
         {links.map((link) => {

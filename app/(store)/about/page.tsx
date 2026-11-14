@@ -14,6 +14,7 @@ import Link from "next/link";
 import { MaskedLine, Reveal } from "@/components/motion/reveal";
 import { ProductArt } from "@/components/product/product-art";
 import { getCatalog } from "@/lib/data/catalog";
+import { getPageContent } from "@/lib/page-content.server";
 
 export const metadata: Metadata = {
   title: "Our story",
@@ -21,27 +22,13 @@ export const metadata: Metadata = {
     "Bengalot makes thoughtful tools for study, focus and the long game — designed in Saltha, Faridpur, Bangladesh.",
 };
 
-const principles = [
-  {
-    icon: PenLine,
-    title: "Useful before beautiful",
-    copy: "Every object has to earn its place in a bag, on a desk or inside a real week. Beauty is the second question, never the only one.",
-  },
-  {
-    icon: Leaf,
-    title: "Quiet over loud",
-    copy: "No streak counters. No promises of effortless success. Just clear tools that make the next honest session easier to begin.",
-  },
-  {
-    icon: MapPin,
-    title: "Made from here",
-    copy: "Designed in Saltha, Faridpur, for learners across Bangladesh. Local printing, local support and a long-term view.",
-  },
-];
+const principleIcons = [PenLine, Leaf, MapPin];
 
 export default async function AboutPage() {
-  const catalog = await getCatalog();
+  const [catalog, page] = await Promise.all([getCatalog(), getPageContent()]);
+  const about = page.about;
   const showcase = catalog.products.slice(0, 3);
+  const headingLines = about.heading.split("\n").filter(Boolean);
 
   return (
     <>
@@ -53,21 +40,21 @@ export default async function AboutPage() {
         <div className="container-wide relative grid gap-10 py-14 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-20">
           <div>
             <Reveal>
-              <p className="eyebrow">The house of Bengalot</p>
+              <p className="eyebrow">{about.eyebrow}</p>
             </Reveal>
             <h1 className="display-xl mt-4 text-ink">
-              <MaskedLine immediate>We make tools for</MaskedLine>
-              <MaskedLine delay={0.08} immediate>the quiet part of</MaskedLine>
+              {headingLines.map((line, index) => (
+                <MaskedLine key={`${line}-${index}`} immediate delay={index * 0.06}>
+                  {line}
+                </MaskedLine>
+              ))}
               <MaskedLine delay={0.16} immediate>
-                <span className="display-italic text-coral">learning.</span>
+                <span className="display-italic text-coral">{about.accent}</span>
               </MaskedLine>
             </h1>
             <Reveal delay={0.16}>
               <p className="mt-6 max-w-[30rem] text-[0.98rem] leading-[1.8] text-ink-soft">
-                The second attempt. The honest hour. The week you actually
-                finish. Bengalot exists for the work that happens after the
-                motivation has worn off — and for the small tools that make that
-                work easier to return to.
+                {about.intro}
               </p>
               <div className="mt-7 flex flex-wrap gap-2.5">
                 <Link href="/shop" className="btn btn-primary">
@@ -113,31 +100,13 @@ export default async function AboutPage() {
           <div>
             <p className="eyebrow">Why this exists</p>
             <p className="mt-5 font-display text-[2.4rem] leading-[0.98] tracking-[-0.045em] text-ink">
-              A brand born from a simple frustration.
+              {about.storyHeading}
             </p>
           </div>
           <div className="max-w-[42rem] space-y-4 text-[0.94rem] leading-[1.85] text-ink-soft">
-            <p>
-              Bengalot started with the gap between how learning looks online
-              and how it actually feels. The beautiful systems, the perfect
-              planners, the endless templates — all of it can become another
-              thing to manage instead of a way to begin.
-            </p>
-            <p>
-              We wanted fewer, better objects. A deck that asks a question. A
-              planner with one honest page. A Notion workspace that opens to the
-              day you are actually in. A timer that removes the phone instead of
-              asking you to ignore it. Tools that respect the person using them.
-            </p>
-            <p>
-              We are a small studio in Saltha, Faridpur. Every product is
-              designed here, made with local partners where possible, and
-              checked by a person before it reaches you. Our brand line is a
-              reminder, not a promise of perfection:{" "}
-              <span className="font-semibold text-ink">
-                bring a lot to learning.
-              </span>
-            </p>
+            {about.storyParagraphs.map((paragraph, index) => (
+              <p key={`${paragraph.slice(0, 24)}-${index}`}>{paragraph}</p>
+            ))}
           </div>
         </div>
       </section>
@@ -155,26 +124,29 @@ export default async function AboutPage() {
             <Heart className="hidden size-10 text-butter/50 sm:block" aria-hidden="true" />
           </div>
           <div className="mt-9 grid gap-4 md:grid-cols-3">
-            {principles.map((principle, index) => (
-              <Reveal key={principle.title} delay={index * 0.08}>
-                <div className="h-full rounded-[1.3rem] border border-cream/10 bg-cream/[0.045] p-5">
-                  <div className="flex items-center justify-between">
-                    <span className="grid size-9 place-items-center rounded-full bg-cream/10 text-butter">
-                      <principle.icon className="size-4" aria-hidden="true" />
-                    </span>
-                    <span className="font-display text-2xl italic text-cream/20">
-                      0{index + 1}
-                    </span>
+            {about.principles.map((principle, index) => {
+              const Icon = principleIcons[index] ?? Sparkles;
+              return (
+                <Reveal key={principle.title} delay={index * 0.08}>
+                  <div className="h-full rounded-[1.3rem] border border-cream/10 bg-cream/[0.045] p-5">
+                    <div className="flex items-center justify-between">
+                      <span className="grid size-9 place-items-center rounded-full bg-cream/10 text-butter">
+                        <Icon className="size-4" aria-hidden="true" />
+                      </span>
+                      <span className="font-display text-2xl italic text-cream/20">
+                        0{index + 1}
+                      </span>
+                    </div>
+                    <h3 className="mt-5 font-display text-[1.4rem] leading-tight text-cream">
+                      {principle.title}
+                    </h3>
+                    <p className="mt-2 text-[0.76rem] leading-[1.7] text-cream/55">
+                      {principle.copy}
+                    </p>
                   </div>
-                  <h3 className="mt-5 font-display text-[1.4rem] leading-tight text-cream">
-                    {principle.title}
-                  </h3>
-                  <p className="mt-2 text-[0.76rem] leading-[1.7] text-cream/55">
-                    {principle.copy}
-                  </p>
-                </div>
-              </Reveal>
-            ))}
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -189,11 +161,10 @@ export default async function AboutPage() {
             <div className="relative">
               <p className="eyebrow">The studio</p>
               <p className="mt-5 font-display text-[2.2rem] leading-[1.02] tracking-[-0.04em] text-ink">
-                Small enough to answer the phone.
+                {about.studioHeading}
               </p>
               <p className="mt-3 max-w-[26rem] text-[0.84rem] leading-[1.75] text-ink-soft/80">
-                We are online-only, but never anonymous. Support is handled by
-                the same small team that makes the tools.
+                {about.studioCopy}
               </p>
               <div className="mt-6 space-y-2 text-[0.72rem] text-ink-soft">
                 <p className="flex items-center gap-2">
@@ -215,11 +186,10 @@ export default async function AboutPage() {
           <div>
             <p className="eyebrow">A note from the studio</p>
             <p className="mt-5 font-display text-[1.9rem] leading-[1.1] tracking-[-0.035em] text-ink">
-              “We are not trying to make learning effortless. We are trying to
-              make the effort feel worth returning to.”
+              “{about.quote}”
             </p>
             <p className="mt-4 text-[0.78rem] leading-relaxed text-muted">
-              — The Bengalot studio, Faridpur
+              — {about.quoteAttribution}
             </p>
             <div className="mt-7 flex flex-wrap gap-2.5">
               <Link href="/product/student-starter-bundle" className="btn btn-primary">

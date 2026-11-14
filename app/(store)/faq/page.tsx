@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { MaskedLine } from "@/components/motion/reveal";
 import { Accordion } from "@/components/ui/accordion";
+import { getPageContent } from "@/lib/page-content.server";
 
 export const metadata: Metadata = {
   title: "FAQ",
@@ -11,54 +12,13 @@ export const metadata: Metadata = {
     "Answers about digital access, delivery, payment and returning a Bengalot study tool.",
 };
 
-const faqs = [
-  {
-    title: "How do digital products arrive?",
-    body: "After payment is confirmed, your resource is added to your account library. Notion templates open through a duplicate link, and downloadable resources appear as PDFs. You will also receive a receipt by email.",
-  },
-  {
-    title: "Can I buy without an account?",
-    body: "You can place a physical order as a guest. Digital orders need an account so we have a safe place to deliver access. Creating one takes less than a minute and keeps every resource in one library.",
-  },
-  {
-    title: "Are the planners printed or digital?",
-    body: "The Exam Focus Planner and Weekly Study Planner are printed physical products, delivered across Bangladesh. Notion templates, the Deep Work guide and other digital tools are separate and appear in your account library after purchase.",
-  },
-  {
-    title: "What payment methods do you accept?",
-    body: "Cash on delivery is available for physical items across Bangladesh. bKash is available for all orders; for bKash we send manual instructions after you place the order. There is no card gateway running yet.",
-  },
-  {
-    title: "How much is delivery?",
-    body: "Delivery is ৳70 inside Faridpur district and ৳130 elsewhere in Bangladesh. Orders above ৳2,000 ship free. Digital orders have no delivery fee.",
-  },
-  {
-    title: "How long does a physical order take?",
-    body: "Most parcels are packed within one working day and arrive in 2–4 working days. If something is delayed, message us on WhatsApp with your order number and we will check it with the courier.",
-  },
-  {
-    title: "Can I return a study card deck?",
-    body: "If a physical item arrives damaged or is not what you ordered, tell us within 48 hours of delivery. Unused items in their original packaging can be exchanged. Digital resources are non-refundable once access has been opened.",
-  },
-  {
-    title: "What if a Notion link stops working?",
-    body: "Send us your order number and the resource name. We check every access link and will repair or reset it for you. Our support window is Sunday to Thursday, 10am–6pm.",
-  },
-  {
-    title: "Are the prices in BDT?",
-    body: "Yes. Every price on Bengalot is in Bangladeshi Taka, including the taka symbol. Delivery is shown separately at checkout before you place the order.",
-  },
-  {
-    title: "Do you ship outside Bangladesh?",
-    body: "Not yet. Our printed tools and delivery pricing are designed for Bangladesh. Digital tools can be used from anywhere, but the checkout address step is currently set up for local delivery only.",
-  },
-  {
-    title: "Can I get a custom bundle or school order?",
-    body: "Yes, for larger orders we can put together a bundle for a class, school or study group. Message support@bengalot.com or WhatsApp 01341739202 with what you need and roughly how many people.",
-  },
-];
 
-export default function FaqPage() {
+
+const cardIcons = [Package, ShieldCheck, Sparkles];
+
+export default async function FaqPage() {
+  const { faq } = await getPageContent();
+
   return (
     <>
       <section className="relative overflow-hidden bg-cream py-12 sm:py-16">
@@ -68,58 +28,44 @@ export default function FaqPage() {
         />
         <div className="container-wide relative grid gap-10 lg:grid-cols-[0.95fr_1.05fr]">
           <div>
-            <p className="eyebrow">Questions, answered</p>
+            <p className="eyebrow">{faq.eyebrow}</p>
             <h1 className="display-xl mt-4 max-w-[12ch] text-ink">
-              <MaskedLine immediate>The useful</MaskedLine>
+              <MaskedLine immediate>{faq.heading}</MaskedLine>
               <MaskedLine delay={0.08} immediate>
-                <span className="display-italic text-coral">small print.</span>
+                <span className="display-italic text-coral">{faq.accent}</span>
               </MaskedLine>
             </h1>
             <p className="mt-5 max-w-[27rem] text-[0.94rem] leading-[1.8] text-ink-soft">
-              Everything we get asked before a first order. If your question is
-              not here, a human is one message away.
+              {faq.intro}
             </p>
 
             <div className="mt-7 space-y-3">
-              {[
-                {
-                  icon: Package,
-                  title: "Delivery across Bangladesh",
-                  copy: "৳70 in Faridpur · ৳130 elsewhere · free over ৳2,000.",
-                },
-                {
-                  icon: ShieldCheck,
-                  title: "Digital access guarantee",
-                  copy: "Every link is checked and reset if it ever breaks.",
-                },
-                {
-                  icon: Sparkles,
-                  title: "Real support",
-                  copy: "The same small studio answers your questions.",
-                },
-              ].map((item) => (
-                <div
-                  key={item.title}
-                  className="flex items-start gap-3 rounded-xl border border-line bg-surface p-3.5"
-                >
-                  <span className="grid size-8 shrink-0 place-items-center rounded-full bg-teal-soft/50 text-teal">
-                    <item.icon className="size-3.5" aria-hidden="true" />
-                  </span>
-                  <div>
-                    <p className="text-[0.68rem] font-bold text-ink">{item.title}</p>
-                    <p className="mt-0.5 text-[0.62rem] leading-relaxed text-muted">
-                      {item.copy}
-                    </p>
+              {faq.cards.map((item, index) => {
+                const Icon = cardIcons[index] ?? Sparkles;
+                return (
+                  <div
+                    key={item.title}
+                    className="flex items-start gap-3 rounded-xl border border-line bg-surface p-3.5"
+                  >
+                    <span className="grid size-8 shrink-0 place-items-center rounded-full bg-teal-soft/50 text-teal">
+                      <Icon className="size-3.5" aria-hidden="true" />
+                    </span>
+                    <div>
+                      <p className="text-[0.68rem] font-bold text-ink">{item.title}</p>
+                      <p className="mt-0.5 text-[0.62rem] leading-relaxed text-muted">
+                        {item.copy}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
           <div className="rounded-[1.5rem] border border-line bg-cream p-5 shadow-[0_24px_50px_-42px_rgba(21,34,50,0.4)] sm:p-6">
-            {faqs.map((faq, index) => (
-              <Accordion key={faq.title} title={faq.title} defaultOpen={index === 0}>
-                {faq.body}
+            {faq.items.map((item, index) => (
+              <Accordion key={item.title} title={item.title} defaultOpen={index === 0}>
+                {item.body}
               </Accordion>
             ))}
           </div>

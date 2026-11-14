@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { MaskedLine, Reveal } from "@/components/motion/reveal";
 import { JournalArtMotif } from "@/components/journal/journal-art-motif";
-import { journalArticles } from "@/lib/journal";
+import { getPageContent } from "@/lib/page-content.server";
 
 export const metadata: Metadata = {
   title: "The journal",
@@ -18,9 +18,11 @@ const themeStyles = {
   lavender: "bg-lavender text-ink",
 };
 
-export default function JournalPage() {
-  const [featured, ...rest] = journalArticles;
+export default async function JournalPage() {
+  const { journal } = await getPageContent();
+  const [featured, ...rest] = journal.articles;
   if (!featured) return null;
+  const headingLines = journal.heading.split("\n").filter(Boolean);
 
   return (
     <>
@@ -30,17 +32,20 @@ export default function JournalPage() {
           aria-hidden="true"
         />
         <div className="container-wide relative">
-          <p className="eyebrow">Field notes</p>
+          <p className="eyebrow">{journal.eyebrow}</p>
           <div className="mt-4 grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
             <h1 className="display-xl max-w-[12ch] text-ink">
-              <MaskedLine immediate>Ideas for a</MaskedLine>
+              {headingLines.map((line, index) => (
+                <MaskedLine key={`${line}-${index}`} immediate delay={index * 0.04}>
+                  {line}
+                </MaskedLine>
+              ))}
               <MaskedLine delay={0.08} immediate>
-                <span className="display-italic text-coral">quieter mind.</span>
+                <span className="display-italic text-coral">{journal.accent}</span>
               </MaskedLine>
             </h1>
             <p className="max-w-[26rem] text-[0.92rem] leading-[1.75] text-ink-soft lg:pb-2">
-              Short, honest notes on focus, study rituals and the objects that
-              help. No hacks, no endless lists — just a little more intention.
+              {journal.intro}
             </p>
           </div>
 

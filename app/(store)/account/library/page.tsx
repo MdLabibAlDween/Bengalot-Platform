@@ -81,19 +81,35 @@ export default async function LibraryPage() {
                 <div className="mt-5">
                   <div className="flex flex-wrap items-center gap-2">
                     {entitlement.access_url ? (
-                      <a
-                        href={entitlement.access_url}
-                        target={entitlement.access_url.startsWith("http") ? "_blank" : undefined}
-                        rel={entitlement.access_url.startsWith("http") ? "noopener noreferrer" : undefined}
-                        className="btn btn-primary btn-sm"
-                      >
-                        {entitlement.access_label}
-                        {entitlement.access_url.startsWith("http") ? (
-                          <ArrowUpRight className="size-3.5" aria-hidden="true" />
-                        ) : (
-                          <Download className="size-3.5" aria-hidden="true" />
-                        )}
-                      </a>
+                      (() => {
+                        const isPdf =
+                          /\.pdf(?:$|[?#])/i.test(entitlement.access_url) ||
+                          entitlement.access_url.includes("/product-resources/");
+                        return (
+                          <a
+                            href={entitlement.access_url}
+                            download={isPdf ? "" : undefined}
+                            target={
+                              entitlement.access_url.startsWith("http") && !isPdf
+                                ? "_blank"
+                                : undefined
+                            }
+                            rel={
+                              entitlement.access_url.startsWith("http") && !isPdf
+                                ? "noopener noreferrer"
+                                : undefined
+                            }
+                            className="btn btn-primary btn-sm"
+                          >
+                            {entitlement.access_label}
+                            {entitlement.access_url.startsWith("http") && !isPdf ? (
+                              <ArrowUpRight className="size-3.5" aria-hidden="true" />
+                            ) : (
+                              <Download className="size-3.5" aria-hidden="true" />
+                            )}
+                          </a>
+                        );
+                      })()
                     ) : (
                       <a
                         href={`https://wa.me/8801341739202?text=${encodeURIComponent(`Hello Bengalot, I would like my access link for ${entitlement.title}.`)}`}

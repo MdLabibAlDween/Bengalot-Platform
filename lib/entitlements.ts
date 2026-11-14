@@ -1,6 +1,7 @@
 import "server-only";
 
 import { getBundleComponentSlugs } from "@/lib/bundles";
+import { productResource } from "@/lib/product-media";
 import { getResourceLink } from "@/lib/resource-links";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
@@ -93,14 +94,15 @@ export async function grantOrderEntitlements({
 
   const { error: entitlementError } = await supabase.from("entitlements").upsert(
     uniqueTargets.map((product) => {
-      const resource = getResourceLink(product.slug);
+      const uploaded = productResource(product);
+      const resource = uploaded ?? getResourceLink(product.slug);
       return {
         user_id: userId,
         product_id: product.id,
         order_id: orderId,
         title: product.title,
-        access_label: resource.label,
-        access_url: resource.url || null,
+        access_label: uploaded?.label ?? resource.label,
+        access_url: uploaded?.url ?? (resource.url || null),
       };
     }),
     { onConflict: "user_id,product_id", ignoreDuplicates: true },

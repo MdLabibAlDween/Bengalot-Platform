@@ -4,17 +4,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Reveal } from "@/components/motion/reveal";
-import { getJournalArticle, journalArticles } from "@/lib/journal";
+import { getPageContent } from "@/lib/page-content.server";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
-export function generateStaticParams() {
-  return journalArticles.map((article) => ({ slug: article.slug }));
-}
-
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const article = getJournalArticle(slug);
+  const { journal } = await getPageContent();
+  const article = journal.articles.find((item) => item.slug === slug);
   if (!article) return {};
   return {
     title: article.title,
@@ -36,10 +33,13 @@ const themeStyles = {
 
 export default async function JournalArticlePage({ params }: PageProps) {
   const { slug } = await params;
-  const article = getJournalArticle(slug);
+  const { journal } = await getPageContent();
+  const article = journal.articles.find((item) => item.slug === slug);
   if (!article) notFound();
 
-  const related = journalArticles.filter((item) => item.slug !== article.slug).slice(0, 2);
+  const related = journal.articles
+    .filter((item) => item.slug !== article.slug)
+    .slice(0, 2);
 
   return (
     <article className="bg-cream">

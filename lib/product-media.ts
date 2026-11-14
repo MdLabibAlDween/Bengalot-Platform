@@ -23,3 +23,31 @@ export function productCoverImage(product: {
 }) {
   return productImages(product)[0] ?? null;
 }
+
+export type ProductResource = {
+  url: string;
+  label: string;
+};
+
+/**
+ * A digital product's delivery PDF (usually explains how to open the Notion
+ * template or download the file). Stored in `preview.resource`.
+ */
+export function productResource(product: {
+  preview?: Product["preview"] | Record<string, unknown> | null;
+}): ProductResource | null {
+  const preview = product.preview as { resource?: unknown } | null | undefined;
+  const resource = preview?.resource;
+  if (!resource || typeof resource !== "object") return null;
+  const value = resource as { url?: unknown; label?: unknown };
+  if (typeof value.url !== "string" || !value.url.startsWith("https://")) {
+    return null;
+  }
+  return {
+    url: value.url,
+    label:
+      typeof value.label === "string" && value.label.trim()
+        ? value.label.trim()
+        : "Download the PDF guide",
+  };
+}

@@ -1,7 +1,6 @@
 import "server-only";
 
 import { createHmac, timingSafeEqual } from "node:crypto";
-
 import { decrementOrderStock, grantOrderEntitlements } from "@/lib/entitlements";
 import { publicEnv } from "@/lib/env";
 import { sendOrderConfirmation } from "@/lib/mail";
@@ -388,4 +387,47 @@ export function isValidWebhookToken(orderNumber: string, token: string) {
   const b = Buffer.from(token);
   if (a.length !== b.length) return false;
   return timingSafeEqual(a, b);
+}
+
+export function verifyWebhookSignature(rawBody: string, signature: string) {
+  const secret = process.env.ZINIPAY_WEBHOOK_SECRET?.trim();
+  if (!secret) return true;
+  if (!signature) return false;
+
+  const expected = createHmac("sha256", secret)
+    .update(rawBody)
+    .digest("hex");
+  const a = Buffer.from(expected);
+  const b = Buffer.from(signature);
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
+}
+
+/**
+ * The ZiniPay dashboard allows one brand-wide IPN endpoint. If it does not
+ * include our per-order query token, resolve the order from the invoice ID
+ * recorded when the invoice was created.
+ */
+export async function findOrderNumberByInvoiceId(invoiceId: string) {
+  if (!invoiceId) return null;
+
+  const supabase = createSupabaseAdminClient();
+  const { data } = await supabase
+    .from("admin_audit")
+    .select("entity_id")
+    .eq("action", "payment.zinipay.invoice")
+    .contains("after", { invoice_id: invoiceId })
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (!data?.entity_id) return null;
+
+  const { data: order } = await supabase
+    .from("orders")
+    .select("order_number")
+    .eq("id", data.entity_id)
+    .maybeSingle();
+
+  return order?.order_number ?? null;
 }

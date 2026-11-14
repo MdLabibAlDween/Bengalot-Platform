@@ -5,7 +5,9 @@ import { z } from "zod";
 import { getCurrentUser, STAFF_ROLES } from "@/lib/auth";
 import {
   deleteProductImage,
+  deleteProductResource,
   isProductImage,
+  isProductResource,
   PRODUCT_IMAGE_BUCKET,
 } from "@/lib/supabase/storage";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -26,6 +28,19 @@ const imageSchema = z
   .refine((url) => isProductImage(url), {
     message: `Images must be uploaded to the ${PRODUCT_IMAGE_BUCKET} storage bucket first.`,
   });
+
+const resourceSchema = z
+  .object({
+    url: z
+      .string()
+      .url()
+      .refine((url) => isProductResource(url), {
+        message: "The PDF must be uploaded through the studio first.",
+      }),
+    label: z.string().trim().min(1).max(120),
+  })
+  .nullable()
+  .optional();
 
 const baseFields = {
   title: z.string().trim().min(2).max(160),
@@ -51,6 +66,7 @@ const baseFields = {
   sort: z.number().int().min(0).max(9999),
   preview: previewSchema,
   images: z.array(imageSchema).max(12),
+  resource: resourceSchema,
 };
 
 const updateSchema = z.object({
@@ -96,12 +112,18 @@ const categoryArtDefaults: Record<
 function mergePreview(
   preview: Record<string, unknown>,
   images: string[],
+  resource: { url: string; label: string } | null | undefined,
 ): Record<string, unknown> {
   const next = { ...preview };
   if (images.length) {
     next.images = images;
   } else {
     delete next.images;
+  }
+  if (resource) {
+    next.resource = resource;
+  } else {
+    delete next.resource;
   }
   return next;
 }
@@ -226,7 +248,7 @@ export async function POST(request: Request) {
         featured: data.featured,
         is_published: data.is_published,
         sort: data.sort,
-        preview: mergePreview(data.preview, data.images),
+        preview: mergePreview(data.preview, data.images, data.resource),
       });
 
       if (insertError) throw insertError;
@@ -268,6 +290,9 @@ export async function POST(request: Request) {
     )
       ? ((before.preview as { images: unknown[] }).images as string[])
       : [];
+    const beforeResource = (
+      before.preview as { resource?: { url?: string } } | null
+    )?.resource?.url;
 
     const { error } = await supabase
       .from("products")
@@ -293,7 +318,7 @@ export async function POST(request: Request) {
         featured: data.featured,
         is_published: data.is_published,
         sort: data.sort,
-        preview: mergePreview(data.preview, data.images),
+        preview: mergePreview(data.preview, data.images, data.resource),
         sku: data.sku || null,
       })
       .eq("slug", slug);
@@ -309,6 +334,14 @@ export async function POST(request: Request) {
         await deleteProductImage(url);
       } catch (storageError) {
         console.warn("Could not delete removed product image", storageError);
+      }
+    }
+
+    if (beforeResource && beforeResource !== data.resource?.url) {
+      try {
+        await deleteProductResource(beforeResource);
+      } catch (storageError) {
+        console.warn("Could not delete replaced product PDF", storageError);
       }
     }
 

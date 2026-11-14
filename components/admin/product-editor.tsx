@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
+  FileText,
   ImagePlus,
   Layers,
   Loader2,
@@ -21,7 +22,7 @@ import { useMemo, useRef, useState } from "react";
 import { ProductArt } from "@/components/product/product-art";
 import { getBundleComponentSlugs, isBundleProduct } from "@/lib/bundles";
 import { productTypeLabel } from "@/lib/catalog-meta";
-import { productCoverImage } from "@/lib/product-media";
+import { productCoverImage, productResource } from "@/lib/product-media";
 import type { Category, Product, ProductSpec } from "@/lib/types";
 import { cn, formatMoney } from "@/lib/utils";
 
@@ -133,6 +134,9 @@ export function ProductEditor({
   const [uploads, setUploads] = useState<Upload[]>([]);
   const [uploadError, setUploadError] = useState("");
   const [dragging, setDragging] = useState(false);
+  const [resource, setResource] = useState(() => productResource(product));
+  const [resourceUploading, setResourceUploading] = useState(false);
+  const [resourceError, setResourceError] = useState("");
   const [bundleComponents, setBundleComponents] =
     useState<string[]>(existingComponents);
   const [state, setState] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -269,6 +273,34 @@ export function ProductEditor({
     setImages((current) => current.filter((_, itemIndex) => itemIndex !== index));
   }
 
+  async function uploadResource(file: File) {
+    setResourceUploading(true);
+    setResourceError("");
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const response = await fetch("/api/admin/resources", {
+        method: "POST",
+        body,
+      });
+      const data = (await response.json()) as { url?: string; message?: string };
+      if (!response.ok || !data.url) {
+        throw new Error(data.message ?? "The PDF could not be uploaded.");
+      }
+      setResource({
+        url: data.url,
+        label: resource?.label || "Download the PDF guide",
+      });
+      setState("idle");
+    } catch (error) {
+      setResourceError(
+        error instanceof Error ? error.message : "The PDF could not be uploaded.",
+      );
+    } finally {
+      setResourceUploading(false);
+    }
+  }
+
   const bundleCandidates = products.filter(
     (candidate) =>
       candidate.slug !== product.slug &&
@@ -376,6 +408,7 @@ export function ProductEditor({
           sort: Number(form.sort) || 0,
           preview: parsedPreview,
           images,
+          resource,
         }),
       });
       const data = (await response.json()) as {
@@ -929,6 +962,101 @@ export function ProductEditor({
                 </div>
               </div>
             </div>
+          </section>
+
+          <section className="rounded-[1.2rem] border border-line bg-cream p-5">
+            <div className="flex items-center gap-2">
+              <span className="grid size-7 place-items-center rounded-full bg-coral text-cream">
+                <FileText className="size-3.5" aria-hidden="true" />
+              </span>
+              <p className="text-[0.55rem] font-extrabold uppercase tracking-[0.13em] text-coral">
+                Digital delivery PDF
+              </p>
+            </div>
+            <p className="mt-3 text-[0.66rem] leading-relaxed text-ink-soft/85">
+              Upload the PDF customers receive after payment. Put the actual
+              Notion template link, download link or setup instructions inside
+              this file. It appears in their account library immediately after a
+              confirmed payment.
+            </p>
+
+            {resource ? (
+              <div className="mt-4 rounded-xl border border-line bg-surface p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-[0.72rem] font-semibold text-ink">
+                      Delivery PDF attached
+                    </p>
+                    <a
+                      href={resource.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 inline-flex items-center gap-1 text-[0.6rem] font-bold text-teal hover:underline"
+                    >
+                      Open the PDF
+                      <ArrowRight className="size-3" aria-hidden="true" />
+                    </a>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setResource(null)}
+                    className="grid size-8 shrink-0 place-items-center rounded-full border border-line text-muted transition-colors hover:border-coral/40 hover:text-coral"
+                    aria-label="Remove delivery PDF"
+                  >
+                    <Trash2 className="size-3.5" aria-hidden="true" />
+                  </button>
+                </div>
+                <div className="mt-3">
+                  <label htmlFor="resource-label" className="field-label">
+                    Library button label
+                  </label>
+                  <input
+                    id="resource-label"
+                    value={resource.label}
+                    onChange={(event) =>
+                      setResource({ ...resource, label: event.target.value })
+                    }
+                    className="field"
+                    placeholder="Download the PDF guide"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="mt-4 rounded-xl border border-dashed border-line-strong bg-paper px-4 py-5 text-center">
+                <p className="text-[0.68rem] font-semibold text-ink">
+                  No delivery PDF yet.
+                </p>
+                <p className="mt-1 text-[0.58rem] text-muted">
+                  Digital products use the older library link until a PDF is attached.
+                </p>
+                <label className="btn btn-outline btn-sm mt-3 inline-flex cursor-pointer">
+                  {resourceUploading ? (
+                    <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+                  ) : (
+                    <UploadCloud className="size-3.5" aria-hidden="true" />
+                  )}
+                  {resourceUploading ? "Uploading" : "Upload PDF"}
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    className="sr-only"
+                    disabled={resourceUploading}
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+                      if (file) void uploadResource(file);
+                      event.target.value = "";
+                    }}
+                  />
+                </label>
+                <p className="mt-2 text-[0.56rem] text-muted">PDF · up to 25MB</p>
+              </div>
+            )}
+
+            {resourceError ? (
+              <p className="mt-2 text-[0.62rem] font-medium text-coral" role="alert">
+                {resourceError}
+              </p>
+            ) : null}
           </section>
 
           {isBundle ? (

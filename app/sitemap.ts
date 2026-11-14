@@ -1,11 +1,12 @@
 import type { MetadataRoute } from "next";
 
 import snapshot from "@/lib/data/snapshot.json";
-import { journalArticles } from "@/lib/journal";
+import { getPageContent } from "@/lib/page-content.server";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = "https://bengalot.com";
   const now = new Date();
+  const { journal: journalPage } = await getPageContent();
   const products = (snapshot.products as { slug: string }[]).map((product) => ({
     url: `${base}/product/${product.slug}`,
     lastModified: now,
@@ -24,7 +25,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "weekly" as const,
     priority: 0.7,
   }));
-  const journal = journalArticles.map((article) => ({
+  const journal = journalPage.articles.map((article) => ({
     url: `${base}/journal/${article.slug}`,
     lastModified: now,
     changeFrequency: "monthly" as const,

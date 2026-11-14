@@ -41,6 +41,8 @@ The sign-in page also has compact demo-fill buttons. Remove or change these acco
 - Product pages with interactive galleries, a flashcard front/back preview, specs, contents and related products. Every content block — title, Bangla title, story copy, type, format, SKU, specs, contents, requirements, tags, artwork, sort order and the advanced preview JSON — is editable in the studio.
 - Bundles are first-class products: the studio lets you choose which digital components a bundle unlocks in the customer library, and printed components are described in "What you get".
 - Promo codes at checkout: percentage or fixed discounts with an optional minimum subtotal, discount cap and expiry. Codes are created in the studio and re-validated on the server when the order is placed.
+- Journal, Our Story and FAQ are editable in the studio Content section, along with the announcement bar at the top of the storefront. Article bodies, FAQ items and the announcement copy can all change without a deploy.
+- Digital products can carry a delivery PDF uploaded in the studio. The customer receives it in their account library only after payment is confirmed — use it for the Notion template link, download link or setup instructions.
 - Transactional email through Purelymail SMTP: order receipts, contact auto-replies and newsletter welcomes. Email is optional — when credentials are blank the storefront keeps working and sends are skipped.
 - ZiniPay hosted checkout for digital orders: bKash, Nagad, Rocket and Upay. Invoices are created server-side, verified before fulfilment, and digital access is only released after ZiniPay confirms the payment. Unpaid orders can retry from the confirmation page.
 - Persistent cart and a responsive cart drawer, guest checkout for physical orders, validated checkout, delivery pricing, promo codes and an order-confirmation page. Guest confirmation pages need an http-only access cookie that is issued when the order is placed.
@@ -61,12 +63,15 @@ The sign-in page also has compact demo-fill buttons. Remove or change these acco
 | `pnpm verify:images` | Upload a test photo, create and clean up a temp product |
 | `pnpm verify:mail` | Check the Purelymail SMTP login and send a test email |
 | `pnpm verify:zinipay` | Check the ZiniPay key; optionally create a sandbox invoice |
+| `pnpm verify:content` | Save and restore page content, then verify a delivery PDF + entitlement |
 
 `pnpm verify:flows` creates two temporary cash-on-delivery orders (one plain, one bundle with a promo code), checks the stored totals, marks one delivered and then cancels it to restore stock. Run it while `pnpm dev` is active. `pnpm verify:images` uploads a generated photo, creates a temporary product with it, checks the product page, shop and studio render the photo, then deletes everything.
 
 ## Product photos
 
 Photos are uploaded in the studio product editor (drag and drop or file picker) and stored in the public `product-images` Supabase Storage bucket, which is created automatically on first upload. The first photo is the cover and is used across the shop, cart, search and product page; the original SVG artwork remains the fallback while a product has no photos. Removing a photo in the editor and saving deletes the file from storage.
+
+Digital delivery files follow the same pattern in the `product-resources` bucket. Upload a PDF in the product editor, give the library button a label, and it is attached to the entitlement only after a confirmed payment. Replacing the PDF deletes the old file when the product is saved.
 
 ## Environment
 
@@ -149,4 +154,5 @@ The second command creates a small invoice without paying it. Use the sandbox br
 - Review the seeded promo codes in `/admin/promo-codes` before going live.
 - Fill both Purelymail passwords (`MAIL_SUPPORT_PASS`, `MAIL_INFO_PASS`) and run `pnpm verify:mail` before taking real orders.
 - Add the production ZiniPay brand key, confirm the brand domain, and run a sandbox payment before launch.
+- Upload the delivery PDF for every digital product before switching the announcement bar to live mode.
 - Add real product photography only when the owner supplies it; the art system is designed to work without photos.
