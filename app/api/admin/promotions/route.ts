@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { getCurrentUser, STAFF_ROLES } from "@/lib/auth";
+import { deleteProductImage, isProductImage } from "@/lib/supabase/storage";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 const color = z.string().regex(/^#[0-9a-fA-F]{6}$/);
@@ -21,6 +22,15 @@ const schema = z.object({
     accent: color,
     from: color,
     to: color,
+    image: z
+      .string()
+      .url()
+      .max(2048)
+      .refine((url) => isProductImage(url), {
+        message: "Upload the image in the studio first.",
+      })
+      .nullable()
+      .optional(),
   }),
   sort: z.number().int().min(0).max(999),
   is_active: z.boolean(),
@@ -43,11 +53,27 @@ export async function POST(request: Request) {
 
     const { id, ...updates } = parsed.data;
     const supabase = createSupabaseAdminClient();
+    const { data: before } = await supabase
+      .from("promotions")
+      .select("theme")
+      .eq("id", id)
+      .maybeSingle();
+
     const { error } = await supabase
       .from("promotions")
       .update(updates)
       .eq("id", id);
     if (error) throw error;
+
+    const previousImage = (before?.theme as { image?: string | null } | null)
+      ?.image;
+    if (previousImage && previousImage !== updates.theme.image) {
+      try {
+        await deleteProductImage(previousImage);
+      } catch (storageError) {
+        console.warn("Could not delete replaced banner image", storageError);
+      }
+    }
 
     await supabase.from("admin_audit").insert({
       actor_id: current.user.id,

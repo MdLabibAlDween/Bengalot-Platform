@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowUpRight, Check, Eye, EyeOff, Loader2 } from "lucide-react";
+import { ArrowUpRight, Check, Eye, EyeOff, ImagePlus, Loader2, X } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -37,9 +38,33 @@ function PromoEditor({
     surface: promotion.theme?.surface ?? "#0d6f6d",
     ink: promotion.theme?.ink ?? "#ffffff",
     accent: promotion.theme?.accent ?? "#f3c95f",
+    image: promotion.theme?.image ?? "",
   });
   const [state, setState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+
+  async function uploadImage(file: File) {
+    setUploading(true);
+    setUploadError("");
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const response = await fetch("/api/admin/uploads", { method: "POST", body });
+      const data = (await response.json()) as { url?: string; message?: string };
+      if (!response.ok || !data.url) {
+        throw new Error(data.message ?? "The image could not be uploaded.");
+      }
+      update("image", data.url);
+    } catch (error) {
+      setUploadError(
+        error instanceof Error ? error.message : "The image could not be uploaded.",
+      );
+    } finally {
+      setUploading(false);
+    }
+  }
 
   function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -68,6 +93,7 @@ function PromoEditor({
             accent: form.accent,
             from: promotion.theme?.from ?? form.surface,
             to: promotion.theme?.to ?? form.surface,
+            image: form.image || null,
           },
           sort: Number(form.sort) || 0,
           is_active: form.is_active,
@@ -249,6 +275,62 @@ function PromoEditor({
               />
             </div>
           </div>
+
+          <div className="rounded-xl border border-line bg-paper p-3">
+            <p className="text-[0.55rem] font-extrabold uppercase tracking-[0.11em] text-muted">
+              Banner image
+            </p>
+            <p className="mt-1 text-[0.58rem] leading-relaxed text-muted">
+              Optional. When added, this photo replaces the generated artwork on
+              the right side of the banner.
+            </p>
+            {form.image ? (
+              <div className="mt-3 flex items-center gap-3">
+                <div className="relative size-16 shrink-0 overflow-hidden rounded-lg border border-line bg-surface">
+                  <Image
+                    src={form.image}
+                    alt=""
+                    fill
+                    sizes="64px"
+                    className="object-cover"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => update("image", "")}
+                  className="inline-flex items-center gap-1 rounded-full border border-line bg-surface px-2.5 py-1.5 text-[0.55rem] font-bold text-muted hover:border-coral/40 hover:text-coral"
+                >
+                  <X className="size-3" aria-hidden="true" />
+                  Remove image
+                </button>
+              </div>
+            ) : (
+              <label className="btn btn-outline btn-sm mt-3 inline-flex cursor-pointer">
+                {uploading ? (
+                  <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+                ) : (
+                  <ImagePlus className="size-3.5" aria-hidden="true" />
+                )}
+                {uploading ? "Uploading" : "Upload banner image"}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/avif"
+                  className="sr-only"
+                  disabled={uploading}
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    if (file) void uploadImage(file);
+                    event.target.value = "";
+                  }}
+                />
+              </label>
+            )}
+            {uploadError ? (
+              <p className="mt-2 text-[0.6rem] font-medium text-coral" role="alert">
+                {uploadError}
+              </p>
+            ) : null}
+          </div>
           <div>
             <span className="field-label">Accent colours</span>
             <div className="flex flex-wrap gap-2">
@@ -326,7 +408,17 @@ function PromoEditor({
             >
               {form.cta_label || "Explore"}
             </span>
-            {product ? (
+            {form.image ? (
+              <div className="pointer-events-none absolute -bottom-12 -right-8 h-[68%] w-[46%] rotate-[5deg] overflow-hidden rounded-xl border border-white/20 shadow-xl">
+                <Image
+                  src={form.image}
+                  alt=""
+                  fill
+                  sizes="300px"
+                  className="object-cover"
+                />
+              </div>
+            ) : product ? (
               <div className="pointer-events-none absolute -bottom-12 -right-8 h-[68%] w-[46%] rotate-[5deg] overflow-hidden rounded-xl border border-white/20 opacity-95 shadow-xl">
                 <ProductArt product={product} showCaption={false} />
               </div>

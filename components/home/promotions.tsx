@@ -1,4 +1,5 @@
 import { ArrowRight, Sparkles } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { MaskedLine, Reveal } from "@/components/motion/reveal";
@@ -64,6 +65,7 @@ export function PromotionSection({
             const surface = promotion.theme?.surface ?? "#0d6f6d";
             const ink = promotion.theme?.ink ?? "#ffffff";
             const accent = promotion.theme?.accent ?? "#f3c95f";
+            const image = promotion.theme?.image ?? "";
             const light = isLight(surface);
             const wide = index === 0;
 
@@ -147,7 +149,7 @@ export function PromotionSection({
                     </Link>
                   </div>
 
-                  {product ? (
+                  {image || product ? (
                     <div
                       className={`pointer-events-none absolute z-0 ${
                         wide
@@ -155,8 +157,18 @@ export function PromotionSection({
                           : "-bottom-10 -right-8 h-[48%] w-[58%] rotate-[-5deg]"
                       }`}
                     >
-                      <div className="h-full w-full overflow-hidden rounded-[1.35rem] border border-white/30 shadow-[0_28px_50px_-20px_rgba(0,0,0,0.5)] transition-transform duration-700 group-hover:rotate-[2deg] group-hover:scale-[1.03]">
-                        <ProductArt product={product} showCaption={false} />
+                      <div className="relative h-full w-full overflow-hidden rounded-[1.35rem] border border-white/30 shadow-[0_28px_50px_-20px_rgba(0,0,0,0.5)] transition-transform duration-700 group-hover:rotate-[2deg] group-hover:scale-[1.03]">
+                        {image ? (
+                          <Image
+                            src={image}
+                            alt={promotion.title}
+                            fill
+                            sizes="(max-width: 1024px) 60vw, 30vw"
+                            className="object-cover"
+                          />
+                        ) : product ? (
+                          <ProductArt product={product} showCaption={false} />
+                        ) : null}
                       </div>
                     </div>
                   ) : null}

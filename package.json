@@ -16,7 +16,8 @@
     "verify:mail": "node scripts/verify-mail.mjs",
     "verify:zinipay": "node scripts/verify-zinipay.mjs",
     "verify:content": "node scripts/verify-content-resource.mjs",
-    "verify:users": "node scripts/verify-users.mjs"
+    "verify:users": "node scripts/verify-users.mjs",
+    "verify:promotions": "node scripts/verify-promotion-image.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

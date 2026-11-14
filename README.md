@@ -39,6 +39,7 @@ The original demo customer has been removed. The bootstrap demo owner account (`
 - Bundles are first-class products: the studio lets you choose which digital components a bundle unlocks in the customer library, and printed components are described in "What you get".
 - Promo codes at checkout: percentage or fixed discounts with an optional minimum subtotal, discount cap and expiry. Codes are created in the studio and re-validated on the server when the order is placed.
 - Journal, Our Story and FAQ are editable in the studio Content section, along with the announcement bar and footer social links. Article bodies, FAQ items, announcement copy and social URLs can all change without a deploy.
+- Homepage promotion banners are fully editable, including an optional uploaded image that replaces the generated artwork on the right side of the card.
 - Customer accounts include a saved address book. Addresses can be added, edited, made default or removed in `/account/addresses`, and checkout fills the whole delivery form with one click.
 - The owner-only Users screen manages real customer and studio accounts: create accounts, change roles, send reset links, delete accounts, and grant, refresh or revoke each customer's digital library access.
 - Digital products can carry a delivery PDF uploaded in the studio. The customer receives it in their account library only after payment is confirmed — use it for the Notion template link, download link or setup instructions.
@@ -64,6 +65,7 @@ The original demo customer has been removed. The bootstrap demo owner account (`
 | `pnpm verify:zinipay` | Check the ZiniPay key; optionally create a sandbox invoice |
 | `pnpm verify:content` | Save and restore page content, then verify a delivery PDF + entitlement |
 | `pnpm verify:users` | Create/role/reset/grant/revoke/delete a temp user, plus address + social checks |
+| `pnpm verify:promotions` | Upload a banner image, verify the homepage, then restore the banner |
 
 `pnpm verify:flows` creates two temporary cash-on-delivery orders (one plain, one bundle with a promo code), checks the stored totals, marks one delivered and then cancels it to restore stock. Run it while `pnpm dev` is active. `pnpm verify:images` uploads a generated photo, creates a temporary product with it, checks the product page, shop and studio render the photo, then deletes everything.
 

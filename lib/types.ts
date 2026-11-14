@@ -108,6 +108,7 @@ export type PromotionTheme = {
   accent: string;
   from: string;
   to: string;
+  image?: string | null;
 };
 
 export type Promotion = {
