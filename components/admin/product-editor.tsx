@@ -1,12 +1,22 @@
 "use client";
 
-import { ArrowLeft, Check, Loader2, Save } from "lucide-react";
+import {
+  ArrowLeft,
+  Check,
+  Layers,
+  Loader2,
+  Plus,
+  Save,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { ProductArt } from "@/components/product/product-art";
-import type { Category, Product } from "@/lib/types";
+import { getBundleComponentSlugs, isBundleProduct } from "@/lib/bundles";
+import { productTypeLabel } from "@/lib/catalog-meta";
+import type { Category, Product, ProductSpec } from "@/lib/types";
 import { formatMoney } from "@/lib/utils";
 
 const artKeys = [
@@ -18,20 +28,44 @@ const artKeys = [
   { value: "bundle", label: "Bundle box" },
 ];
 
+const typeOptions = ["digital", "physical", "bundle"] as const;
+
+function lines(value: string) {
+  return value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function tags(value: string) {
+  return value
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+}
+
 export function ProductEditor({
   product,
   categories,
+  products,
 }: {
   product: Product;
   categories: Category[];
+  products: Product[];
 }) {
   const router = useRouter();
+  const isBundle = isBundleProduct(product);
+  const existingComponents = getBundleComponentSlugs(product);
+
   const [form, setForm] = useState({
     title: product.title,
     title_bn: product.title_bn ?? "",
     subtitle: product.subtitle,
     description: product.description,
+    sku: product.sku ?? "",
     category_slug: product.category_slug,
+    type: product.type,
+    format: product.format,
     price: String(product.price),
     compare_at: product.compare_at ? String(product.compare_at) : "",
     stock: String(product.stock),
@@ -40,7 +74,23 @@ export function ProductEditor({
     is_published: product.is_published,
     art_key: product.art_key,
     palette: [...product.palette],
+    includes: product.includes.join("\n"),
+    requirements: product.requirements.join("\n"),
+    tags: product.tags.join(", "),
+    specs: product.specs.map((spec) => ({ ...spec })),
+    sort: String(product.sort),
+    preview: JSON.stringify(
+      Object.fromEntries(
+        Object.entries(product.preview ?? {}).filter(
+          ([key]) => key !== "productSlugs",
+        ),
+      ),
+      null,
+      2,
+    ),
   });
+  const [bundleComponents, setBundleComponents] =
+    useState<string[]>(existingComponents);
   const [state, setState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [message, setMessage] = useState("");
 
@@ -59,6 +109,58 @@ export function ProductEditor({
     setState("idle");
   }
 
+  function updateSpec(index: number, key: keyof ProductSpec, value: string) {
+    setForm((current) => ({
+      ...current,
+      specs: current.specs.map((spec, specIndex) =>
+        specIndex === index ? { ...spec, [key]: value } : spec,
+      ),
+    }));
+    setState("idle");
+  }
+
+  function addSpec() {
+    setForm((current) => ({
+      ...current,
+      specs: [...current.specs, { label: "", value: "" }],
+    }));
+    setState("idle");
+  }
+
+  function removeSpec(index: number) {
+    setForm((current) => ({
+      ...current,
+      specs: current.specs.filter((_, specIndex) => specIndex !== index),
+    }));
+    setState("idle");
+  }
+
+  function toggleComponent(slug: string) {
+    setBundleComponents((current) =>
+      current.includes(slug)
+        ? current.filter((item) => item !== slug)
+        : [...current, slug],
+    );
+    setState("idle");
+    setMessage("");
+  }
+
+  const bundleCandidates = products.filter(
+    (candidate) =>
+      candidate.slug !== product.slug &&
+      (candidate.type === "digital" || candidate.type === "bundle"),
+  );
+
+  const previewObject = useMemo(() => {
+    try {
+      return JSON.parse(form.preview || "{}") as Record<string, unknown>;
+    } catch {
+      return product.preview as Record<string, unknown>;
+    }
+  }, [form.preview, product.preview]);
+
+  const includesList = lines(form.includes);
+
   const previewProduct: Product = {
     ...product,
     title: form.title || "Untitled product",
@@ -66,6 +168,8 @@ export function ProductEditor({
     subtitle: form.subtitle,
     description: form.description,
     category_slug: form.category_slug,
+    type: form.type,
+    format: form.format,
     price: Number(form.price) || 0,
     compare_at: form.compare_at ? Number(form.compare_at) : null,
     stock: Number(form.stock) || 0,
@@ -74,12 +178,28 @@ export function ProductEditor({
     is_published: form.is_published,
     art_key: form.art_key,
     palette: form.palette,
+    includes: includesList,
+    preview: isBundle
+      ? { ...previewObject, productSlugs: bundleComponents }
+      : previewObject,
   };
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setState("saving");
     setMessage("");
+
+    let parsedPreview: Record<string, unknown>;
+    try {
+      parsedPreview = JSON.parse(form.preview || "{}") as Record<string, unknown>;
+      if (!parsedPreview || typeof parsedPreview !== "object" || Array.isArray(parsedPreview)) {
+        throw new Error("Preview content must be a JSON object.");
+      }
+    } catch {
+      setState("error");
+      setMessage("The preview content is not valid JSON. Fix it before saving.");
+      return;
+    }
 
     try {
       const response = await fetch("/api/admin/products", {
@@ -91,7 +211,10 @@ export function ProductEditor({
           title_bn: form.title_bn || null,
           subtitle: form.subtitle,
           description: form.description,
+          sku: form.sku || null,
           category_slug: form.category_slug,
+          type: form.type,
+          format: form.format,
           price: Number(form.price),
           compare_at: form.compare_at ? Number(form.compare_at) : null,
           stock: Number(form.stock),
@@ -100,6 +223,19 @@ export function ProductEditor({
           is_published: form.is_published,
           art_key: form.art_key,
           palette: form.palette,
+          includes: includesList,
+          requirements: lines(form.requirements),
+          specs: form.specs
+            .map((spec) => ({
+              label: spec.label.trim(),
+              value: spec.value.trim(),
+            }))
+            .filter((spec) => spec.label && spec.value),
+          tags: tags(form.tags),
+          sort: Number(form.sort) || 0,
+          preview: isBundle
+            ? { ...parsedPreview, kind: "bundle", productSlugs: bundleComponents }
+            : parsedPreview,
         }),
       });
       const data = (await response.json()) as { message?: string; ok?: boolean };
@@ -129,7 +265,8 @@ export function ProductEditor({
             Edit: <span className="display-italic text-teal">{product.title}</span>
           </h1>
           <p className="mt-2 text-[0.68rem] text-muted">
-            The live preview updates as you type. Nothing changes until you save.
+            The product page, card artwork and bundle access all update from
+            here. Nothing changes until you save.
           </p>
         </div>
         <button
@@ -216,29 +353,52 @@ export function ProductEditor({
                   required
                 />
               </div>
-              <div>
-                <label htmlFor="product-category" className="field-label">
-                  Collection
-                </label>
-                <select
-                  id="product-category"
-                  value={form.category_slug}
-                  onChange={(event) => update("category_slug", event.target.value)}
-                  className="field"
-                >
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.slug}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="product-category" className="field-label">
+                    Collection
+                  </label>
+                  <select
+                    id="product-category"
+                    value={form.category_slug}
+                    onChange={(event) =>
+                      update("category_slug", event.target.value)
+                    }
+                    className="field"
+                  >
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.slug}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="product-type" className="field-label">
+                    Type
+                  </label>
+                  <select
+                    id="product-type"
+                    value={form.type}
+                    onChange={(event) =>
+                      update("type", event.target.value as typeof form.type)
+                    }
+                    className="field"
+                  >
+                    {typeOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {productTypeLabel(option)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
           </section>
 
           <section className="rounded-[1.2rem] border border-line bg-cream p-5">
             <p className="text-[0.55rem] font-extrabold uppercase tracking-[0.13em] text-muted">
-              Price and stock
+              Price, stock and identity
             </p>
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
               <div>
@@ -280,7 +440,30 @@ export function ProductEditor({
                   className="field"
                 />
               </div>
-              <div className="sm:col-span-3">
+              <div className="sm:col-span-2">
+                <label htmlFor="product-format" className="field-label">
+                  Format shown on cards
+                </label>
+                <input
+                  id="product-format"
+                  value={form.format}
+                  onChange={(event) => update("format", event.target.value)}
+                  className="field"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="product-sku" className="field-label">
+                  SKU
+                </label>
+                <input
+                  id="product-sku"
+                  value={form.sku}
+                  onChange={(event) => update("sku", event.target.value)}
+                  className="field font-mono"
+                />
+              </div>
+              <div className="sm:col-span-2">
                 <label htmlFor="product-badge" className="field-label">
                   Badge
                 </label>
@@ -292,8 +475,162 @@ export function ProductEditor({
                   className="field"
                 />
               </div>
+              <div>
+                <label htmlFor="product-sort" className="field-label">
+                  Sort order
+                </label>
+                <input
+                  id="product-sort"
+                  type="number"
+                  min="0"
+                  value={form.sort}
+                  onChange={(event) => update("sort", event.target.value)}
+                  className="field"
+                />
+              </div>
             </div>
           </section>
+
+          <section className="rounded-[1.2rem] border border-line bg-cream p-5">
+            <p className="text-[0.55rem] font-extrabold uppercase tracking-[0.13em] text-muted">
+              Product page content
+            </p>
+            <div className="mt-4 space-y-4">
+              <div>
+                <label htmlFor="product-includes" className="field-label">
+                  What you get
+                </label>
+                <textarea
+                  id="product-includes"
+                  rows={5}
+                  value={form.includes}
+                  onChange={(event) => update("includes", event.target.value)}
+                  placeholder="One item per line"
+                  className="field resize-y"
+                />
+              </div>
+              <div>
+                <label htmlFor="product-requirements" className="field-label">
+                  Requirements
+                </label>
+                <textarea
+                  id="product-requirements"
+                  rows={3}
+                  value={form.requirements}
+                  onChange={(event) =>
+                    update("requirements", event.target.value)
+                  }
+                  placeholder="One item per line"
+                  className="field resize-y"
+                />
+              </div>
+              <div>
+                <label htmlFor="product-tags" className="field-label">
+                  Tags
+                </label>
+                <input
+                  id="product-tags"
+                  value={form.tags}
+                  onChange={(event) => update("tags", event.target.value)}
+                  placeholder="planner, exam, printed"
+                  className="field"
+                />
+              </div>
+              <div>
+                <span className="field-label">Specifications</span>
+                <div className="space-y-2">
+                  {form.specs.map((spec, index) => (
+                    <div
+                      key={index}
+                      className="grid gap-2 sm:grid-cols-[0.8fr_1.2fr_auto]"
+                    >
+                      <input
+                        value={spec.label}
+                        onChange={(event) =>
+                          updateSpec(index, "label", event.target.value)
+                        }
+                        className="field !py-2 !text-[0.72rem]"
+                        aria-label={`Specification ${index + 1} label`}
+                        placeholder="Label"
+                      />
+                      <input
+                        value={spec.value}
+                        onChange={(event) =>
+                          updateSpec(index, "value", event.target.value)
+                        }
+                        className="field !py-2 !text-[0.72rem]"
+                        aria-label={`Specification ${index + 1} value`}
+                        placeholder="Value"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeSpec(index)}
+                        className="grid size-9 place-items-center rounded-lg border border-line text-muted transition-colors hover:border-coral/40 hover:text-coral"
+                        aria-label={`Remove specification ${index + 1}`}
+                      >
+                        <Trash2 className="size-3.5" aria-hidden="true" />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={addSpec}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-[0.6rem] font-bold text-ink-soft transition-colors hover:border-teal hover:text-teal"
+                  >
+                    <Plus className="size-3.5" aria-hidden="true" />
+                    Add specification
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {isBundle ? (
+            <section className="rounded-[1.2rem] border border-teal/20 bg-teal-soft/25 p-5">
+              <div className="flex items-center gap-2">
+                <span className="grid size-7 place-items-center rounded-full bg-teal text-cream">
+                  <Layers className="size-3.5" aria-hidden="true" />
+                </span>
+                <p className="text-[0.55rem] font-extrabold uppercase tracking-[0.13em] text-teal">
+                  Bundle components
+                </p>
+              </div>
+              <p className="mt-3 text-[0.66rem] leading-relaxed text-ink-soft/85">
+                Choose the digital products this bundle unlocks in the
+                customer&apos;s library. Printed components are described in
+                &ldquo;What you get&rdquo; and ship with the parcel.
+              </p>
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                {bundleCandidates.map((candidate) => (
+                  <label
+                    key={candidate.id}
+                    className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-line bg-surface px-3.5 py-3"
+                  >
+                    <span className="min-w-0">
+                      <span className="block truncate text-[0.7rem] font-semibold text-ink">
+                        {candidate.title}
+                      </span>
+                      <span className="mt-0.5 block text-[0.56rem] text-muted">
+                        {productTypeLabel(candidate.type)} · {formatMoney(candidate.price)}
+                      </span>
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={bundleComponents.includes(candidate.slug)}
+                      onChange={() => toggleComponent(candidate.slug)}
+                      className="size-4 accent-[var(--teal)]"
+                    />
+                  </label>
+                ))}
+              </div>
+              {!bundleComponents.length ? (
+                <p className="mt-3 text-[0.62rem] font-medium text-coral">
+                  No digital components selected. Customers will not receive
+                  library access with this bundle.
+                </p>
+              ) : null}
+            </section>
+          ) : null}
 
           <section className="rounded-[1.2rem] border border-line bg-cream p-5">
             <p className="text-[0.55rem] font-extrabold uppercase tracking-[0.13em] text-muted">
@@ -379,6 +716,23 @@ export function ProductEditor({
               </label>
             </div>
           </section>
+
+          <details className="group rounded-[1.2rem] border border-line bg-cream p-5">
+            <summary className="cursor-pointer text-[0.55rem] font-extrabold uppercase tracking-[0.13em] text-muted">
+              Advanced preview content (JSON)
+            </summary>
+            <p className="mt-3 text-[0.64rem] leading-relaxed text-muted">
+              This powers the artwork modules and the flashcard preview. Keep it
+              as valid JSON — the page will not save otherwise.
+            </p>
+            <textarea
+              rows={10}
+              value={form.preview}
+              onChange={(event) => update("preview", event.target.value)}
+              className="field mt-3 resize-y font-mono !text-[0.66rem]"
+              aria-label="Preview content JSON"
+            />
+          </details>
         </div>
 
         <aside className="xl:sticky xl:top-20">

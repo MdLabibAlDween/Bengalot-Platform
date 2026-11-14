@@ -1,6 +1,7 @@
 import { cache } from "react";
 
 import snapshot from "@/lib/data/snapshot.json";
+import { normaliseSettings } from "@/lib/settings";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
 import type {
   Category,
@@ -28,25 +29,6 @@ export type CatalogData = {
   settings: StoreSettings;
   source: "database" | "snapshot";
 };
-
-const defaultSettings: StoreSettings = {
-  name: "Bengalot",
-  slogan: "Bring a lot to learning.",
-  announcement:
-    "Free delivery over ৳2,000 · Digital access after payment",
-  whatsapp: "01341739202",
-  supportEmail: "support@bengalot.com",
-  city: "Saltha, Faridpur",
-  deliveryInside: 70,
-  deliveryOutside: 130,
-  freeDeliveryThreshold: 2000,
-  currency: "BDT",
-};
-
-function normaliseSettings(value: unknown): StoreSettings {
-  if (!value || typeof value !== "object") return defaultSettings;
-  return { ...defaultSettings, ...(value as Partial<StoreSettings>) };
-}
 
 async function loadCatalog(): Promise<CatalogData> {
   try {

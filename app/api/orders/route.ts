@@ -1,13 +1,17 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import { getBundleComponentSlugs } from "@/lib/bundles";
+import { evaluatePromoCode, getPromoCodes } from "@/lib/promos";
+import { getResourceLink } from "@/lib/resource-links";
+import { normaliseSettings } from "@/lib/settings";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { getBundleDigitalComponents } from "@/lib/bundles";
-import { getResourceLink } from "@/lib/resource-links";
 import { normalizeBdPhone } from "@/lib/utils";
 
 export const runtime = "nodejs";
+
+const ORDER_ACCESS_COOKIE = "bengalot-order-access";
 
 const itemSchema = z.object({
   slug: z.string().min(1).max(140),
@@ -23,6 +27,7 @@ const checkoutSchema = z.object({
   district: z.string().trim().min(2).max(120),
   notes: z.string().trim().max(1000).optional().nullable(),
   paymentMethod: z.enum(["cod", "bkash"]),
+  promoCode: z.string().trim().max(40).optional().nullable(),
   items: z.array(itemSchema).min(1).max(30),
 });
 
@@ -34,6 +39,7 @@ type ProductRow = {
   format: string;
   price: number;
   stock: number;
+  preview?: Record<string, unknown> | null;
 };
 
 function orderNumber() {
@@ -69,20 +75,36 @@ export async function POST(request: Request) {
       );
     }
 
+    const mergedItems = new Map<string, number>();
+    for (const item of body.items) {
+      mergedItems.set(
+        item.slug,
+        Math.min((mergedItems.get(item.slug) ?? 0) + item.quantity, 20),
+      );
+    }
+
     const auth = await createSupabaseServerClient();
     const {
       data: { user },
     } = await auth.auth.getUser();
 
     const supabase = createSupabaseAdminClient();
-    const slugs = [...new Set(body.items.map((item) => item.slug))];
-    const { data: productRows, error: productError } = await supabase
-      .from("products")
-      .select("id,slug,title,type,format,price,stock")
-      .in("slug", slugs)
-      .eq("is_published", true);
+    const slugs = [...mergedItems.keys()];
+    const [productResult, settingsResult] = await Promise.all([
+      supabase
+        .from("products")
+        .select("id,slug,title,type,format,price,stock,preview")
+        .in("slug", slugs)
+        .eq("is_published", true),
+      supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "store")
+        .maybeSingle(),
+    ]);
 
-    if (productError) throw productError;
+    if (productResult.error) throw productResult.error;
+    const productRows = productResult.data;
     if (!productRows?.length) {
       return NextResponse.json(
         { message: "These products are no longer available." },
@@ -90,30 +112,49 @@ export async function POST(request: Request) {
       );
     }
 
+    if (productRows.length !== slugs.length) {
+      return NextResponse.json(
+        { message: "One of these products is no longer available." },
+        { status: 409 },
+      );
+    }
+
+    const settings = normaliseSettings(settingsResult.data?.value);
     const products = productRows as ProductRow[];
-    const resolved = body.items.map((item) => {
-      const product = products.find((row) => row.slug === item.slug);
-      if (!product) throw new Error(`Missing product: ${item.slug}`);
-      if (product.type === "physical" && product.stock < item.quantity) {
-        throw new Error(`Not enough stock for ${product.title}`);
+    const resolved = [...mergedItems.entries()].map(([slug, quantity]) => {
+      const product = products.find((row) => row.slug === slug);
+      if (!product) throw new Error(`Missing product: ${slug}`);
+      if (product.type === "physical" && product.stock < quantity) {
+        return {
+          error: `${product.title} only has ${product.stock} left in stock.`,
+        };
       }
       return {
         product,
-        quantity: item.quantity,
-        lineTotal: product.price * item.quantity,
+        quantity,
+        lineTotal: product.price * quantity,
       };
     });
 
-    const subtotal = resolved.reduce((total, item) => total + item.lineTotal, 0);
-    const hasPhysical = resolved.some(
-      (item) => item.product.type === "physical",
-    );
+    const stockProblem = resolved.find((item) => "error" in item);
+    if (stockProblem && "error" in stockProblem) {
+      return NextResponse.json({ message: stockProblem.error }, { status: 409 });
+    }
+
+    const lines = resolved as {
+      product: ProductRow;
+      quantity: number;
+      lineTotal: number;
+    }[];
+
+    const subtotal = lines.reduce((total, item) => total + item.lineTotal, 0);
+    const hasPhysical = lines.some((item) => item.product.type === "physical");
     const deliveryFee = hasPhysical
-      ? subtotal >= 2000
+      ? subtotal >= settings.freeDeliveryThreshold
         ? 0
         : body.district.toLowerCase() === "faridpur"
-          ? 70
-          : 130
+          ? settings.deliveryInside
+          : settings.deliveryOutside
       : 0;
 
     if (!hasPhysical && body.paymentMethod === "cod") {
@@ -126,7 +167,22 @@ export async function POST(request: Request) {
       );
     }
 
-    const total = subtotal + deliveryFee;
+    let discount = 0;
+    let appliedPromo: string | null = null;
+    if (body.promoCode) {
+      const codes = await getPromoCodes();
+      const promo = evaluatePromoCode(codes, body.promoCode, subtotal);
+      if (!promo.ok) {
+        return NextResponse.json(
+          { message: promo.message, fields: { promoCode: [promo.message] } },
+          { status: 400 },
+        );
+      }
+      discount = promo.discount;
+      appliedPromo = promo.code;
+    }
+
+    const total = Math.max(0, subtotal + deliveryFee - discount);
     const { data: order, error: orderError } = await supabase
       .from("orders")
       .insert({
@@ -141,10 +197,10 @@ export async function POST(request: Request) {
         notes: body.notes ?? null,
         subtotal,
         delivery_fee: deliveryFee,
-        discount: 0,
+        discount,
         total,
         payment_method: body.paymentMethod,
-        payment_status: body.paymentMethod === "cod" ? "pending" : "pending",
+        payment_status: "pending",
         status: "processing",
       })
       .select("id,order_number")
@@ -153,7 +209,7 @@ export async function POST(request: Request) {
     if (orderError) throw orderError;
 
     const { error: itemsError } = await supabase.from("order_items").insert(
-      resolved.map((item) => ({
+      lines.map((item) => ({
         order_id: order.id,
         product_id: item.product.id,
         title: item.product.title,
@@ -170,8 +226,12 @@ export async function POST(request: Request) {
     if (user) {
       const componentSlugs = [
         ...new Set(
-          resolved.flatMap((item) =>
-            getBundleDigitalComponents(item.product.slug),
+          lines.flatMap((item) =>
+            getBundleComponentSlugs({
+              slug: item.product.slug,
+              type: item.product.type,
+              preview: item.product.preview,
+            }),
           ),
         ),
       ];
@@ -181,56 +241,82 @@ export async function POST(request: Request) {
         const { data, error } = await supabase
           .from("products")
           .select("id,slug,title,type,format,price,stock")
-          .in("slug", componentSlugs);
+          .in("slug", componentSlugs)
+          .eq("is_published", true);
         if (error) throw error;
         componentProducts = (data ?? []) as ProductRow[];
       }
 
       const digitalTargets = [
-        ...resolved
+        ...lines
           .filter(
             (item) =>
-              item.product.type === "digital" || item.product.type === "bundle",
+              item.product.type === "digital" ||
+              item.product.type === "bundle",
           )
           .map((item) => item.product),
-        ...componentProducts,
+        ...componentProducts.filter(
+          (product) => product.type === "digital" || product.type === "bundle",
+        ),
       ];
       const uniqueTargets = [
         ...new Map(digitalTargets.map((product) => [product.id, product])).values(),
       ];
 
       if (uniqueTargets.length) {
-        await supabase.from("entitlements").upsert(
-          uniqueTargets.map((product) => {
-            const resource = getResourceLink(product.slug);
-            return {
-              user_id: user.id,
-              product_id: product.id,
-              order_id: order.id,
-              title: product.title,
-              access_label: resource.label,
-              access_url: resource.url || null,
-            };
-          }),
-          { onConflict: "user_id,product_id", ignoreDuplicates: true },
-        );
+        const { error: entitlementError } = await supabase
+          .from("entitlements")
+          .upsert(
+            uniqueTargets.map((product) => {
+              const resource = getResourceLink(product.slug);
+              return {
+                user_id: user.id,
+                product_id: product.id,
+                order_id: order.id,
+                title: product.title,
+                access_label: resource.label,
+                access_url: resource.url || null,
+              };
+            }),
+            { onConflict: "user_id,product_id", ignoreDuplicates: true },
+          );
+        if (entitlementError) throw entitlementError;
       }
     }
 
-    for (const item of resolved) {
+    for (const item of lines) {
       if (item.product.type !== "physical") continue;
-      await supabase
+      const { error: stockError } = await supabase
         .from("products")
-        .update({ stock: item.product.stock - item.quantity })
-        .eq("id", item.product.id);
+        .update({ stock: Math.max(0, item.product.stock - item.quantity) })
+        .eq("id", item.product.id)
+        .eq("stock", item.product.stock);
+      if (stockError) throw stockError;
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       orderNumber: order.order_number,
-      total,
+      subtotal,
       deliveryFee,
+      discount,
+      promoCode: appliedPromo,
+      total,
       signedIn: Boolean(user),
     });
+
+    // Guest confirmation pages need a scoped key. The order number in the URL
+    // alone is not enough to expose a customer's address and phone number.
+    response.cookies.set({
+      name: ORDER_ACCESS_COOKIE,
+      value: order.id,
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    return response;
   } catch (error) {
     console.error("Order creation failed", error);
     return NextResponse.json(

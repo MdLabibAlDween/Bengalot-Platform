@@ -213,6 +213,23 @@
     font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 96;
   }
 
+  /*
+   * The masked line animation needs a clip box, but a normal overflow:hidden
+   * box cuts through descenders and italic overhangs on display type. Clip
+   * margins keep the mask while allowing the glyphs to breathe.
+   */
+  .masked-line {
+    display: block;
+    overflow: hidden;
+  }
+
+  @supports (overflow: clip) and (overflow-clip-margin: 0.35em) {
+    .masked-line {
+      overflow: clip;
+      overflow-clip-margin: 0.35em;
+    }
+  }
+
   .eyebrow {
     display: inline-flex;
     align-items: center;

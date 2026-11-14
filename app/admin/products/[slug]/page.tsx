@@ -25,9 +25,10 @@ export default async function AdminProductEditPage({
   await requireStaff("/admin/products");
   const { slug } = await params;
   const supabase = createSupabaseAdminClient();
-  const [productResult, categoriesResult] = await Promise.all([
+  const [productResult, categoriesResult, productsResult] = await Promise.all([
     supabase.from("products").select("*").eq("slug", slug).maybeSingle(),
     supabase.from("categories").select("*").order("sort"),
+    supabase.from("products").select("*").order("sort"),
   ]);
 
   if (!productResult.data) notFound();
@@ -36,6 +37,7 @@ export default async function AdminProductEditPage({
     <ProductEditor
       product={productResult.data as Product}
       categories={(categoriesResult.data ?? []) as Category[]}
+      products={(productsResult.data ?? []) as Product[]}
     />
   );
 }

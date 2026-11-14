@@ -24,6 +24,7 @@ import {
   RelatedProducts,
 } from "@/components/product/product-sections";
 import { Accordion } from "@/components/ui/accordion";
+import { isBundleProduct } from "@/lib/bundles";
 import {
   getCatalog,
   getRelatedProducts,
@@ -72,10 +73,11 @@ export default async function ProductPage({ params }: PageProps) {
   const related = getRelatedProducts(catalog, product);
   const isFlashcards = (product.preview as { kind?: string }).kind === "flashcards";
   const isPhysical = product.type === "physical";
-  const isBundle = product.category_slug === "bundles";
+  const isBundle = isBundleProduct(product);
   const savings = product.compare_at
     ? product.compare_at - product.price
     : 0;
+  const settings = catalog.settings;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -85,11 +87,15 @@ export default async function ProductPage({ params }: PageProps) {
     sku: product.sku,
     category: category?.name,
     brand: { "@type": "Brand", name: "Bengalot" },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: Number(product.rating),
-      reviewCount: product.review_count,
-    },
+    ...(product.review_count > 0
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: Number(product.rating),
+            reviewCount: product.review_count,
+          },
+        }
+      : {}),
     offers: {
       "@type": "Offer",
       priceCurrency: "BDT",
@@ -232,8 +238,8 @@ export default async function ProductPage({ params }: PageProps) {
                 </p>
                 {isBundle && isPhysical ? (
                   <p className="mt-3">
-                    The printed planners ship to you. The Notion workspace and
-                    Deep Work guide are added to your library after payment.
+                    Printed items in this bundle ship to you. Digital components
+                    are added to your library after payment.
                   </p>
                 ) : null}
               </Accordion>
@@ -242,7 +248,7 @@ export default async function ProductPage({ params }: PageProps) {
                   <p className="flex items-start gap-2">
                     <Truck className="mt-0.5 size-4 shrink-0 text-teal" aria-hidden="true" />
                     {isPhysical
-                      ? "Ships from Saltha, Faridpur. ৳70 inside Faridpur district, ৳130 elsewhere. Free delivery above ৳2,000."
+                      ? `Ships from ${settings.city}. ${formatMoney(settings.deliveryInside)} inside Faridpur district, ${formatMoney(settings.deliveryOutside)} elsewhere. Free delivery above ${formatMoney(settings.freeDeliveryThreshold)}.`
                       : "Digital access is delivered to your account library after payment. You will also receive an email receipt."}
                   </p>
                   <p className="flex items-start gap-2">

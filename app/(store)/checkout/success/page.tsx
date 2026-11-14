@@ -9,11 +9,12 @@ import {
   Truck,
 } from "lucide-react";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
+import { getCurrentUser, STAFF_ROLES } from "@/lib/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { Order, OrderItem } from "@/lib/types";
-import { hasDigitalContent } from "@/lib/bundles";
 import { formatDate, formatMoney } from "@/lib/utils";
 
 type PageProps = {
@@ -38,14 +39,35 @@ export default async function OrderSuccessPage({ searchParams }: PageProps) {
 
   if (!order) notFound();
 
-  const { data: items } = await supabase
-    .from("order_items")
-    .select("*")
-    .eq("order_id", (order as Order).id);
   const typedOrder = order as Order;
-  const typedItems = (items ?? []) as OrderItem[];
+  const [cookieStore, current, itemsResult, entitlementResult] = await Promise.all([
+    cookies(),
+    getCurrentUser(),
+    supabase.from("order_items").select("*").eq("order_id", typedOrder.id),
+    supabase
+      .from("entitlements")
+      .select("id")
+      .eq("order_id", typedOrder.id)
+      .limit(1),
+  ]);
+
+  const cookieOrderId = cookieStore.get("bengalot-order-access")?.value;
+  const ownsOrder = Boolean(
+    current?.user && typedOrder.user_id === current.user.id,
+  );
+  const isStaff = Boolean(
+    current?.profile && STAFF_ROLES.has(current.profile.role),
+  );
+
+  if (cookieOrderId !== typedOrder.id && !ownsOrder && !isStaff) {
+    notFound();
+  }
+
+  const typedItems = (itemsResult.data ?? []) as OrderItem[];
   const hasPhysical = typedItems.some((item) => item.type === "physical");
-  const hasDigital = typedItems.some((item) => hasDigitalContent(item));
+  const hasDigital =
+    typedItems.some((item) => item.type !== "physical") ||
+    Boolean(entitlementResult.data?.length);
 
   return (
     <div className="bg-cream">
@@ -188,6 +210,12 @@ export default async function OrderSuccessPage({ searchParams }: PageProps) {
                   {typedOrder.delivery_fee === 0 ? "Free" : formatMoney(typedOrder.delivery_fee)}
                 </span>
               </div>
+              {typedOrder.discount > 0 ? (
+                <div className="flex justify-between text-teal">
+                  <span>Promo discount</span>
+                  <span className="price">−{formatMoney(typedOrder.discount)}</span>
+                </div>
+              ) : null}
               <div className="flex justify-between border-t border-line pt-2 font-semibold text-ink">
                 <span>Total</span>
                 <span className="price font-display text-xl">{formatMoney(typedOrder.total)}</span>

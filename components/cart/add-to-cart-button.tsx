@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import { useCart } from "@/components/cart/cart-provider";
 import { Button } from "@/components/ui/button";
+import { hasDigitalContent } from "@/lib/bundles";
 import type { Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +20,7 @@ export function toCartLine(product: Product) {
     art_key: product.art_key,
     palette: product.palette,
     stock: product.stock,
+    has_digital_content: hasDigitalContent(product),
   };
 }
 

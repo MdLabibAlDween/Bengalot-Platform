@@ -11,7 +11,9 @@ import {
   LockKeyhole,
   ShieldCheck,
   Smartphone,
+  TicketPercent,
   UserRound,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -89,6 +91,14 @@ export function CheckoutClient({
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState("");
+  const [promoInput, setPromoInput] = useState("");
+  const [promo, setPromo] = useState<{
+    code: string;
+    description: string;
+    discount: number;
+  } | null>(null);
+  const [promoError, setPromoError] = useState("");
+  const [promoLoading, setPromoLoading] = useState(false);
 
   const deliveryFee = useMemo(() => {
     if (!hasPhysical) return 0;
@@ -105,12 +115,60 @@ export function CheckoutClient({
     form.district,
   ]);
 
-  const total = subtotal + deliveryFee;
+  const discount = promo?.discount ?? 0;
+  const total = Math.max(0, subtotal + deliveryFee - discount);
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((current) => ({ ...current, [key]: value }));
     setErrors((current) => ({ ...current, [key]: undefined }));
     setServerError("");
+  }
+
+  async function applyPromo() {
+    const code = promoInput.trim();
+    if (!code) {
+      setPromo(null);
+      setPromoError("Enter a promo code first.");
+      return;
+    }
+
+    setPromoLoading(true);
+    setPromoError("");
+    try {
+      const response = await fetch("/api/promos/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, subtotal }),
+      });
+      const data = (await response.json()) as {
+        message?: string;
+        code?: string;
+        description?: string;
+        discount?: number;
+      };
+      if (!response.ok || !data.code || !data.discount) {
+        throw new Error(data.message ?? "That code could not be applied.");
+      }
+      setPromo({
+        code: data.code,
+        description: data.description ?? "",
+        discount: data.discount,
+      });
+      setPromoInput(data.code);
+    } catch (error) {
+      setPromo(null);
+      setPromoError(
+        error instanceof Error ? error.message : "That code could not be applied.",
+      );
+    } finally {
+      setPromoLoading(false);
+    }
+  }
+
+  function removePromo() {
+    setPromo(null);
+    setPromoInput("");
+    setPromoError("");
   }
 
   function validate() {
@@ -151,6 +209,7 @@ export function CheckoutClient({
         body: JSON.stringify({
           ...form,
           customerName: form.fullName,
+          promoCode: promo?.code ?? null,
           items: lines.map((line) => ({
             slug: line.slug,
             quantity: line.quantity,
@@ -585,6 +644,65 @@ export function CheckoutClient({
             </div>
 
             <div className="border-t border-line px-5 py-4">
+              <div className="mb-4 border-b border-line pb-4">
+                <label
+                  htmlFor="promo-code"
+                  className="flex items-center gap-1.5 text-[0.62rem] font-bold uppercase tracking-[0.08em] text-muted"
+                >
+                  <TicketPercent className="size-3.5 text-teal" aria-hidden="true" />
+                  Promo code
+                </label>
+                {promo ? (
+                  <div className="mt-2 flex items-center justify-between gap-2 rounded-lg border border-teal/20 bg-teal-soft/30 px-3 py-2">
+                    <div className="min-w-0">
+                      <p className="font-mono text-[0.72rem] font-bold text-teal">
+                        {promo.code}
+                      </p>
+                      <p className="truncate text-[0.58rem] text-muted">
+                        {promo.description || "Discount applied"}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={removePromo}
+                      className="grid size-6 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-white hover:text-coral"
+                      aria-label="Remove promo code"
+                    >
+                      <X className="size-3.5" aria-hidden="true" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="mt-2 flex gap-2">
+                    <input
+                      id="promo-code"
+                      value={promoInput}
+                      onChange={(event) => {
+                        setPromoInput(event.target.value.toUpperCase());
+                        setPromoError("");
+                      }}
+                      placeholder="Enter code"
+                      className="field !min-h-9 !py-1.5 font-mono text-[0.72rem] uppercase"
+                    />
+                    <button
+                      type="button"
+                      onClick={applyPromo}
+                      disabled={promoLoading}
+                      className="btn btn-outline btn-sm shrink-0"
+                    >
+                      {promoLoading ? (
+                        <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+                      ) : null}
+                      Apply
+                    </button>
+                  </div>
+                )}
+                {promoError ? (
+                  <p className="mt-1.5 text-[0.62rem] font-medium text-coral" role="alert">
+                    {promoError}
+                  </p>
+                ) : null}
+              </div>
+
               <dl className="space-y-2.5 text-[0.78rem]">
                 <div className="flex justify-between">
                   <dt className="text-muted">Subtotal</dt>
@@ -600,6 +718,12 @@ export function CheckoutClient({
                     )}
                   </dd>
                 </div>
+                {discount > 0 ? (
+                  <div className="flex justify-between text-teal">
+                    <dt>Promo · {promo?.code}</dt>
+                    <dd className="price font-semibold">−{formatMoney(discount)}</dd>
+                  </div>
+                ) : null}
                 <div className="flex items-center justify-between border-t border-line pt-3">
                   <dt className="font-semibold text-ink">Total</dt>
                   <dd>

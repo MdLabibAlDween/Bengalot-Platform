@@ -6,6 +6,7 @@ import {
   Megaphone,
   Package,
   ShoppingCart,
+  TicketPercent,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -17,6 +18,7 @@ const links = [
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { href: "/admin/promotions", label: "Promotions", icon: Megaphone },
+  { href: "/admin/promo-codes", label: "Promo codes", icon: TicketPercent },
 ];
 
 export function AdminNav({
@@ -33,7 +35,7 @@ export function AdminNav({
         className={cn(
           variant === "sidebar"
             ? "space-y-1"
-            : "grid grid-cols-4 gap-1",
+            : "grid grid-cols-5 gap-1",
         )}
       >
         {links.map((link) => {

@@ -36,6 +36,8 @@ export type TimerPreview = {
 export type BundlePreview = {
   kind: "bundle";
   items: string[];
+  /** Product slugs that unlock in the customer library with this bundle. */
+  productSlugs?: string[];
 };
 
 export type ProductPreview =
@@ -199,6 +201,19 @@ export type Entitlement = {
   last_accessed_at: string | null;
 };
 
+export type PromoCodeType = "percent" | "fixed";
+
+export type PromoCode = {
+  code: string;
+  description: string;
+  type: PromoCodeType;
+  value: number;
+  minSubtotal: number;
+  maxDiscount: number | null;
+  active: boolean;
+  expiresAt: string | null;
+};
+
 export type Profile = {
   id: string;
   email: string;
@@ -221,4 +236,6 @@ export type CartLine = {
   palette: string[];
   quantity: number;
   stock: number;
+  /** Whether this line carries digital access, including physical bundles. */
+  has_digital_content?: boolean;
 };

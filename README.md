@@ -38,11 +38,12 @@ The sign-in page also has compact demo-fill buttons. Remove or change these acco
 
 - Editorial homepage with a layered product hero, asymmetric category bento, featured product rail, brand story, flashcard preview, four-step explainer, editable promotion banners, reviews and journal.
 - Shop with search, category, format and sort controls.
-- Product pages with interactive galleries, a flashcard front/back preview, specs, contents and related products.
-- Printed planners with paper, page count and delivery details, plus a printed + digital Student Starter Bundle.
-- Persistent cart and a responsive cart drawer, guest checkout for physical orders, validated checkout, delivery pricing and an order-confirmation page.
+- Product pages with interactive galleries, a flashcard front/back preview, specs, contents and related products. Every content block — title, Bangla title, story copy, type, format, SKU, specs, contents, requirements, tags, artwork, sort order and the advanced preview JSON — is editable in the studio.
+- Bundles are first-class products: the studio lets you choose which digital components a bundle unlocks in the customer library, and printed components are described in "What you get".
+- Promo codes at checkout: percentage or fixed discounts with an optional minimum subtotal, discount cap and expiry. Codes are created in the studio and re-validated on the server when the order is placed.
+- Persistent cart and a responsive cart drawer, guest checkout for physical orders, validated checkout, delivery pricing, promo codes and an order-confirmation page. Guest confirmation pages need an http-only access cookie that is issued when the order is placed.
 - Customer dashboard with a digital library, order tracking, profile editing and password reset.
-- Admin studio with analytics, revenue chart, product table and live product editor, orders with status updates, and a promotion editor with live preview and accent colours.
+- Admin studio with analytics, revenue chart, product table and live product editor, orders with status updates, and a promotion editor with live preview and accent colours. Cancelling an order restores physical stock, and a delivered cash-on-delivery order is marked paid automatically.
 - Account and admin routes are protected and excluded from search indexing.
 
 ## Commands
@@ -54,6 +55,9 @@ The sign-in page also has compact demo-fill buttons. Remove or change these acco
 | `pnpm start` | Start the production build |
 | `pnpm lint` | ESLint |
 | `pnpm typecheck` | Generate route types and run TypeScript |
+| `pnpm verify:flows` | Place and clean up test COD + promo orders against a running server |
+
+`pnpm verify:flows` creates two temporary cash-on-delivery orders (one plain, one bundle with a promo code), checks the stored totals, marks one delivered and then cancels it to restore stock. Run it while `pnpm dev` is active.
 
 ## Environment
 
@@ -81,4 +85,5 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 - Replace the demo accounts and reset the exposed setup keys.
 - Connect a real bKash/payment workflow; the current flow records orders and grants library access for signed-in digital purchases.
 - Review the privacy and terms copy with the owner.
+- Review the seeded promo codes in `/admin/promo-codes` before going live.
 - Add real product photography only when the owner supplies it; the art system is designed to work without photos.

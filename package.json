@@ -10,7 +10,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "next typegen && tsc --noEmit"
+    "typecheck": "next typegen && tsc --noEmit",
+    "verify:flows": "node scripts/verify-store-flows.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import { toCartLine } from "@/components/cart/add-to-cart-button";
 import { useCart } from "@/components/cart/cart-provider";
+import { isBundleProduct } from "@/lib/bundles";
 import type { Product } from "@/lib/types";
 import { formatMoney } from "@/lib/utils";
 
@@ -16,7 +17,7 @@ export function BuyPanel({ product }: { product: Product }) {
   const [buying, setBuying] = useState(false);
   const router = useRouter();
   const isPhysical = product.type === "physical";
-  const isBundle = product.category_slug === "bundles";
+  const isBundle = isBundleProduct(product);
   const soldOut = isPhysical && product.stock <= 0;
 
   useEffect(() => {
@@ -159,8 +160,8 @@ export function BuyPanel({ product }: { product: Product }) {
 
       {isBundle && isPhysical ? (
         <p className="mt-3 rounded-lg bg-paper px-3 py-2 text-[0.6rem] leading-relaxed text-muted">
-          The printed planners ship to you. The Notion workspace and Deep Work
-          guide are added to your library after payment.
+          Printed items in this bundle ship to you. Digital components are added
+          to your library after payment.
         </p>
       ) : null}
     </div>

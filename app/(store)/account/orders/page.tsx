@@ -5,6 +5,7 @@ import {
   MapPin,
   Package,
   Smartphone,
+  TicketPercent,
   Truck,
 } from "lucide-react";
 import Link from "next/link";
@@ -217,6 +218,12 @@ export default async function OrdersPage() {
                       <span className="flex items-center gap-1.5">
                         <Truck className="size-3" aria-hidden="true" />
                         Delivery ৳{order.delivery_fee}
+                      </span>
+                    ) : null}
+                    {order.discount > 0 ? (
+                      <span className="flex items-center gap-1.5">
+                        <TicketPercent className="size-3" aria-hidden="true" />
+                        Promo −৳{order.discount}
                       </span>
                     ) : null}
                   </div>

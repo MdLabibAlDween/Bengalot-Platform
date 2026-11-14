@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
-import type { ReactNode } from "react";
+import { motion, useInView, useReducedMotion } from "motion/react";
+import { useRef, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -90,7 +90,7 @@ export function MaskedLine({
 
   if (immediate) {
     return (
-      <span className={cn("block overflow-hidden pb-[0.08em]", className)}>
+      <span className={cn("masked-line", className)}>
         <span
           className="line-rise block"
           style={{ animationDelay: `${delay}s` }}
@@ -101,13 +101,27 @@ export function MaskedLine({
     );
   }
 
+  return <MaskedInView className={className} delay={delay}>{children}</MaskedInView>;
+}
+
+function MaskedInView({
+  children,
+  className,
+  delay,
+}: {
+  children: ReactNode;
+  className?: string;
+  delay: number;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-40px" });
+
   return (
-    <span className={cn("block overflow-hidden pb-[0.08em]", className)}>
+    <span ref={ref} className={cn("masked-line", className)}>
       <motion.span
         className="block"
-        initial={{ y: "115%", rotate: 1.5 }}
-        whileInView={{ y: "0%", rotate: 0 }}
-        viewport={{ once: true, margin: "-40px" }}
+        initial={{ y: "150%", rotate: 1.5 }}
+        animate={inView ? { y: "0%", rotate: 0 } : undefined}
         transition={{
           duration: 0.72,
           delay,
