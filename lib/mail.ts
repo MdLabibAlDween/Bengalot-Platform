@@ -3,8 +3,8 @@ import "server-only";
 import nodemailer from "nodemailer";
 import type { Transporter } from "nodemailer";
 
-import { getMailConfig } from "@/lib/env";
-import type { MailConfig } from "@/lib/env";
+import { getMailAccount } from "@/lib/env";
+import type { MailAccountKind } from "@/lib/env";
 
 type MailMessage = {
   to: string;
@@ -19,36 +19,41 @@ type SendResult =
   | { sent: false; skipped: true }
   | { sent: false; skipped: false; error: string };
 
-let transporter: Transporter | null = null;
-let transporterKey = "";
-let warnedMissing = false;
+const transporters = new Map<string, Transporter>();
+const warnedMissing = new Set<MailAccountKind>();
 
-function getTransporter(config: MailConfig) {
+function getTransporter(
+  config: NonNullable<ReturnType<typeof getMailAccount>>,
+) {
   const key = `${config.host}:${config.port}:${config.secure}:${config.user}`;
-  if (transporter && transporterKey === key) return transporter;
+  const existing = transporters.get(key);
+  if (existing) return existing;
 
-  transporter = nodemailer.createTransport({
+  const transporter = nodemailer.createTransport({
     host: config.host,
     port: config.port,
     secure: config.secure,
     auth: { user: config.user, pass: config.pass },
   });
-  transporterKey = key;
+  transporters.set(key, transporter);
   return transporter;
 }
 
-export function isMailConfigured() {
-  return Boolean(getMailConfig());
+export function isMailConfigured(kind: MailAccountKind) {
+  return Boolean(getMailAccount(kind));
 }
 
-export async function sendMail(message: MailMessage): Promise<SendResult> {
-  const config = getMailConfig();
+export async function sendMail(
+  kind: MailAccountKind,
+  message: MailMessage,
+): Promise<SendResult> {
+  const config = getMailAccount(kind);
   if (!config) {
-    if (!warnedMissing) {
+    if (!warnedMissing.has(kind)) {
       console.info(
-        "Email is not configured. Set MAIL_USER and MAIL_PASS to enable order receipts and replies.",
+        `Email for ${kind}@ is not configured. Add MAIL_${kind.toUpperCase()}_USER and MAIL_${kind.toUpperCase()}_PASS to enable it.`,
       );
-      warnedMissing = true;
+      warnedMissing.add(kind);
     }
     return { sent: false, skipped: true };
   }
@@ -65,7 +70,7 @@ export async function sendMail(message: MailMessage): Promise<SendResult> {
     return { sent: true };
   } catch (error) {
     const detail = error instanceof Error ? error.message : "Unknown mail error";
-    console.error("Email send failed", detail);
+    console.error(`Email send failed (${kind})`, detail);
     return { sent: false, skipped: false, error: detail };
   }
 }
@@ -198,7 +203,7 @@ export async function sendOrderConfirmation({
     </div>
     <p style="margin:20px 0 0;font-size:13px;line-height:1.7;color:#2f3d4d;">Questions? Reply to this email or write to ${escapeHtml(supportEmail)} and a human will answer.</p>`;
 
-  return sendMail({
+  return sendMail("support", {
     to: order.email,
     replyTo: supportEmail,
     subject: `Order ${order.order_number} received · Bengalot`,
@@ -236,7 +241,7 @@ export async function sendContactAcknowledgement({
   message: string;
   supportEmail: string;
 }) {
-  return sendMail({
+  return sendMail("support", {
     to: email,
     replyTo: supportEmail,
     subject: "We have your note · Bengalot",
@@ -257,8 +262,40 @@ export async function sendContactAcknowledgement({
   });
 }
 
+export async function sendContactNotification({
+  name,
+  email,
+  message,
+}: {
+  name: string;
+  email: string;
+  message: string;
+}) {
+  const info = getMailAccount("info");
+  if (!info) return { sent: false as const, skipped: true as const };
+
+  return sendMail("info", {
+    to: process.env.MAIL_CONTACT_TO?.trim() || info.user,
+    replyTo: email,
+    subject: `New contact note from ${name} · Bengalot`,
+    text: [
+      `New contact message from ${name} <${email}>.`,
+      "",
+      message,
+      "",
+      "Reply directly to this email to answer the customer.",
+    ].join("\n"),
+    html: layout({
+      heading: "A new note arrived.",
+      intro: `${name} <${email}> used the contact form. Reply to this email to answer them directly.`,
+      body: `<div style="padding:14px 16px;background:#f6f8f8;border-left:3px solid #0d6f6d;border-radius:8px;font-size:13px;line-height:1.7;color:#2f3d4d;">${escapeHtml(message)}</div>`,
+      footer: "This notification was sent to the info@ mailbox.",
+    }),
+  });
+}
+
 export async function sendNewsletterWelcome(email: string) {
-  return sendMail({
+  return sendMail("info", {
     to: email,
     subject: "You are on the list · Bengalot",
     text: [

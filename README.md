@@ -76,18 +76,29 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
-# Purelymail SMTP (optional — mail is skipped safely when these are blank)
+# Purelymail SMTP (optional — a mailbox without a password is skipped)
 MAIL_HOST=smtp.purelymail.com
 MAIL_PORT=465
 MAIL_SECURE=true
-MAIL_USER=
-MAIL_PASS=
-MAIL_FROM="Bengalot <support@bengalot.com>"
-MAIL_REPLY_TO=support@bengalot.com
+
+MAIL_SUPPORT_USER=support@bengalot.com
+MAIL_SUPPORT_PASS=
+MAIL_SUPPORT_FROM="Bengalot Support <support@bengalot.com>"
+MAIL_SUPPORT_REPLY_TO=support@bengalot.com
+
+MAIL_INFO_USER=info@bengalot.com
+MAIL_INFO_PASS=
+MAIL_INFO_FROM="Bengalot <info@bengalot.com>"
+MAIL_INFO_REPLY_TO=info@bengalot.com
+
 MAIL_SUPPORT_EMAIL=support@bengalot.com
 ```
 
-`SUPABASE_SERVICE_ROLE_KEY` is server-only. It is used by order creation and admin route handlers after server-side role checks. Never expose it to the browser. `MAIL_*` values are also server-only. Create the mailbox and SMTP password in Purelymail, then run `pnpm verify:mail` to test the connection.
+`SUPABASE_SERVICE_ROLE_KEY` is server-only. It is used by order creation and admin route handlers after server-side role checks. Never expose it to the browser. `MAIL_*` values are also server-only. Create both mailboxes in Purelymail and add their SMTP passwords, then run `pnpm verify:mail`.
+
+Mailbox split:
+- **support@bengalot.com** — order receipts and contact auto-replies.
+- **info@bengalot.com** — newsletter welcomes and contact-form notifications.
 
 ## Design notes
 
@@ -103,5 +114,5 @@ MAIL_SUPPORT_EMAIL=support@bengalot.com
 - Connect a real bKash/payment workflow; the current flow records orders and grants library access for signed-in digital purchases.
 - Review the privacy and terms copy with the owner.
 - Review the seeded promo codes in `/admin/promo-codes` before going live.
-- Fill `MAIL_USER`/`MAIL_PASS` with a Purelymail mailbox and run `pnpm verify:mail` before taking real orders.
+- Fill both Purelymail passwords (`MAIL_SUPPORT_PASS`, `MAIL_INFO_PASS`) and run `pnpm verify:mail` before taking real orders.
 - Add real product photography only when the owner supplies it; the art system is designed to work without photos.
