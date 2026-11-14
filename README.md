@@ -27,7 +27,7 @@ The live Supabase project is already seeded. The SQL schema and catalogue seed l
 
 Customers create their own account from `/register`, then keep digital purchases in `/account/library`. Sign-in, forgot-password, reset-password and address-book pages all use real Supabase Auth data.
 
-Studio access is managed from **Admin → Users**. The owner can create customer or team accounts, change roles, send password-reset links, delete accounts, and grant, refresh or revoke each customer's library access. New registrations are always created as `customer` — studio roles are only assigned inside the owner-only Users screen.
+Studio access is managed from **Admin → Users**. Accounts themselves are created only in **Supabase → Authentication → Users** (or by customers at `/register`); the studio never creates auth accounts. Once the profile appears, the owner can assign roles, send password-reset links, delete accounts, and grant, refresh or revoke each customer's library access. New registrations are always created as `customer` — studio roles are only assigned inside the owner-only Users screen.
 
 The original demo customer has been removed. The bootstrap demo owner account (`admin@bengalot.com`) should be replaced: sign in, create your own owner account from Users, sign in with it, then delete the demo owner from the same screen.
 
@@ -41,7 +41,7 @@ The original demo customer has been removed. The bootstrap demo owner account (`
 - Journal, Our Story and FAQ are editable in the studio Content section, along with the announcement bar and footer social links. Article bodies, FAQ items, announcement copy and social URLs can all change without a deploy.
 - Homepage promotion banners are fully editable, including an optional uploaded image that replaces the generated artwork on the right side of the card.
 - Customer accounts include a saved address book. Addresses can be added, edited, made default or removed in `/account/addresses`, and checkout fills the whole delivery form with one click.
-- The owner-only Users screen manages real customer and studio accounts: create accounts, change roles, send reset links, delete accounts, and grant, refresh or revoke each customer's digital library access.
+- The owner-only Users screen manages real customer and studio profiles: assign roles, send reset links, delete accounts, and grant, refresh or revoke each customer's digital library access. Auth accounts are created only in Supabase Authentication or public registration.
 - Digital products can carry a delivery PDF uploaded in the studio. The customer receives it in their account library only after payment is confirmed — use it for the Notion template link, download link or setup instructions.
 - Transactional email through Purelymail SMTP: order receipts, contact auto-replies and newsletter welcomes. Email is optional — when credentials are blank the storefront keeps working and sends are skipped.
 - ZiniPay hosted checkout for digital orders: bKash, Nagad, Rocket and Upay. Invoices are created server-side, verified before fulfilment, and digital access is only released after ZiniPay confirms the payment. Unpaid orders can retry from the confirmation page.

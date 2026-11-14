@@ -143,21 +143,23 @@ try {
   const checkoutPage = await app("/checkout");
   check("Checkout receives the saved address", checkoutPage.ok && checkoutPage.text.includes("Verification"));
 
-  // User lifecycle
+  // User lifecycle — accounts are created in Supabase Auth, never in the studio.
   const email = `verify-user-${Date.now()}@bengalot.dev`;
-  const created = await app("/api/admin/users", {
+  const created = await adminAuth("users", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      action: "create",
-      fullName: "Verification Customer",
       email,
       password: "VerifyPass!2026",
-      role: "customer",
+      email_confirm: true,
+      user_metadata: { full_name: "Verification Customer" },
     }),
   });
-  tempUserId = created.body?.userId;
-  check("Admin can create a customer account", created.ok && Boolean(tempUserId), tempUserId ?? JSON.stringify(created.body));
+  tempUserId = created?.id ?? null;
+  check(
+    "Supabase Auth creates a customer profile automatically",
+    Boolean(tempUserId),
+    tempUserId ?? JSON.stringify(created),
+  );
 
   if (tempUserId) {
     const profileRows = await rest(`profiles?id=eq.${tempUserId}&select=role,email`);

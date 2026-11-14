@@ -94,6 +94,11 @@ try {
     ...content,
     announcement: { ...content.announcement, desktopText: marker },
     journal: { ...content.journal, intro: `${content.journal.intro} ${marker}` },
+    about: {
+      ...content.about,
+      storyHeading: `${content.about.storyHeading} ${marker}`,
+    },
+    faq: { ...content.faq, intro: `${content.faq.intro} ${marker}` },
   };
   const saved = await app("/api/admin/content", {
     method: "POST",
@@ -112,7 +117,12 @@ try {
 
   for (const path of ["/about", "/faq"]) {
     const page = await fetch(`${base}${path}`);
-    check(`${path} renders`, page.ok, `status ${page.status}`);
+    const html = await page.text();
+    check(
+      `${path} uses saved content`,
+      page.ok && html.includes(marker),
+      `status ${page.status}`,
+    );
   }
 
   // Delivery PDF flow

@@ -5,11 +5,9 @@ import {
   Eye,
   KeyRound,
   Loader2,
-  Plus,
   Search,
   ShieldCheck,
   Trash2,
-  UserPlus,
   UsersRound,
 } from "lucide-react";
 import Link from "next/link";
@@ -46,15 +44,8 @@ export function UserManager({
   const [query, setQuery] = useState("");
   const [roles, setRoles] = useState<Record<string, Profile["role"]>>({});
   const [busyId, setBusyId] = useState("");
-  const [creating, setCreating] = useState(false);
   const [message, setMessage] = useState("");
   const [state, setState] = useState<"idle" | "error" | "ok">("idle");
-  const [form, setForm] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-    role: "customer" as Profile["role"],
-  });
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -108,26 +99,6 @@ export function UserManager({
       throw new Error(data.message ?? "The action could not be completed.");
     }
     return data;
-  }
-
-  async function createUser(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setCreating(true);
-    setState("idle");
-    setMessage("");
-    try {
-      await post({ action: "create", ...form });
-      setForm({ fullName: "", email: "", password: "", role: "customer" });
-      notify("ok", "Account created. They can sign in immediately.");
-      router.refresh();
-    } catch (error) {
-      notify(
-        "error",
-        error instanceof Error ? error.message : "The account could not be created.",
-      );
-    } finally {
-      setCreating(false);
-    }
   }
 
   async function saveRole(user: UserRow) {
@@ -219,7 +190,8 @@ export function UserManager({
       {hasDemoOwner ? (
         <div className="rounded-[1.2rem] border border-butter/60 bg-butter-soft/50 p-4 text-[0.66rem] leading-relaxed text-ink-soft">
           <strong className="text-ink">The demo owner account is still active.</strong>{" "}
-          Create your own owner account below, sign in with it, then delete
+          Create your real owner account in Supabase → Authentication → Users,
+          set its role to Owner here, sign in with it, then delete
           `admin@bengalot.com` from this page. The storefront demo customer has
           been removed.
         </div>
@@ -243,90 +215,20 @@ export function UserManager({
         <section className="rounded-[1.2rem] border border-line bg-cream p-5">
           <div className="flex items-center gap-2">
             <span className="grid size-7 place-items-center rounded-full bg-teal text-cream">
-              <UserPlus className="size-3.5" aria-hidden="true" />
+              <ShieldCheck className="size-3.5" aria-hidden="true" />
             </span>
             <p className="text-[0.55rem] font-extrabold uppercase tracking-[0.13em] text-muted">
-              Create an account
+              Studio accounts
             </p>
           </div>
-          <form onSubmit={createUser} className="mt-4 grid gap-3 sm:grid-cols-2">
-            <div>
-              <label htmlFor="new-user-name" className="field-label">Full name</label>
-              <input
-                id="new-user-name"
-                value={form.fullName}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, fullName: event.target.value }))
-                }
-                className="field"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="new-user-email" className="field-label">Email</label>
-              <input
-                id="new-user-email"
-                type="email"
-                value={form.email}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, email: event.target.value }))
-                }
-                className="field"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="new-user-password" className="field-label">
-                Temporary password
-              </label>
-              <input
-                id="new-user-password"
-                type="text"
-                minLength={8}
-                value={form.password}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, password: event.target.value }))
-                }
-                className="field font-mono"
-                placeholder="At least 8 characters"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="new-user-role" className="field-label">Role</label>
-              <select
-                id="new-user-role"
-                value={form.role}
-                onChange={(event) =>
-                  setForm((current) => ({
-                    ...current,
-                    role: event.target.value as Profile["role"],
-                  }))
-                }
-                className="field"
-              >
-                {roleOptions.map((role) => (
-                  <option key={role} value={role}>
-                    {role.charAt(0).toUpperCase() + role.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="sm:col-span-2">
-              <button
-                type="submit"
-                disabled={creating}
-                className="btn btn-primary btn-sm"
-              >
-                {creating ? (
-                  <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
-                ) : (
-                  <Plus className="size-3.5" aria-hidden="true" />
-                )}
-                {creating ? "Creating account" : "Create account"}
-              </button>
-            </div>
-          </form>
+          <p className="mt-3 max-w-[46rem] text-[0.7rem] leading-relaxed text-ink-soft">
+            Studio and customer accounts are created in{" "}
+            <strong className="text-ink">Supabase → Authentication → Users</strong>{" "}
+            (or by the customer at <strong className="text-ink">/register</strong>).
+            Their profile appears here automatically. Use this screen only to
+            assign a role, send a reset link, manage library access or remove
+            the account.
+          </p>
         </section>
       ) : null}
 

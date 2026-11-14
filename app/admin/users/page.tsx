@@ -43,9 +43,10 @@ export default async function AdminUsersPage() {
           <span className="display-italic text-teal">behind the shelf.</span>
         </h1>
         <p className="mt-2 max-w-[42rem] text-[0.76rem] leading-relaxed text-muted">
-          Real accounts, real roles, real library access. Create a customer or a
-          studio user, reset a password, or remove an account. Deleting a user
-          also removes their profile and digital library.
+          Real profiles, real roles, real library access. Accounts are created in
+          Supabase Authentication (or by customers at /register); this screen
+          assigns roles, sends reset links, manages library access and removes
+          accounts.
         </p>
       </div>
 
