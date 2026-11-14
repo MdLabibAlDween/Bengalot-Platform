@@ -106,19 +106,37 @@ if (!session.ok) {
   throw new Error(`Admin sign-in failed (${session.status}). Check VERIFY_ADMIN_EMAIL/PASSWORD.`);
 }
 
-const authSession = session.body;
-const adminCookieValue = `base64-${base64Url(
-  JSON.stringify({
-    provider_token: authSession.provider_token ?? null,
-    provider_refresh_token: authSession.provider_refresh_token ?? null,
-    access_token: authSession.access_token,
-    refresh_token: authSession.refresh_token,
-    token_type: authSession.token_type,
-    expires_in: authSession.expires_in,
-    expires_at: authSession.expires_at,
-    user: authSession.user,
-  }),
-)}`;
+function sessionCookie(authSession) {
+  return `base64-${base64Url(
+    JSON.stringify({
+      provider_token: authSession.provider_token ?? null,
+      provider_refresh_token: authSession.provider_refresh_token ?? null,
+      access_token: authSession.access_token,
+      refresh_token: authSession.refresh_token,
+      token_type: authSession.token_type,
+      expires_in: authSession.expires_in,
+      expires_at: authSession.expires_at,
+      user: authSession.user,
+    }),
+  )}`;
+}
+
+const adminCookieValue = sessionCookie(session.body);
+
+const customerEmail = process.env.VERIFY_CUSTOMER_EMAIL ?? adminEmail;
+const customerPassword = process.env.VERIFY_CUSTOMER_PASSWORD ?? adminPassword;
+const customerSession = await supabase("auth/v1/token?grant_type=password", {
+  method: "POST",
+  body: JSON.stringify({ email: customerEmail, password: customerPassword }),
+});
+const customerCookieValue = customerSession.ok
+  ? sessionCookie(customerSession.body)
+  : adminCookieValue;
+if (!customerSession.ok) {
+  console.log(
+    `Customer demo sign-in unavailable (${customerSession.status}); using the admin session for the digital order check.`,
+  );
+}
 
 const existingCodes = await rest("site_settings?key=eq.promo_codes&select=value");
 const storedCodes = Array.isArray(existingCodes.body?.[0]?.value)
@@ -255,10 +273,13 @@ const initialStock = {
 
 const testEmail = "verify-cod@bengalot.dev";
 
-async function placeOrder(payload) {
+async function placeOrder(payload, cookie) {
   const response = await fetch(`${BASE_URL}/api/orders`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(cookie ? { Cookie: `${authCookieName}=${cookie}` } : {}),
+    },
     body: JSON.stringify(payload),
   });
   return { ok: response.ok, status: response.status, body: await response.json() };
@@ -285,14 +306,18 @@ record(
   JSON.stringify(plainOrder.body ?? {}),
 );
 
-const bundleOrder = await placeOrder({
-  ...orderBase,
-  email: testEmail,
-  promoCode: "BENGALOT10",
-  items: [{ slug: "student-starter-bundle", quantity: 1 }],
-});
+const bundleOrder = await placeOrder(
+  {
+    ...orderBase,
+    email: customerEmail,
+    paymentMethod: "bkash",
+    promoCode: "BENGALOT10",
+    items: [{ slug: "student-starter-bundle", quantity: 1 }],
+  },
+  customerCookieValue,
+);
 record(
-  "Cash on delivery bundle order with promo is created",
+  "Signed-in digital bundle order with promo is created",
   bundleOrder.ok && bundleOrder.body.discount === 229,
   JSON.stringify(bundleOrder.body ?? {}),
 );
@@ -340,6 +365,20 @@ record(
   JSON.stringify(bundleRow ?? {}),
 );
 
+const bundleOrderId = (
+  await rest(`orders?order_number=eq.${bundleOrder.body.orderNumber}&select=id`)
+).body?.[0]?.id;
+if (bundleOrderId) {
+  const { body: bundleEntitlements } = await rest(
+    `entitlements?order_id=eq.${bundleOrderId}&select=id`,
+  );
+  record(
+    "Bundle components unlock in the customer library",
+    Array.isArray(bundleEntitlements) && bundleEntitlements.length >= 2,
+    `${bundleEntitlements?.length ?? 0} entitlements`,
+  );
+}
+
 const stockAfterOrders = await stockFor("student-starter-bundle");
 record(
   "Stock decrements for a physical bundle",
@@ -347,16 +386,16 @@ record(
   `${initialStock["student-starter-bundle"]} → ${stockAfterOrders}`,
 );
 
-const orderId = (
-  await rest(`orders?order_number=eq.${bundleOrder.body.orderNumber}&select=id`)
+const plainOrderId = (
+  await rest(`orders?order_number=eq.${plainOrder.body.orderNumber}&select=id`)
 ).body?.[0]?.id;
 
-if (orderId) {
+if (plainOrderId) {
   const delivered = await adminApi("/api/admin/orders", {
-    id: orderId,
+    id: plainOrderId,
     status: "delivered",
   });
-  const deliveredRow = await orderRow(bundleOrder.body.orderNumber);
+  const deliveredRow = await orderRow(plainOrder.body.orderNumber);
   record(
     "Delivered COD order is marked paid",
     delivered.ok && deliveredRow.payment_status === "paid",
@@ -364,17 +403,17 @@ if (orderId) {
   );
 
   const cancelled = await adminApi("/api/admin/orders", {
-    id: orderId,
+    id: plainOrderId,
     status: "cancelled",
   });
-  const cancelledRow = await orderRow(bundleOrder.body.orderNumber);
-  const stockAfterCancel = await stockFor("student-starter-bundle");
+  const cancelledRow = await orderRow(plainOrder.body.orderNumber);
+  const stockAfterCancel = await stockFor("english-vocabulary-cards");
   record(
     "Cancelling a COD order restores stock",
     cancelled.ok &&
       cancelledRow.status === "cancelled" &&
-      stockAfterCancel === initialStock["student-starter-bundle"],
-    `${initialStock["student-starter-bundle"]} → ${stockAfterCancel}`,
+      stockAfterCancel === initialStock["english-vocabulary-cards"],
+    `${initialStock["english-vocabulary-cards"]} → ${stockAfterCancel}`,
   );
 }
 
@@ -410,6 +449,9 @@ const appOrderIds = createdOrderNumbers.length
   : [];
 
 if (appOrderIds.length) {
+  await rest(`entitlements?order_id=in.(${appOrderIds.join(",")})`, {
+    method: "DELETE",
+  });
   await rest(`orders?id=in.(${appOrderIds.join(",")})`, { method: "DELETE" });
 }
 

@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 import { OrderStatusSelect } from "@/components/admin/order-status-select";
 import { orderStatusMeta } from "@/lib/order-status";
+import { paymentMethodLabel } from "@/lib/payment-labels";
 import type { Order, OrderItem, OrderStatus } from "@/lib/types";
 import { cn, formatDate, formatMoney } from "@/lib/utils";
 
@@ -147,8 +148,7 @@ export function AdminOrderList({ orders }: { orders: OrderWithItems[] }) {
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-[0.56rem] text-muted">
-                      {order.payment_method === "cod" ? "Cash on delivery" : "bKash"} ·{" "}
-                      {meta.label}
+                      {paymentMethodLabel(order.payment_method)} · {meta.label}
                     </span>
                     <a
                       href={`https://wa.me/88${order.phone.replace(/^0/, "")}`}

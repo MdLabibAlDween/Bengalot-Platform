@@ -42,6 +42,7 @@ The sign-in page also has compact demo-fill buttons. Remove or change these acco
 - Bundles are first-class products: the studio lets you choose which digital components a bundle unlocks in the customer library, and printed components are described in "What you get".
 - Promo codes at checkout: percentage or fixed discounts with an optional minimum subtotal, discount cap and expiry. Codes are created in the studio and re-validated on the server when the order is placed.
 - Transactional email through Purelymail SMTP: order receipts, contact auto-replies and newsletter welcomes. Email is optional — when credentials are blank the storefront keeps working and sends are skipped.
+- ZiniPay hosted checkout for digital orders: bKash, Nagad, Rocket and Upay. Invoices are created server-side, verified before fulfilment, and digital access is only released after ZiniPay confirms the payment. Unpaid orders can retry from the confirmation page.
 - Persistent cart and a responsive cart drawer, guest checkout for physical orders, validated checkout, delivery pricing, promo codes and an order-confirmation page. Guest confirmation pages need an http-only access cookie that is issued when the order is placed.
 - Customer dashboard with a digital library, order tracking, profile editing and password reset.
 - Admin studio with analytics, revenue chart, product table and live product editor, orders with status updates, and a promotion editor with live preview and accent colours. Cancelling an order restores physical stock, and a delivered cash-on-delivery order is marked paid automatically.
@@ -59,6 +60,7 @@ The sign-in page also has compact demo-fill buttons. Remove or change these acco
 | `pnpm verify:flows` | Place and clean up test COD + promo orders against a running server |
 | `pnpm verify:images` | Upload a test photo, create and clean up a temp product |
 | `pnpm verify:mail` | Check the Purelymail SMTP login and send a test email |
+| `pnpm verify:zinipay` | Check the ZiniPay key; optionally create a sandbox invoice |
 
 `pnpm verify:flows` creates two temporary cash-on-delivery orders (one plain, one bundle with a promo code), checks the stored totals, marks one delivered and then cancels it to restore stock. Run it while `pnpm dev` is active. `pnpm verify:images` uploads a generated photo, creates a temporary product with it, checks the product page, shop and studio render the photo, then deletes everything.
 
@@ -96,9 +98,40 @@ MAIL_SUPPORT_EMAIL=support@bengalot.com
 
 `SUPABASE_SERVICE_ROLE_KEY` is server-only. It is used by order creation and admin route handlers after server-side role checks. Never expose it to the browser. `MAIL_*` values are also server-only. Create both mailboxes in Purelymail and add their SMTP passwords, then run `pnpm verify:mail`.
 
+Add the ZiniPay brand key for online payments:
+
+```env
+ZINIPAY_API_KEY=
+ZINIPAY_BASE_URL=https://api.zinipay.com
+ZINIPAY_WEBHOOK_SECRET=
+```
+
+`ZINIPAY_WEBHOOK_SECRET` is optional — webhook tokens fall back to `APP_ENCRYPTION_KEY`. The webhook payload is never trusted on its own: every callback calls the ZiniPay verify endpoint before an order is marked paid.
+
 Mailbox split:
 - **support@bengalot.com** — order receipts and contact auto-replies.
 - **info@bengalot.com** — newsletter welcomes and contact-form notifications.
+
+## ZiniPay payments
+
+Digital orders are paid through ZiniPay's hosted invoice page. The flow is:
+
+1. Checkout creates the order (unpaid) and a ZiniPay invoice.
+2. The customer is redirected to ZiniPay and pays with bKash, Nagad, Rocket or Upay.
+3. ZiniPay redirects back to `/api/payments/zinipay/return`, or calls `/api/payments/zinipay/webhook`.
+4. The server calls ZiniPay's verify endpoint and checks the paid amount.
+5. Only then is the order marked paid, stock is adjusted, the library access is granted and the receipt email is sent.
+
+Physical-only orders keep cash on delivery. If a digital order is abandoned, the confirmation page offers a retry button that creates a fresh invoice for the same order. Digital access is never granted from the browser or from the webhook payload alone.
+
+In the ZiniPay dashboard, add the site domain to the brand and make sure the redirect URLs (`https://bengalot.com`, or your preview domain) match. For sandbox testing:
+
+```bash
+pnpm verify:zinipay
+VERIFY_ZINIPAY_CREATE=true pnpm verify:zinipay
+```
+
+The second command creates a small invoice without paying it. Use the sandbox brand key while testing.
 
 ## Design notes
 
@@ -115,4 +148,5 @@ Mailbox split:
 - Review the privacy and terms copy with the owner.
 - Review the seeded promo codes in `/admin/promo-codes` before going live.
 - Fill both Purelymail passwords (`MAIL_SUPPORT_PASS`, `MAIL_INFO_PASS`) and run `pnpm verify:mail` before taking real orders.
+- Add the production ZiniPay brand key, confirm the brand domain, and run a sandbox payment before launch.
 - Add real product photography only when the owner supplies it; the art system is designed to work without photos.

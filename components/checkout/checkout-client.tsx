@@ -52,7 +52,7 @@ type FormState = {
   city: string;
   district: string;
   notes: string;
-  paymentMethod: "cod" | "bkash";
+  paymentMethod: "cod" | "bkash" | "zinipay";
 };
 
 type Errors = Partial<Record<keyof FormState, string>>;
@@ -66,9 +66,11 @@ const progressSteps = [
 export function CheckoutClient({
   settings,
   user,
+  zinipayEnabled,
 }: {
   settings: StoreSettings;
   user: { email: string; name: string } | null;
+  zinipayEnabled: boolean;
 }) {
   const { lines, subtotal, clearCart, hydrated } = useCart();
   const router = useRouter();
@@ -86,11 +88,19 @@ export function CheckoutClient({
       ? "Faridpur"
       : "Dhaka",
     notes: "",
-    paymentMethod: hasPhysical ? "cod" : "bkash",
+    paymentMethod:
+      hasDigital && zinipayEnabled
+        ? "zinipay"
+        : hasDigital
+          ? "bkash"
+          : hasPhysical
+            ? "cod"
+            : "bkash",
   });
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState("");
+  const [paymentTouched, setPaymentTouched] = useState(false);
   const [promoInput, setPromoInput] = useState("");
   const [promo, setPromo] = useState<{
     code: string;
@@ -117,6 +127,21 @@ export function CheckoutClient({
 
   const discount = promo?.discount ?? 0;
   const total = Math.max(0, subtotal + deliveryFee - discount);
+  const defaultPaymentMethod: FormState["paymentMethod"] = hasDigital
+    ? zinipayEnabled
+      ? "zinipay"
+      : "bkash"
+    : hasPhysical
+      ? "cod"
+      : "bkash";
+  const paymentMethod = paymentTouched
+    ? form.paymentMethod
+    : defaultPaymentMethod;
+
+  function choosePayment(value: FormState["paymentMethod"]) {
+    update("paymentMethod", value);
+    setPaymentTouched(true);
+  }
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -208,6 +233,7 @@ export function CheckoutClient({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
+          paymentMethod,
           customerName: form.fullName,
           promoCode: promo?.code ?? null,
           items: lines.map((line) => ({
@@ -219,11 +245,16 @@ export function CheckoutClient({
       const data = (await response.json()) as {
         message?: string;
         orderNumber?: string;
+        paymentUrl?: string;
       };
       if (!response.ok || !data.orderNumber) {
         throw new Error(data.message ?? "The order could not be placed.");
       }
       clearCart();
+      if (data.paymentUrl) {
+        window.location.assign(data.paymentUrl);
+        return;
+      }
       router.push(`/checkout/success?order=${encodeURIComponent(data.orderNumber)}`);
     } catch (error) {
       setServerError(
@@ -506,11 +537,11 @@ export function CheckoutClient({
                 </h2>
               </div>
               <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
-                {hasPhysical ? (
+                {hasPhysical && !hasDigital ? (
                   <label
                     className={cn(
                       "relative flex cursor-pointer gap-3 rounded-xl border p-3.5 transition-colors",
-                      form.paymentMethod === "cod"
+                      paymentMethod === "cod"
                         ? "border-teal bg-teal-soft/30"
                         : "border-line bg-surface hover:border-line-strong",
                     )}
@@ -519,8 +550,8 @@ export function CheckoutClient({
                       type="radio"
                       name="payment"
                       value="cod"
-                      checked={form.paymentMethod === "cod"}
-                      onChange={() => update("paymentMethod", "cod")}
+                      checked={paymentMethod === "cod"}
+                      onChange={() => choosePayment("cod")}
                       className="mt-1 accent-[var(--teal)]"
                     />
                     <span>
@@ -534,38 +565,74 @@ export function CheckoutClient({
                     </span>
                   </label>
                 ) : null}
-                <label
-                  className={cn(
-                    "relative flex cursor-pointer gap-3 rounded-xl border p-3.5 transition-colors",
-                    form.paymentMethod === "bkash"
-                      ? "border-teal bg-teal-soft/30"
-                      : "border-line bg-surface hover:border-line-strong",
-                  )}
-                >
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="bkash"
-                    checked={form.paymentMethod === "bkash"}
-                    onChange={() => update("paymentMethod", "bkash")}
-                    className="mt-1 accent-[var(--teal)]"
-                  />
-                  <span>
-                    <span className="flex items-center gap-1.5 text-[0.78rem] font-bold text-ink">
-                      <Smartphone className="size-4 text-coral" aria-hidden="true" />
-                      bKash
+                {zinipayEnabled ? (
+                  <label
+                    className={cn(
+                      "relative flex cursor-pointer gap-3 rounded-xl border p-3.5 transition-colors",
+                      paymentMethod === "zinipay"
+                        ? "border-teal bg-teal-soft/30"
+                        : "border-line bg-surface hover:border-line-strong",
+                    )}
+                  >
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="zinipay"
+                      checked={paymentMethod === "zinipay"}
+                      onChange={() => choosePayment("zinipay")}
+                      className="mt-1 accent-[var(--teal)]"
+                    />
+                    <span>
+                      <span className="flex items-center gap-1.5 text-[0.78rem] font-bold text-ink">
+                        <ShieldCheck className="size-4 text-coral" aria-hidden="true" />
+                        Pay online with ZiniPay
+                      </span>
+                      <span className="mt-1 block text-[0.64rem] leading-relaxed text-muted">
+                        bKash, Nagad, Rocket or Upay on a secure hosted page.
+                      </span>
                     </span>
-                    <span className="mt-1 block text-[0.64rem] leading-relaxed text-muted">
-                      We send payment instructions after you order.
+                  </label>
+                ) : (
+                  <label
+                    className={cn(
+                      "relative flex cursor-pointer gap-3 rounded-xl border p-3.5 transition-colors",
+                      paymentMethod === "bkash"
+                        ? "border-teal bg-teal-soft/30"
+                        : "border-line bg-surface hover:border-line-strong",
+                    )}
+                  >
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="bkash"
+                      checked={paymentMethod === "bkash"}
+                      onChange={() => choosePayment("bkash")}
+                      className="mt-1 accent-[var(--teal)]"
+                    />
+                    <span>
+                      <span className="flex items-center gap-1.5 text-[0.78rem] font-bold text-ink">
+                        <Smartphone className="size-4 text-coral" aria-hidden="true" />
+                        bKash
+                      </span>
+                      <span className="mt-1 block text-[0.64rem] leading-relaxed text-muted">
+                        We send payment instructions after you order.
+                      </span>
                     </span>
-                  </span>
-                </label>
+                  </label>
+                )}
               </div>
               {hasPhysical && hasDigital ? (
                 <p className="mt-3 flex items-start gap-2 rounded-lg bg-paper px-3 py-2 text-[0.62rem] leading-relaxed text-muted">
                   <LockKeyhole className="mt-0.5 size-3 shrink-0 text-teal" aria-hidden="true" />
                   Your digital tools unlock as soon as payment is confirmed. Physical
                   items ship separately.
+                </p>
+              ) : null}
+              {paymentMethod === "zinipay" ? (
+                <p className="mt-3 flex items-start gap-2 rounded-lg bg-paper px-3 py-2 text-[0.62rem] leading-relaxed text-muted">
+                  <LockKeyhole className="mt-0.5 size-3 shrink-0 text-teal" aria-hidden="true" />
+                  You will be redirected to ZiniPay to finish payment. Your order is
+                  only released after ZiniPay confirms it.
                 </p>
               ) : null}
             </section>
@@ -759,15 +826,19 @@ export function CheckoutClient({
                   ? "Placing your order"
                   : requiresAccount
                     ? "Sign in to continue"
-                    : `Place order · ${formatMoney(total)}`}
+                    : paymentMethod === "zinipay"
+                      ? `Pay securely · ${formatMoney(total)}`
+                      : `Place order · ${formatMoney(total)}`}
                 {!submitting && !requiresAccount ? (
                   <Check className="size-4" aria-hidden="true" />
                 ) : null}
               </button>
               <p className="mt-3 text-center text-[0.6rem] leading-relaxed text-muted">
-                {form.paymentMethod === "cod"
+                {paymentMethod === "cod"
                   ? "No payment needed now. Pay when the parcel arrives."
-                  : "We will send bKash payment instructions by email after the order."}
+                  : paymentMethod === "zinipay"
+                    ? "You will be redirected to ZiniPay's secure payment page."
+                    : "We will send bKash payment instructions by email after the order."}
               </p>
             </div>
             <div className="flex items-center justify-center gap-2 border-t border-line bg-surface px-5 py-3">

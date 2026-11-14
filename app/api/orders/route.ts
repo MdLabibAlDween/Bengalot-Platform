@@ -2,13 +2,14 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { getBundleComponentSlugs } from "@/lib/bundles";
+import { grantOrderEntitlements } from "@/lib/entitlements";
 import { sendOrderConfirmation } from "@/lib/mail";
 import { evaluatePromoCode, getPromoCodes } from "@/lib/promos";
-import { getResourceLink } from "@/lib/resource-links";
 import { normaliseSettings } from "@/lib/settings";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { normalizeBdPhone } from "@/lib/utils";
+import { createZinipayInvoice, isZinipayConfigured } from "@/lib/zinipay";
 
 export const runtime = "nodejs";
 
@@ -27,7 +28,7 @@ const checkoutSchema = z.object({
   city: z.string().trim().min(2).max(120),
   district: z.string().trim().min(2).max(120),
   notes: z.string().trim().max(1000).optional().nullable(),
-  paymentMethod: z.enum(["cod", "bkash"]),
+  paymentMethod: z.enum(["cod", "bkash", "zinipay"]),
   promoCode: z.string().trim().max(40).optional().nullable(),
   items: z.array(itemSchema).min(1).max(30),
 });
@@ -150,6 +151,15 @@ export async function POST(request: Request) {
 
     const subtotal = lines.reduce((total, item) => total + item.lineTotal, 0);
     const hasPhysical = lines.some((item) => item.product.type === "physical");
+    const hasDigital = lines.some(
+      (item) =>
+        item.product.type !== "physical" ||
+        getBundleComponentSlugs({
+          slug: item.product.slug,
+          type: item.product.type,
+          preview: item.product.preview,
+        }).length > 0,
+    );
     const deliveryFee = hasPhysical
       ? subtotal >= settings.freeDeliveryThreshold
         ? 0
@@ -162,9 +172,39 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           message:
-            "Digital orders need bKash. Cash on delivery is for physical items.",
+            "Digital orders need online payment. Cash on delivery is for printed items.",
         },
         { status: 400 },
+      );
+    }
+
+    if (hasDigital && body.paymentMethod === "cod") {
+      return NextResponse.json(
+        {
+          message:
+            "This order includes digital access. Please pay online so it can unlock.",
+        },
+        { status: 400 },
+      );
+    }
+
+    if (hasDigital && !user) {
+      return NextResponse.json(
+        {
+          message:
+            "Please sign in before buying digital products so access can be added to your library.",
+        },
+        { status: 401 },
+      );
+    }
+
+    if (body.paymentMethod === "zinipay" && !isZinipayConfigured()) {
+      return NextResponse.json(
+        {
+          message:
+            "Online payment is not available yet. Please use cash on delivery or contact support.",
+        },
+        { status: 503 },
       );
     }
 
@@ -224,98 +264,96 @@ export async function POST(request: Request) {
     );
     if (itemsError) throw itemsError;
 
-    if (user) {
-      const componentSlugs = [
-        ...new Set(
-          lines.flatMap((item) =>
-            getBundleComponentSlugs({
-              slug: item.product.slug,
-              type: item.product.type,
-              preview: item.product.preview,
-            }),
-          ),
-        ),
-      ];
+    const isZinipay = body.paymentMethod === "zinipay";
+    let paymentUrl: string | undefined;
 
-      let componentProducts: ProductRow[] = [];
-      if (componentSlugs.length) {
-        const { data, error } = await supabase
+    if (!isZinipay) {
+      for (const item of lines) {
+        if (item.product.type !== "physical") continue;
+        const { error: stockError } = await supabase
           .from("products")
-          .select("id,slug,title,type,format,price,stock")
-          .in("slug", componentSlugs)
-          .eq("is_published", true);
-        if (error) throw error;
-        componentProducts = (data ?? []) as ProductRow[];
+          .update({ stock: Math.max(0, item.product.stock - item.quantity) })
+          .eq("id", item.product.id)
+          .eq("stock", item.product.stock);
+        if (stockError) throw stockError;
       }
 
-      const digitalTargets = [
-        ...lines
-          .filter(
-            (item) =>
-              item.product.type === "digital" ||
-              item.product.type === "bundle",
-          )
-          .map((item) => item.product),
-        ...componentProducts.filter(
-          (product) => product.type === "digital" || product.type === "bundle",
-        ),
-      ];
-      const uniqueTargets = [
-        ...new Map(digitalTargets.map((product) => [product.id, product])).values(),
-      ];
+      await grantOrderEntitlements({
+        orderId: order.id,
+        userId: user?.id ?? null,
+      });
 
-      if (uniqueTargets.length) {
-        const { error: entitlementError } = await supabase
-          .from("entitlements")
-          .upsert(
-            uniqueTargets.map((product) => {
-              const resource = getResourceLink(product.slug);
-              return {
-                user_id: user.id,
-                product_id: product.id,
-                order_id: order.id,
-                title: product.title,
-                access_label: resource.label,
-                access_url: resource.url || null,
-              };
-            }),
-            { onConflict: "user_id,product_id", ignoreDuplicates: true },
-          );
-        if (entitlementError) throw entitlementError;
-      }
-    }
-
-    for (const item of lines) {
-      if (item.product.type !== "physical") continue;
-      const { error: stockError } = await supabase
-        .from("products")
-        .update({ stock: Math.max(0, item.product.stock - item.quantity) })
-        .eq("id", item.product.id)
-        .eq("stock", item.product.stock);
-      if (stockError) throw stockError;
-    }
-
-    await sendOrderConfirmation({
-      order: {
+      await sendOrderConfirmation({
+        order: {
+          order_number: order.order_number,
+          customer_name: body.customerName,
+          email: body.email,
+          address: body.address,
+          city: body.city,
+          district: body.district,
+          subtotal,
+          delivery_fee: deliveryFee,
+          discount,
+          total,
+          payment_method: body.paymentMethod,
+        },
+        items: lines.map((item) => ({
+          title: item.product.title,
+          quantity: item.quantity,
+          line_total: item.lineTotal,
+        })),
+        supportEmail: settings.supportEmail,
+      });
+    } else {
+      const invoice = await createZinipayInvoice({
+        id: order.id,
         order_number: order.order_number,
+        user_id: user?.id ?? null,
         customer_name: body.customerName,
         email: body.email,
+        phone,
         address: body.address,
         city: body.city,
         district: body.district,
+        notes: body.notes ?? null,
         subtotal,
         delivery_fee: deliveryFee,
         discount,
         total,
-        payment_method: body.paymentMethod,
-      },
-      items: lines.map((item) => ({
-        title: item.product.title,
-        quantity: item.quantity,
-        line_total: item.lineTotal,
-      })),
-      supportEmail: settings.supportEmail,
-    });
+        payment_method: "zinipay",
+        payment_status: "pending",
+        status: "processing",
+        created_at: new Date().toISOString(),
+      });
+
+      if (!invoice.ok) {
+        await supabase
+          .from("orders")
+          .update({ status: "cancelled" })
+          .eq("id", order.id);
+
+        await supabase.from("admin_audit").insert({
+          action: "payment.zinipay.create_failed",
+          actor_email: body.email,
+          entity: "order",
+          entity_id: order.id,
+          after: {
+            order_number: order.order_number,
+            message: invoice.message,
+            total,
+          },
+        });
+
+        return NextResponse.json(
+          {
+            message: `Your order was saved, but the payment page could not open. ${invoice.message} Please try again.`,
+          },
+          { status: 502 },
+        );
+      }
+
+      paymentUrl = invoice.paymentUrl;
+    }
 
     const response = NextResponse.json({
       orderNumber: order.order_number,
@@ -325,6 +363,8 @@ export async function POST(request: Request) {
       promoCode: appliedPromo,
       total,
       signedIn: Boolean(user),
+      paymentUrl,
+      requiresPayment: Boolean(paymentUrl),
     });
 
     // Guest confirmation pages need a scoped key. The order number in the URL

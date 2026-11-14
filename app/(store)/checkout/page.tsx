@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { CheckoutClient } from "@/components/checkout/checkout-client";
 import { getCurrentUser } from "@/lib/auth";
 import { getCatalog } from "@/lib/data/catalog";
+import { isZinipayConfigured } from "@/lib/zinipay";
 
 export const metadata: Metadata = {
   title: "Checkout",
@@ -16,6 +17,7 @@ export default async function CheckoutPage() {
   return (
     <CheckoutClient
       settings={catalog.settings}
+      zinipayEnabled={isZinipayConfigured()}
       user={
         current?.user
           ? {

@@ -137,7 +137,7 @@ export function BuyPanel({ product }: { product: Product }) {
           <div>
             <p className="text-[0.62rem] font-bold text-ink">Secure checkout</p>
             <p className="mt-0.5 text-[0.56rem] leading-relaxed text-muted">
-              {isPhysical ? "Cash on delivery or bKash" : "bKash · manual confirmation"}
+              {isPhysical ? "Cash on delivery or online payment" : "bKash · Nagad · secure checkout"}
             </p>
           </div>
         </div>

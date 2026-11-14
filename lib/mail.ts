@@ -155,7 +155,9 @@ export async function sendOrderConfirmation({
   const payment =
     order.payment_method === "cod"
       ? "Cash on delivery — no payment is needed now. Please have the exact amount ready when the parcel arrives."
-      : "bKash — we will send payment instructions shortly. Digital access unlocks once payment is confirmed.";
+      : order.payment_method === "zinipay"
+        ? "Paid securely through ZiniPay (bKash, Nagad, Rocket or Upay). Digital access is ready in your account library."
+        : "bKash — we will send payment instructions shortly. Digital access unlocks once payment is confirmed.";
 
   const itemRows = items
     .map(

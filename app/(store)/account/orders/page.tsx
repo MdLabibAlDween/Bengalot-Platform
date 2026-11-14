@@ -15,6 +15,7 @@ import { requireUser } from "@/lib/auth";
 import { getAccountSnapshot } from "@/lib/account";
 import { hasDigitalContent } from "@/lib/bundles";
 import { getCatalog } from "@/lib/data/catalog";
+import { paymentMethodLabel } from "@/lib/payment-labels";
 import { orderStatusMeta, orderTimeline } from "@/lib/order-status";
 import { formatDate, formatMoney } from "@/lib/utils";
 
@@ -50,9 +51,11 @@ export default async function OrdersPage() {
             const hasPhysical = order.order_items.some(
               (item) => item.type === "physical",
             );
-            const hasDigital = order.order_items.some((item) =>
-              hasDigitalContent(item),
-            );
+            const hasDigital =
+              order.order_items.some((item) => hasDigitalContent(item)) ||
+              snapshot.entitlements.some(
+                (entitlement) => entitlement.order_id === order.id,
+              );
             return (
               <article
                 key={order.id}
@@ -89,7 +92,7 @@ export default async function OrdersPage() {
                         {formatMoney(order.total)}
                       </p>
                       <p className="mt-1 text-[0.58rem] uppercase tracking-[0.08em] text-muted">
-                        {order.payment_method === "cod" ? "Cash on delivery" : "bKash"}
+                        {paymentMethodLabel(order.payment_method)}
                       </p>
                     </div>
                   </div>
@@ -211,7 +214,7 @@ export default async function OrdersPage() {
                       ) : (
                         <Smartphone className="size-3" aria-hidden="true" />
                       )}
-                      {order.payment_method === "cod" ? "Cash on delivery" : "bKash"} ·{" "}
+                      {paymentMethodLabel(order.payment_method)} ·{" "}
                       {order.payment_status}
                     </span>
                     {hasPhysical ? (

@@ -13,12 +13,14 @@ import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
 import { getCurrentUser, STAFF_ROLES } from "@/lib/auth";
+import { RetryZinipayButton } from "@/components/checkout/retry-zinipay-button";
+import { paymentMethodLabel } from "@/lib/payment-labels";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { Order, OrderItem } from "@/lib/types";
 import { formatDate, formatMoney } from "@/lib/utils";
 
 type PageProps = {
-  searchParams: Promise<{ order?: string }>;
+  searchParams: Promise<{ order?: string; payment?: string }>;
 };
 
 export const metadata: Metadata = {
@@ -27,7 +29,7 @@ export const metadata: Metadata = {
 };
 
 export default async function OrderSuccessPage({ searchParams }: PageProps) {
-  const { order: orderNumber } = await searchParams;
+  const { order: orderNumber, payment } = await searchParams;
   if (!orderNumber) notFound();
 
   const supabase = createSupabaseAdminClient();
@@ -68,6 +70,9 @@ export default async function OrderSuccessPage({ searchParams }: PageProps) {
   const hasDigital =
     typedItems.some((item) => item.type !== "physical") ||
     Boolean(entitlementResult.data?.length);
+  const isZinipay = typedOrder.payment_method === "zinipay";
+  const paymentPending = isZinipay && typedOrder.payment_status !== "paid";
+  const paymentFailed = payment === "failed" || payment === "error" || payment === "mismatch";
 
   return (
     <div className="bg-cream">
@@ -90,32 +95,44 @@ export default async function OrderSuccessPage({ searchParams }: PageProps) {
             <div className="max-w-[38rem]">
               <span className="inline-flex items-center gap-2 rounded-full border border-butter/30 bg-butter/10 px-3.5 py-2 text-[0.58rem] font-extrabold uppercase tracking-[0.14em] text-butter">
                 <Check className="size-3.5" aria-hidden="true" />
-                Order received
+                {paymentPending ? "Payment pending" : "Order received"}
               </span>
               <h1 className="display-xl mt-6 text-cream">
-                A clearer week
-                <br />
-                <span className="display-italic text-butter">
-                  starts here.
-                </span>
+                {paymentPending ? (
+                  <>
+                    One step
+                    <br />
+                    <span className="display-italic text-butter">
+                      still open.
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    A clearer week
+                    <br />
+                    <span className="display-italic text-butter">
+                      starts here.
+                    </span>
+                  </>
+                )}
               </h1>
               <p className="mt-5 max-w-[28rem] text-[0.92rem] leading-[1.8] text-cream/65">
-                Thank you, {typedOrder.customer_name.split(" ")[0]}. We have
-                your order and a human will check it before it leaves the
-                studio. A receipt is on its way to {typedOrder.email}.
+                {paymentPending
+                  ? `Your order ${typedOrder.order_number} is saved, but ZiniPay has not confirmed the payment yet. You can retry the secure payment page below${paymentFailed ? " — the last attempt did not complete" : ""}.`
+                  : `Thank you, ${typedOrder.customer_name.split(" ")[0]}. We have your order and a human will check it before it leaves the studio. A receipt is on its way to ${typedOrder.email}.`}
               </p>
               <div className="mt-7 flex flex-wrap items-center gap-3">
-                <Link
-                  href={
-                    hasDigital
-                      ? "/account/library"
-                      : "/shop"
-                  }
-                  className="btn btn-butter btn-lg"
-                >
-                  {hasDigital ? "Open your library" : "Continue shopping"}
-                  <ArrowRight className="size-4" aria-hidden="true" />
-                </Link>
+                {paymentPending ? (
+                  <RetryZinipayButton orderNumber={typedOrder.order_number} />
+                ) : (
+                  <Link
+                    href={hasDigital ? "/account/library" : "/shop"}
+                    className="btn btn-butter btn-lg"
+                  >
+                    {hasDigital ? "Open your library" : "Continue shopping"}
+                    <ArrowRight className="size-4" aria-hidden="true" />
+                  </Link>
+                )}
                 <a
                   href="https://wa.me/8801341739202"
                   target="_blank"
@@ -150,7 +167,14 @@ export default async function OrderSuccessPage({ searchParams }: PageProps) {
                 <div className="flex justify-between gap-4">
                   <span className="text-cream/45">Payment</span>
                   <span className="text-cream/80">
-                    {typedOrder.payment_method === "cod" ? "Cash on delivery" : "bKash · awaiting confirmation"}
+                    {paymentMethodLabel(typedOrder.payment_method)}
+                    {isZinipay
+                      ? typedOrder.payment_status === "paid"
+                        ? " · paid"
+                        : " · pending"
+                      : typedOrder.payment_method === "bkash"
+                        ? " · awaiting confirmation"
+                        : ""}
                   </span>
                 </div>
                 <div className="flex justify-between gap-4">
@@ -240,15 +264,38 @@ export default async function OrderSuccessPage({ searchParams }: PageProps) {
                 </div>
               </div>
             ) : null}
+            {paymentPending ? (
+              <div className="flex gap-3 rounded-2xl border border-butter/60 bg-butter-soft/40 p-4">
+                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-butter text-ink">
+                  <Clock className="size-4" aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="text-[0.76rem] font-bold text-ink">Payment has not landed yet</p>
+                  <p className="mt-1 text-[0.68rem] leading-relaxed text-muted">
+                    Use the payment button above to reopen the secure ZiniPay page. Nothing is released until ZiniPay confirms it.
+                  </p>
+                </div>
+              </div>
+            ) : null}
             {hasDigital ? (
               <div className="flex gap-3 rounded-2xl border border-line bg-surface p-4">
                 <span className="grid size-9 shrink-0 place-items-center rounded-full bg-coral/10 text-coral">
                   <BookOpen className="size-4" aria-hidden="true" />
                 </span>
                 <div>
-                  <p className="text-[0.76rem] font-bold text-ink">Digital access is being prepared</p>
+                  <p className="text-[0.76rem] font-bold text-ink">
+                    {isZinipay && typedOrder.payment_status === "paid"
+                      ? "Your library is ready"
+                      : paymentPending
+                        ? "Unlocks after payment"
+                        : "Digital access is being prepared"}
+                  </p>
                   <p className="mt-1 text-[0.68rem] leading-relaxed text-muted">
-                    We confirm bKash payments by hand. Your resource appears in the library once confirmed — usually within a few hours.
+                    {isZinipay
+                      ? typedOrder.payment_status === "paid"
+                        ? "Your digital tools are in your account library now."
+                        : "Finish the payment above and your tools appear in the library automatically."
+                      : "We confirm bKash payments by hand. Your resource appears in the library once confirmed — usually within a few hours."}
                   </p>
                 </div>
               </div>
