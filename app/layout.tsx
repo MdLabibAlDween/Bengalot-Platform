@@ -74,7 +74,7 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className={`${fraunces.variable} ${manrope.variable} ${anekBangla.variable}`}
     >
-      <body>
+      <body suppressHydrationWarning>
         <MotionProvider>
           <CartProvider>{children}</CartProvider>
         </MotionProvider>
