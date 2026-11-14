@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { z } from "zod";
 
 import { sendNewsletterWelcome } from "@/lib/mail";
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
 
     if (error && error.code !== "23505") throw error;
     if (!error) {
-      await sendNewsletterWelcome(email);
+      after(() => sendNewsletterWelcome(email));
     }
 
     return NextResponse.json({

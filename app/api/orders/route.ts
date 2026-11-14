@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { z } from "zod";
 
 import { getBundleComponentSlugs } from "@/lib/bundles";
@@ -283,27 +283,29 @@ export async function POST(request: Request) {
         userId: user?.id ?? null,
       });
 
-      await sendOrderConfirmation({
-        order: {
-          order_number: order.order_number,
-          customer_name: body.customerName,
-          email: body.email,
-          address: body.address,
-          city: body.city,
-          district: body.district,
-          subtotal,
-          delivery_fee: deliveryFee,
-          discount,
-          total,
-          payment_method: body.paymentMethod,
-        },
-        items: lines.map((item) => ({
-          title: item.product.title,
-          quantity: item.quantity,
-          line_total: item.lineTotal,
-        })),
-        supportEmail: settings.supportEmail,
-      });
+      after(() =>
+        sendOrderConfirmation({
+          order: {
+            order_number: order.order_number,
+            customer_name: body.customerName,
+            email: body.email,
+            address: body.address,
+            city: body.city,
+            district: body.district,
+            subtotal,
+            delivery_fee: deliveryFee,
+            discount,
+            total,
+            payment_method: body.paymentMethod,
+          },
+          items: lines.map((item) => ({
+            title: item.product.title,
+            quantity: item.quantity,
+            line_total: item.lineTotal,
+          })),
+          supportEmail: settings.supportEmail,
+        }),
+      );
     } else {
       const invoice = await createZinipayInvoice({
         id: order.id,

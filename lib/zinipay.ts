@@ -1,6 +1,9 @@
 import "server-only";
 
 import { createHmac, timingSafeEqual } from "node:crypto";
+
+import { after } from "next/server";
+
 import { decrementOrderStock, grantOrderEntitlements } from "@/lib/entitlements";
 import { publicEnv } from "@/lib/env";
 import { sendOrderConfirmation } from "@/lib/mail";
@@ -322,27 +325,30 @@ export async function syncZinipayOrder(
     }
 
     const items = await orderItems(order.id);
-    await sendOrderConfirmation({
-      order: {
-        order_number: order.order_number,
-        customer_name: order.customer_name,
-        email: order.email,
-        address: order.address,
-        city: order.city,
-        district: order.district,
-        subtotal: order.subtotal,
-        delivery_fee: order.delivery_fee,
-        discount: order.discount,
-        total: order.total,
-        payment_method: "zinipay",
-      },
-      items: items.map((item) => ({
-        title: item.title,
-        quantity: item.quantity,
-        line_total: item.line_total,
-      })),
-      supportEmail: await storeSupportEmail(),
-    });
+    const supportEmail = await storeSupportEmail();
+    after(() =>
+      sendOrderConfirmation({
+        order: {
+          order_number: order.order_number,
+          customer_name: order.customer_name,
+          email: order.email,
+          address: order.address,
+          city: order.city,
+          district: order.district,
+          subtotal: order.subtotal,
+          delivery_fee: order.delivery_fee,
+          discount: order.discount,
+          total: order.total,
+          payment_method: "zinipay",
+        },
+        items: items.map((item) => ({
+          title: item.title,
+          quantity: item.quantity,
+          line_total: item.line_total,
+        })),
+        supportEmail,
+      }),
+    );
 
     await supabase.from("admin_audit").insert({
       action: "payment.zinipay.confirmed",

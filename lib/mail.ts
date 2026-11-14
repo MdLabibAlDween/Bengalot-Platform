@@ -25,7 +25,7 @@ const warnedMissing = new Set<MailAccountKind>();
 function getTransporter(
   config: NonNullable<ReturnType<typeof getMailAccount>>,
 ) {
-  const key = `${config.host}:${config.port}:${config.secure}:${config.user}`;
+  const key = `${config.host}:${config.port}:${config.secure}:${config.user}:${config.pass}`;
   const existing = transporters.get(key);
   if (existing) return existing;
 
@@ -34,6 +34,9 @@ function getTransporter(
     port: config.port,
     secure: config.secure,
     auth: { user: config.user, pass: config.pass },
+    connectionTimeout: 8000,
+    greetingTimeout: 8000,
+    socketTimeout: 15000,
   });
   transporters.set(key, transporter);
   return transporter;

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { z } from "zod";
 
 import { sendContactAcknowledgement, sendContactNotification } from "@/lib/mail";
@@ -26,13 +26,15 @@ export async function POST(request: Request) {
 
     const supportEmail =
       process.env.MAIL_SUPPORT_EMAIL?.trim() || "support@bengalot.com";
-    await Promise.all([
-      sendContactAcknowledgement({
-        ...parsed.data,
-        supportEmail,
-      }),
-      sendContactNotification(parsed.data),
-    ]);
+    after(() =>
+      Promise.all([
+        sendContactAcknowledgement({
+          ...parsed.data,
+          supportEmail,
+        }),
+        sendContactNotification(parsed.data),
+      ]),
+    );
 
     return NextResponse.json({
       message: "Thank you — we usually reply within one working day.",
